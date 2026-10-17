@@ -1,0 +1,61 @@
+---
+// Wordmark: the first "o" of "oo" is a sun resting on the baseline — a Paris sunset.
+interface Props {
+  href: string;
+  rise?: boolean;
+}
+const { href, rise = false } = Astro.props;
+---
+
+<a class:list={['logo', { rise }]} href={href} aria-label="Luminoor">
+  <span aria-hidden="true">Lumin<span class="sun"><span></span></span>or</span>
+</a>
+
+<style>
+  .logo {
+    font-family: var(--display);
+    font-size: 1.7rem;
+    font-weight: 500;
+    letter-spacing: 0.005em;
+    text-decoration: none;
+    color: inherit;
+    white-space: nowrap;
+    isolation: isolate;
+  }
+  .sun {
+    display: inline-block;
+    width: 0.6em;
+    height: 0.54em;
+    margin-inline: 0.02em 0.03em;
+    overflow: hidden;
+    position: relative;
+    vertical-align: -0.02em;
+    box-shadow: inset 0 -0.04em 0 currentColor;
+  }
+  .sun > span {
+    position: absolute;
+    left: 0.03em;
+    top: 0;
+    width: 0.54em;
+    height: 0.54em;
+    border-radius: 50%;
+    background: var(--gold);
+    z-index: -1;
+  }
+  .rise .sun > span {
+    animation: rise 1.6s cubic-bezier(0.2, 0.7, 0.2, 1) 0.2s both;
+  }
+  @keyframes rise {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .rise .sun > span {
+      animation: none;
+    }
+  }
+</style>

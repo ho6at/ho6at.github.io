@@ -1,0 +1,54 @@
+---
+import Base from '../../layouts/Base.astro';
+import { site } from '../../site';
+---
+
+<Base
+  lang="fr"
+  title="Mentions légales — Luminoor"
+  description="Mentions légales du site Luminoor."
+  altHref="/en/"
+  altLang="en"
+>
+  <main class="wrap legal">
+    <a class="textlink" href="/">Luminoor</a>
+    <h1>Mentions légales</h1>
+    <!-- TODO: compléter après l'immatriculation de la société -->
+    <h2>Éditeur du site</h2>
+    <p>Luminoor SAS, au capital de [montant] €</p>
+    <p>Siège social : [adresse], Paris</p>
+    <p>RCS Paris [numéro] · SIRET [numéro] · TVA intracommunautaire [numéro]</p>
+    <p>Directeur de la publication : [nom du président]</p>
+    <p>Contact : <a href={`mailto:${site.email}`}>{site.email}</a></p>
+    <h2>Hébergement</h2>
+    <p>[Nom de l’hébergeur, adresse, téléphone]</p>
+    <h2>Propriété intellectuelle</h2>
+    <p>
+      Les photos et vidéos de ce site appartiennent à Luminoor ou à leurs auteurs. Toute reproduction sans
+      autorisation écrite est interdite.
+    </p>
+    <h2>Données personnelles</h2>
+    <p>
+      Les informations que vous nous envoyez par e-mail servent uniquement à répondre à votre demande. Pour les
+      consulter ou les supprimer, écrivez à <a href={`mailto:${site.email}`}>{site.email}</a>.
+    </p>
+  </main>
+</Base>
+
+<style>
+  .legal {
+    max-width: 44rem;
+    padding-block: 3rem 5rem;
+  }
+  h1 {
+    font-size: clamp(2.5rem, 6vw, 3.5rem);
+    margin: 2rem 0 1rem;
+  }
+  h2 {
+    font-size: 1.5rem;
+    margin: 2.25rem 0 0.5rem;
+  }
+  p + p {
+    margin-top: 0.35rem;
+  }
+</style>

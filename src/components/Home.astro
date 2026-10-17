@@ -1,0 +1,1226 @@
+---
+import Photo from './Photo.astro';
+import Logo from './Logo.astro';
+import { site } from '../site';
+import type fr from '../i18n/fr';
+
+interface Props {
+  t: typeof fr;
+}
+const { t } = Astro.props;
+const home = t.lang === 'fr' ? '/' : '/en/';
+const quoteHref = `mailto:${site.email}?subject=${encodeURIComponent(t.brands.quoteSubject)}`;
+const lights = ['dawn', 'day', 'golden', 'blue'] as const;
+const strings = {
+  names: t.light.names,
+  moods: t.light.moods,
+  locale: t.locale,
+  email: site.email,
+  whatsapp: site.whatsapp,
+  subject: t.sessions.subject,
+  message: t.sessions.message,
+  around: t.sessions.around,
+  packages: t.sessions.packages,
+  people: t.sessions.people,
+};
+---
+
+<header class="top" data-top>
+  <div class="wrap bar">
+    <Logo href={home} rise />
+    <nav aria-label="Main">
+      <a class="hide-sm" href="#sessions">{t.nav.sessions}</a>
+      <a class="hide-sm" href="#places">{t.nav.places}</a>
+      <a class="hide-sm" href="#brands">{t.nav.brands}</a>
+      <a class="hide-sm" href="#team">{t.nav.about}</a>
+      <a href="#contact">{t.nav.contact}</a>
+      <a class="lang" href={t.nav.switchHref} hreflang={t.lang === 'fr' ? 'en' : 'fr'} aria-label={t.nav.switchName}
+        >{t.nav.switchLabel}</a
+      >
+    </nav>
+  </div>
+</header>
+
+<main data-strings={JSON.stringify(strings)}>
+  <!-- Hero: the sky follows the real light in Paris, and the visitor can drag the sun -->
+  <section class="hero sky" id="hero">
+    <div class="wrap hero-inner">
+      <p class="live" aria-live="polite">
+        <span class="live-dot" aria-hidden="true"></span>
+        {t.light.now} <strong data-clock>--:--</strong> · <span data-live-phase></span>
+      </p>
+      <h1>{t.hero.title}</h1>
+      <p class="hero-lead">{t.hero.lead}</p>
+
+      <div class="dial">
+        <div class="dial-track">
+          <svg class="dial-arc" viewBox="0 0 1000 200" preserveAspectRatio="none" aria-hidden="true">
+            <line x1="0" x2="1000" y1="150" y2="150" vector-effect="non-scaling-stroke" class="horizon"></line>
+            <path data-arc vector-effect="non-scaling-stroke"></path>
+          </svg>
+          <span class="tick" data-tick="sunrise"><span>{t.light.sunrise}</span> <time></time></span>
+          <span class="tick" data-tick="sunset"><span>{t.light.sunset}</span> <time></time></span>
+          <span class="dial-sun" data-sun aria-hidden="true"></span>
+          <input type="range" min="0" max="1000" step="1" value="700" data-dial aria-label={t.light.dialLabel} />
+        </div>
+        <div class="readout">
+          <div>
+            <p class="readout-name"><span data-dial-name></span> <strong data-dial-time></strong></p>
+            <p class="readout-mood" data-dial-mood></p>
+          </div>
+          <div class="readout-actions">
+            <a class="button" href="#sessions" data-dial-book>{t.light.book}</a>
+            <a class="button ghost" href="#brands">{t.hero.ctaSecondary}</a>
+          </div>
+        </div>
+        <p class="hint">{t.light.hint}</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Session composer -->
+  <section class="block wrap" id="sessions">
+    <div class="block-head">
+      <h2>{t.sessions.title}</h2>
+      <p class="lead">{t.sessions.lead}</p>
+    </div>
+
+    <form class="composer" data-composer>
+      <div class="composer-fields">
+        <fieldset class="packages">
+          <legend class="label">{t.sessions.packageLabel}</legend>
+          {
+            t.sessions.packages.map((p, i) => (
+              <label class="package">
+                <input type="radio" name="package" value={p.id} checked={i === 1} />
+                <span class="package-name">{p.name}</span>
+                <span class="package-meta">
+                  {p.duration}, {p.places}
+                </span>
+                <span class="package-body">{p.includes}</span>
+                <span class="package-price">{p.price} €</span>
+              </label>
+            ))
+          }
+        </fieldset>
+
+        <div class="field-row">
+          <label class="field">
+            <span class="label">{t.sessions.dateLabel}</span>
+            <input type="date" name="date" data-date required />
+          </label>
+          <fieldset class="field">
+            <legend class="label">{t.sessions.peopleLabel}</legend>
+            <div class="chips">
+              {
+                t.sessions.people.map((n, i) => (
+                  <label class="chip">
+                    <input type="radio" name="people" value={String(i + 1)} checked={i === 1} />
+                    <span>{n}</span>
+                  </label>
+                ))
+              }
+            </div>
+          </fieldset>
+        </div>
+
+        <fieldset class="field">
+          <legend class="label">{t.sessions.lightLabel}</legend>
+          <div class="lights">
+            {
+              lights.map((l) => (
+                <label class={`light light-${l}`}>
+                  <input type="radio" name="light" value={l} checked={l === 'golden'} />
+                  <span class="light-swatch" aria-hidden="true" />
+                  <span class="light-name">{t.light.names[l]}</span>
+                  <span class="light-time" data-light-time={l} />
+                </label>
+              ))
+            }
+          </div>
+        </fieldset>
+
+        <label class="field">
+          <span class="label">{t.sessions.nameLabel}</span>
+          <input type="text" name="name" autocomplete="given-name" placeholder={t.sessions.namePlaceholder} />
+        </label>
+      </div>
+
+      <aside class="ticket" aria-live="polite">
+        <p class="label">{t.sessions.summary}</p>
+        <p class="ticket-package" data-sum-package></p>
+        <p class="ticket-line" data-sum-date></p>
+        <p class="ticket-line" data-sum-light></p>
+        <p class="ticket-price" data-sum-price></p>
+        <p class="ticket-note" data-group-note hidden>{t.sessions.groupNote}</p>
+        <p class="ticket-note">{t.sessions.priceNote}</p>
+        <div class="ticket-actions">
+          <a class="button" data-send-email href={`mailto:${site.email}`}>{t.sessions.sendEmail}</a>
+          {site.whatsapp && <a class="button ghost" data-send-wa href={site.whatsapp}>{t.sessions.sendWhatsapp}</a>}
+        </div>
+        <p class="ticket-note">{t.sessions.reassurance}</p>
+      </aside>
+    </form>
+    <p class="note">{t.sessions.extras}</p>
+  </section>
+
+  <!-- Places, each with its best light -->
+  <section class="block wrap" id="places">
+    <div class="block-head">
+      <h2>{t.places.title}</h2>
+      <p class="lead">{t.places.lead}</p>
+    </div>
+    <div class="places">
+      <ul class="place-list">
+        {
+          t.places.items.map((p, i) => (
+            <li class={`place light-${p.light}`} data-place={i} data-light={p.light}>
+              <button type="button" class="place-button" data-choose-light={p.light}>
+                <span class="place-name">{p.name}</span>
+                <span class="place-light">
+                  <span class="light-swatch" aria-hidden="true" />
+                  {t.light.names[p.light as keyof typeof t.light.names]}
+                </span>
+                <span class="place-note">{p.note}</span>
+                <span class="place-choose">{t.places.choose}</span>
+              </button>
+            </li>
+          ))
+        }
+      </ul>
+      <div class="place-preview" data-preview aria-hidden="true">
+        {
+          t.places.items.map((p, i) => (
+            <Photo
+              tone={p.light as 'dawn' | 'day' | 'golden' | 'blue'}
+              alt={`Photo : ${p.name}`}
+              ratio="4 / 5"
+              data-preview-photo={i}
+            />
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Brands, on a blue-hour band -->
+  <section class="brands" id="brands">
+    <div class="wrap">
+      <div class="block-head">
+        <h2>{t.brands.title}</h2>
+        <p class="lead">{t.brands.lead}</p>
+      </div>
+    </div>
+    <div class="reels" tabindex="0" aria-label={t.brands.title}>
+      {
+        t.brands.reels.map((r) => (
+          <figure class="reel">
+            <div class="reel-screen">
+              <span class="reel-play" aria-hidden="true" />
+            </div>
+            <figcaption>{r}</figcaption>
+          </figure>
+        ))
+      }
+    </div>
+    <div class="wrap">
+      <ul class="offers">
+        {
+          t.brands.offers.map((o) => (
+            <li class="offer">
+              <h3>{o.name}</h3>
+              <p class="offer-body">{o.includes}</p>
+              <p class="offer-price">{o.price}</p>
+            </li>
+          ))
+        }
+      </ul>
+      <p class="note">{t.brands.rights}</p>
+
+      <h3 class="steps-title">{t.brands.stepsTitle}</h3>
+      <ol class="steps">
+        {
+          t.brands.steps.map((s) => (
+            <li>
+              <strong>{s.name}</strong>
+              <p>{s.body}</p>
+            </li>
+          ))
+        }
+      </ol>
+      <a class="button" href={quoteHref}>{t.brands.cta}</a>
+    </div>
+  </section>
+
+  <!-- Team and the name -->
+  <section class="block wrap" id="team">
+    <div class="block-head">
+      <h2>{t.about.title}</h2>
+      <p class="lead">{t.about.languages}</p>
+    </div>
+    <div class="people">
+      {
+        t.about.people.map((p) => (
+          <article class="person">
+            <Photo alt={`Portrait : ${p.name}`} ratio="4 / 5" />
+            <h3>{p.name}</h3>
+            <p class="role">{p.role}</p>
+            <p>{p.body}</p>
+          </article>
+        ))
+      }
+      <aside class="name-story">
+        <p class="name-words" aria-hidden="true">
+          <span>lumière</span>
+          <span lang="fa" dir="rtl">نور</span>
+        </p>
+        <h3>{t.about.nameTitle}</h3>
+        <p>{t.about.nameBody}</p>
+      </aside>
+    </div>
+  </section>
+
+  <section class="block wrap faq" id="faq">
+    <h2>{t.faq.title}</h2>
+    <div class="faq-list">
+      {
+        t.faq.items.map((item) => (
+          <details>
+            <summary>{item.q}</summary>
+            <p>{item.a}</p>
+          </details>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="contact sky" id="contact">
+    <div class="wrap contact-inner">
+      <h2>{t.contact.title}</h2>
+      <p class="lead">{t.contact.lead}</p>
+      <div class="actions">
+        <a class="button" href={`mailto:${site.email}`}>{t.contact.email}</a>
+        <a class="button ghost" href={site.instagram} rel="noopener">{t.contact.instagram}</a>
+        {site.whatsapp && <a class="button ghost" href={site.whatsapp} rel="noopener">{t.contact.whatsapp}</a>}
+      </div>
+      <p class="contact-mail"><a href={`mailto:${site.email}`}>{site.email}</a></p>
+    </div>
+  </section>
+</main>
+
+<footer class="wrap foot">
+  <Logo href={home} />
+  <p>© {new Date().getFullYear()} Luminoor, {site.city}. {t.footer.rights}</p>
+  <a href={t.footer.legalHref}>{t.footer.legal}</a>
+</footer>
+
+<script>
+  import '../scripts/home';
+</script>
+
+<style>
+  /* ---------- Header ---------- */
+  .top {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 10;
+    color: var(--sky-ink, var(--ink));
+    transition:
+      background 0.4s ease,
+      color 0.4s ease,
+      box-shadow 0.4s ease;
+  }
+  .top:global(.scrolled) {
+    background: rgb(251 251 249 / 0.86);
+    backdrop-filter: blur(14px);
+    color: var(--ink);
+    box-shadow: 0 1px 0 var(--rule);
+  }
+  .bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-block: 1rem;
+  }
+  nav {
+    display: flex;
+    align-items: center;
+    gap: clamp(0.9rem, 2.4vw, 2rem);
+    font-size: 0.95rem;
+  }
+  nav a {
+    text-decoration: none;
+    color: inherit;
+  }
+  nav a:hover {
+    text-decoration: underline;
+    text-underline-offset: 0.35em;
+    text-decoration-thickness: 1px;
+  }
+  .lang {
+    border: 1px solid currentColor;
+    border-radius: 999px;
+    padding: 0.15rem 0.6rem;
+    font-size: 0.8rem;
+    letter-spacing: 0.04em;
+  }
+
+  /* ---------- Sky (shared by hero and contact) ---------- */
+  .sky {
+    position: relative;
+    color: var(--sky-ink, var(--ink));
+    background: linear-gradient(175deg, var(--sky-1, #efbd74) 0%, var(--sky-2, #f6d7a4) 52%, var(--sky-3, #fbefdc) 100%);
+    isolation: isolate;
+  }
+  .sky::after {
+    /* film grain */
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    opacity: 0.16;
+    mix-blend-mode: overlay;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    min-height: min(100svh, 62rem);
+    display: flex;
+    padding-block: 6.5rem 2.5rem;
+  }
+  .hero-inner {
+    display: flex;
+    flex-direction: column;
+  }
+  .live {
+    font-size: 0.9rem;
+    opacity: 0.85;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: clamp(1.5rem, 4vh, 3rem);
+  }
+  .live strong {
+    font-variant-numeric: tabular-nums;
+  }
+  .live-dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: var(--gold);
+    box-shadow: 0 0 0 0 rgb(217 146 46 / 0.6);
+    animation: pulse 2.4s ease-out infinite;
+  }
+  @keyframes pulse {
+    to {
+      box-shadow: 0 0 0 0.6rem rgb(217 146 46 / 0);
+    }
+  }
+  h1 {
+    font-size: clamp(3.1rem, 9.6vw, 9rem);
+    font-weight: 400;
+    line-height: 0.94;
+    letter-spacing: -0.035em;
+    max-width: 10em;
+  }
+  .hero-lead {
+    margin-top: 2.5rem;
+    font-size: 1.1875rem;
+    max-width: 31em;
+    opacity: 0.82;
+  }
+
+  /* Light dial */
+  .dial {
+    margin-top: auto;
+    padding-top: clamp(2rem, 6vh, 4rem);
+  }
+  .dial-track {
+    position: relative;
+    height: clamp(110px, 18vh, 170px);
+  }
+  .dial-arc {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+  .dial-arc path {
+    fill: none;
+    stroke: currentColor;
+    stroke-opacity: 0.45;
+    stroke-width: 1;
+    stroke-dasharray: 2 5;
+  }
+  .horizon {
+    stroke: currentColor;
+    stroke-opacity: 0.55;
+    stroke-width: 1;
+  }
+  .tick {
+    position: absolute;
+    top: 75%;
+    transform: translate(-50%, 0.6rem);
+    font-size: 0.8rem;
+    white-space: nowrap;
+    opacity: 0.8;
+  }
+  .tick time {
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+  }
+  .dial-sun {
+    position: absolute;
+    width: 2.75rem;
+    height: 2.75rem;
+    margin: -1.375rem 0 0 -1.375rem;
+    border-radius: 50%;
+    background: radial-gradient(circle at 40% 38%, #ffe2a8, var(--gold) 62%);
+    box-shadow:
+      0 0 0 0.45rem rgb(255 214 140 / 0.22),
+      0 0 3rem 0.6rem rgb(255 190 90 / 0.45);
+    pointer-events: none;
+    transition: box-shadow 0.3s ease;
+  }
+  .dial-track:has(input:focus-visible) .dial-sun {
+    outline: 2px solid currentColor;
+    outline-offset: 6px;
+  }
+  .dial-track:hover .dial-sun,
+  .dial-track:has(input:active) .dial-sun {
+    box-shadow:
+      0 0 0 0.7rem rgb(255 214 140 / 0.28),
+      0 0 3.5rem 0.9rem rgb(255 190 90 / 0.55);
+  }
+  .dial input {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    opacity: 0;
+    cursor: grab;
+    touch-action: pan-y;
+  }
+  .dial input:active {
+    cursor: grabbing;
+  }
+  .readout {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: end;
+    gap: 1.25rem 2rem;
+    margin-top: 2.5rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid color-mix(in srgb, currentColor 30%, transparent);
+  }
+  .readout-name {
+    font-family: var(--display);
+    font-size: clamp(1.75rem, 3.4vw, 2.6rem);
+    line-height: 1.1;
+  }
+  .readout-name strong {
+    font-weight: 400;
+    font-style: italic;
+    font-variant-numeric: tabular-nums;
+    margin-left: 0.35em;
+  }
+  .readout-mood {
+    opacity: 0.82;
+    margin-top: 0.35rem;
+  }
+  .readout-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+  .hint {
+    font-size: 0.85rem;
+    opacity: 0.7;
+    margin-top: 1rem;
+  }
+  .hero .button.ghost,
+  .contact .button.ghost {
+    color: inherit;
+  }
+
+  /* ---------- Sections ---------- */
+  .block {
+    padding-block: clamp(5rem, 11vw, 9rem) 0;
+  }
+  .block-head {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    gap: 1rem 3rem;
+    align-items: end;
+    margin-bottom: clamp(2rem, 5vw, 3.5rem);
+  }
+  .label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--zinc);
+    margin-bottom: 0.6rem;
+    padding: 0;
+  }
+  fieldset {
+    border: 0;
+    margin: 0;
+    padding: 0;
+    min-width: 0;
+  }
+  .note {
+    margin-top: 1.5rem;
+    color: var(--zinc);
+    max-width: 44em;
+  }
+
+  /* ---------- Composer ---------- */
+  .composer {
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+    gap: clamp(2rem, 5vw, 4.5rem);
+    align-items: start;
+  }
+  .composer-fields {
+    display: grid;
+    gap: 2.25rem;
+  }
+  .packages .package:first-of-type {
+    border-top: 1px solid var(--ink);
+  }
+  .package {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.2rem 1.5rem;
+    padding: 1.35rem 1rem 1.35rem 2.75rem;
+    border-bottom: 1px solid var(--rule);
+    cursor: pointer;
+    transition: background 0.25s ease;
+  }
+  .package::before {
+    content: '';
+    position: absolute;
+    left: 0.75rem;
+    top: 1.85rem;
+    width: 1.1rem;
+    height: 1.1rem;
+    border-radius: 50%;
+    border: 1px solid var(--ink);
+    transition: box-shadow 0.2s ease;
+  }
+  .package:has(input:checked) {
+    background: linear-gradient(90deg, rgb(217 146 46 / 0.13), rgb(217 146 46 / 0));
+  }
+  .package:has(input:checked)::before {
+    background: var(--gold);
+    border-color: var(--gold);
+    box-shadow: 0 0 0 4px rgb(217 146 46 / 0.2);
+  }
+  .package:has(input:focus-visible) {
+    outline: 2px solid var(--gold);
+    outline-offset: -2px;
+  }
+  .package input,
+  .chip input,
+  .light input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .package-name {
+    font-family: var(--display);
+    font-size: 1.85rem;
+    line-height: 1.1;
+  }
+  .package-price {
+    font-family: var(--display);
+    font-size: 1.85rem;
+    grid-column: 2;
+    grid-row: 1;
+    white-space: nowrap;
+  }
+  .package-meta {
+    color: var(--zinc);
+    font-size: 0.95rem;
+  }
+  .package-body {
+    grid-column: 1 / -1;
+  }
+
+  .field-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+    gap: 1.5rem;
+  }
+  .field input[type='date'],
+  .field input[type='text'] {
+    width: 100%;
+    font: inherit;
+    color: inherit;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid var(--ink);
+    padding: 0.55rem 0;
+    border-radius: 0;
+  }
+  .field input:focus-visible {
+    outline: none;
+    border-bottom: 2px solid var(--gold);
+  }
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .chip span {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--ink);
+    border-radius: 999px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition:
+      background 0.2s ease,
+      color 0.2s ease;
+  }
+  .chip input:checked + span {
+    background: var(--ink);
+    color: var(--paper);
+  }
+  .chip input:focus-visible + span {
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
+  }
+
+  .lights {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.6rem;
+  }
+  .light {
+    position: relative;
+    display: grid;
+    gap: 0.2rem;
+    padding: 0.6rem 0.6rem 0.8rem;
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    cursor: pointer;
+    transition:
+      border-color 0.2s ease,
+      transform 0.2s ease;
+  }
+  .light:hover {
+    border-color: var(--zinc);
+  }
+  .light:has(input:checked) {
+    border-color: var(--ink);
+    box-shadow: inset 0 0 0 1px var(--ink);
+  }
+  .light:has(input:focus-visible) {
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
+  }
+  .light .light-swatch {
+    height: 3.25rem;
+    border-radius: 3px;
+    margin-bottom: 0.4rem;
+  }
+  .light-name {
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+  .light-time {
+    font-size: 0.85rem;
+    color: var(--zinc);
+    font-variant-numeric: tabular-nums;
+  }
+  .light-swatch {
+    display: block;
+  }
+  .light-dawn .light-swatch {
+    background: linear-gradient(175deg, #6b5a7e, #eea58c 55%, #f8e7dc);
+  }
+  .light-day .light-swatch {
+    background: linear-gradient(175deg, #a9c6de, #d6e4ee 55%, #f6f8f9);
+  }
+  .light-golden .light-swatch {
+    background: linear-gradient(175deg, #efbd74, #f6d7a4 55%, #fbefdc);
+  }
+  .light-blue .light-swatch {
+    background: linear-gradient(175deg, #1b2e5a, #2f4a7a 55%, #6a7aa0);
+  }
+
+  .ticket {
+    position: sticky;
+    top: 6rem;
+    background: var(--ink);
+    color: var(--paper);
+    border-radius: 6px;
+    padding: 1.75rem;
+    display: grid;
+    gap: 0.4rem;
+  }
+  .ticket .label {
+    color: rgb(251 251 249 / 0.65);
+  }
+  .ticket-package {
+    font-family: var(--display);
+    font-size: 2.1rem;
+    line-height: 1.1;
+  }
+  .ticket-line {
+    color: rgb(251 251 249 / 0.85);
+  }
+  .ticket-price {
+    font-family: var(--display);
+    font-size: 3rem;
+    line-height: 1;
+    margin: 1rem 0 0.5rem;
+    padding-top: 1rem;
+    border-top: 1px dashed rgb(251 251 249 / 0.3);
+  }
+  .ticket-note {
+    font-size: 0.875rem;
+    color: rgb(251 251 249 / 0.7);
+  }
+  .ticket-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin: 1rem 0 0.5rem;
+  }
+  .ticket .button.ghost {
+    color: var(--paper);
+  }
+
+  /* ---------- Places ---------- */
+  .places {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    gap: clamp(2rem, 5vw, 5rem);
+    align-items: start;
+  }
+  .place-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid var(--ink);
+  }
+  .place-button {
+    all: unset;
+    box-sizing: border-box;
+    width: 100%;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.3rem 1rem;
+    padding: 1.3rem 0;
+    border-bottom: 1px solid var(--rule);
+    cursor: pointer;
+  }
+  .place-button:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
+  }
+  .place-name {
+    font-family: var(--display);
+    font-size: clamp(1.6rem, 3vw, 2.3rem);
+    line-height: 1.1;
+    transition: transform 0.35s cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+  .place-light {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--zinc);
+    white-space: nowrap;
+  }
+  .place-light .light-swatch {
+    width: 1.1rem;
+    height: 1.1rem;
+    border-radius: 50%;
+  }
+  .place-note {
+    grid-column: 1 / -1;
+    color: var(--zinc);
+  }
+  .place-choose {
+    grid-column: 1 / -1;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--gold-ink);
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition:
+      max-height 0.3s ease,
+      opacity 0.3s ease;
+  }
+  .place:global(.active) .place-name {
+    transform: translateX(0.6rem);
+  }
+  .place:global(.active) .place-choose {
+    max-height: 2rem;
+    opacity: 1;
+  }
+  .place-preview {
+    position: sticky;
+    top: 6rem;
+    display: grid;
+  }
+  .place-preview :global(.photo) {
+    grid-area: 1 / 1;
+    opacity: 0;
+    transition: opacity 0.6s ease;
+  }
+  .place-preview :global(.photo.shown) {
+    opacity: 1;
+  }
+
+  /* ---------- Brands ---------- */
+  .brands {
+    margin-top: clamp(5rem, 11vw, 9rem);
+    padding-block: clamp(5rem, 10vw, 8rem);
+    background: #14203b;
+    color: #eef0f3;
+    --rule: rgb(238 240 243 / 0.16);
+    --zinc: rgb(238 240 243 / 0.68);
+  }
+  .brands .lead {
+    color: var(--zinc);
+  }
+  .reels {
+    display: flex;
+    gap: clamp(1rem, 2.5vw, 2rem);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding: 0.5rem max(var(--gutter), calc((100vw - var(--max)) / 2 + var(--gutter))) 1.5rem;
+    scrollbar-width: none;
+  }
+  .reels::-webkit-scrollbar {
+    display: none;
+  }
+  .reels:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: -2px;
+  }
+  .reel {
+    margin: 0;
+    flex: 0 0 clamp(11rem, 22vw, 15.5rem);
+    scroll-snap-align: start;
+  }
+  .reel:nth-child(even) {
+    margin-top: 3rem;
+  }
+  .reel-screen {
+    aspect-ratio: 9 / 16;
+    border-radius: 1.6rem;
+    border: 6px solid #0a1122;
+    box-shadow: 0 0 0 1px rgb(238 240 243 / 0.18);
+    background:
+      radial-gradient(90% 60% at 30% 110%, rgb(217 146 46 / 0.55), transparent 60%),
+      linear-gradient(175deg, #2f4a7a, #6a7aa0);
+    display: grid;
+    place-items: center;
+    transition: transform 0.4s cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+  .reel:nth-child(2) .reel-screen {
+    background:
+      radial-gradient(90% 60% at 70% 0%, rgb(255 230 190 / 0.6), transparent 60%),
+      linear-gradient(175deg, #c8a989, #6d5a4c);
+  }
+  .reel:nth-child(3) .reel-screen {
+    background: linear-gradient(175deg, #cfd6dd, #7d8a96);
+  }
+  .reel:nth-child(4) .reel-screen {
+    background:
+      radial-gradient(80% 50% at 50% 100%, rgb(217 146 46 / 0.7), transparent 70%),
+      linear-gradient(175deg, #1b2e5a, #0c1530);
+  }
+  .reel:hover .reel-screen {
+    transform: translateY(-0.5rem);
+  }
+  .reel-play {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    background: rgb(255 255 255 / 0.18);
+    backdrop-filter: blur(6px);
+    position: relative;
+  }
+  .reel-play::after {
+    content: '';
+    position: absolute;
+    left: 1.2rem;
+    top: 0.95rem;
+    border-left: 0.85rem solid #fff;
+    border-block: 0.55rem solid transparent;
+  }
+  .reel figcaption {
+    margin-top: 0.75rem;
+    font-size: 0.9rem;
+    color: var(--zinc);
+  }
+  .offers {
+    list-style: none;
+    margin: 3rem 0 0;
+    padding: 0;
+    border-top: 1px solid rgb(238 240 243 / 0.5);
+  }
+  .offer {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2.2fr) auto;
+    gap: 0.4rem 2rem;
+    align-items: baseline;
+    padding-block: 1.5rem;
+    border-bottom: 1px solid var(--rule);
+  }
+  .offer h3 {
+    font-size: 1.85rem;
+  }
+  .offer-body {
+    color: var(--zinc);
+  }
+  .offer-price {
+    font-family: var(--display);
+    font-size: 1.6rem;
+    text-align: right;
+    white-space: nowrap;
+  }
+  .steps-title {
+    margin-top: 4.5rem;
+    font-size: 1.85rem;
+  }
+  .steps {
+    list-style: none;
+    counter-reset: step;
+    margin: 1.5rem 0 2.75rem;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 2rem;
+  }
+  .steps li {
+    counter-increment: step;
+    border-top: 1px solid rgb(238 240 243 / 0.5);
+    padding-top: 1rem;
+  }
+  .steps li::before {
+    content: counter(step);
+    display: block;
+    font-family: var(--display);
+    font-style: italic;
+    font-size: 2.75rem;
+    line-height: 1;
+    margin-bottom: 0.75rem;
+    color: var(--gold);
+  }
+  .steps p {
+    color: var(--zinc);
+    margin-top: 0.35rem;
+  }
+
+  /* ---------- Team ---------- */
+  .people {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1.15fr;
+    gap: clamp(1.5rem, 4vw, 3.5rem);
+    align-items: start;
+  }
+  .person:nth-child(2) {
+    margin-top: 4rem;
+  }
+  .person h3 {
+    margin-top: 1.25rem;
+    font-size: 1.85rem;
+  }
+  .role {
+    color: var(--gold-ink);
+    font-weight: 600;
+    margin: 0.25rem 0 0.75rem;
+  }
+  .person p:last-child {
+    color: var(--zinc);
+  }
+  .name-story {
+    align-self: center;
+  }
+  .name-words {
+    font-family: var(--display);
+    font-size: clamp(3rem, 5.5vw, 4.75rem);
+    line-height: 1;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1.5rem;
+  }
+  .name-words span:first-child {
+    font-style: italic;
+  }
+  .name-words span + span {
+    padding-left: 1.4em;
+    color: var(--gold-ink);
+  }
+  .name-story p:last-child {
+    color: var(--zinc);
+    margin-top: 0.75rem;
+  }
+
+  /* ---------- FAQ ---------- */
+  .faq {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+    gap: 2rem 3rem;
+  }
+  .faq-list {
+    border-top: 1px solid var(--ink);
+  }
+  details {
+    border-bottom: 1px solid var(--rule);
+    padding-block: 1.15rem;
+  }
+  summary {
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 1.125rem;
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  summary::-webkit-details-marker {
+    display: none;
+  }
+  summary::after {
+    content: '+';
+    font-family: var(--display);
+    font-size: 1.6rem;
+    line-height: 1;
+    transition: transform 0.3s ease;
+  }
+  details[open] summary::after {
+    transform: rotate(45deg);
+  }
+  details p {
+    margin-top: 0.75rem;
+    color: var(--zinc);
+    max-width: 38em;
+  }
+
+  /* ---------- Contact ---------- */
+  .contact {
+    margin-top: clamp(5rem, 11vw, 9rem);
+    padding-block: clamp(5rem, 11vw, 9rem);
+  }
+  .contact h2 {
+    font-size: clamp(2.75rem, 7vw, 6rem);
+    font-weight: 400;
+    letter-spacing: -0.03em;
+    max-width: 11em;
+  }
+  .contact .lead {
+    color: inherit;
+    opacity: 0.82;
+    margin-top: 1.25rem;
+  }
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 2rem;
+  }
+  .contact-mail {
+    margin-top: 1.5rem;
+    opacity: 0.85;
+  }
+
+  .foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem 2rem;
+    padding-block: 2rem;
+    font-size: 0.9rem;
+    color: var(--zinc);
+  }
+  .foot :global(.logo) {
+    color: var(--ink);
+    font-size: 1.4rem;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .live-dot {
+      animation: none;
+    }
+    .place-name,
+    .reel-screen,
+    .place-preview :global(.photo) {
+      transition: none;
+    }
+  }
+
+  @media (max-width: 900px) {
+    .block-head,
+    .composer,
+    .places,
+    .people,
+    .faq {
+      grid-template-columns: 1fr;
+    }
+    .ticket,
+    .place-preview {
+      position: static;
+    }
+    .place-preview {
+      display: none;
+    }
+    .place-choose {
+      max-height: 2rem;
+      opacity: 1;
+    }
+    .person:nth-child(2) {
+      margin-top: 0;
+    }
+    .offer {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .offer-price {
+      text-align: left;
+      white-space: normal;
+    }
+    .steps {
+      grid-template-columns: 1fr 1fr;
+    }
+    .lights {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  @media (max-width: 560px) {
+    .hide-sm {
+      display: none;
+    }
+    .field-row {
+      grid-template-columns: 1fr;
+    }
+    .steps {
+      grid-template-columns: 1fr;
+    }
+    .package {
+      padding-right: 0.25rem;
+    }
+    .package-name,
+    .package-price {
+      font-size: 1.5rem;
+    }
+    .readout-actions {
+      width: 100%;
+    }
+  }
+</style>

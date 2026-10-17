@@ -1,0 +1,41 @@
+---
+import '../styles/global.css';
+import { site } from '../site';
+
+interface Props {
+  lang: string;
+  title: string;
+  description: string;
+  altHref: string;
+  altLang: string;
+}
+const { lang, title, description, altHref, altLang } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+---
+
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {!site.indexable && <meta name="robots" content="noindex" />}
+    <link rel="alternate" hreflang={altLang} href={new URL(altHref, Astro.site)} />
+    <link rel="alternate" hreflang={lang} href={canonical} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400&family=Instrument+Sans:wght@400..600&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>
