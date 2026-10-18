@@ -35,6 +35,15 @@ const windows = (day: ReturnType<typeof sunDay>): Record<Light, [Date, Date]> =>
   blue: [day.sunset, day.blueEnd],
 });
 
+/* ---------- Language: switching remembers the choice ---------- */
+$$<HTMLAnchorElement>('a.lang[hreflang]').forEach((a) =>
+  a.addEventListener('click', () => {
+    try {
+      localStorage.setItem('luminoor-lang', a.hreflang);
+    } catch {}
+  }),
+);
+
 /* ---------- Header and current section ---------- */
 const top = $('[data-top]');
 const onScroll = () => top.classList.toggle('scrolled', window.scrollY > 40);

@@ -1,6 +1,7 @@
 ---
 import Logo from './Logo.astro';
 import Booking from './Booking.astro';
+import LanguageGate from './LanguageGate.astro';
 import { site } from '../site';
 import type fr from '../i18n/fr';
 
@@ -274,6 +275,7 @@ const strings = {
 </nav>
 
 <Booking t={t} />
+<LanguageGate lang={t.lang} />
 
 <script>
   import '../scripts/home';

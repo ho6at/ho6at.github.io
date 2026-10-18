@@ -1,0 +1,169 @@
+---
+// First visit: ask which language to use, then remember it.
+// The <html> gets the `ask-lang` class from an inline script in Base.astro, so the gate shows before first paint.
+interface Props {
+  lang: string;
+}
+const { lang } = Astro.props;
+---
+
+<div class="gate" role="dialog" aria-modal="true" aria-labelledby="gate-title" data-gate>
+  <div class="gate-inner">
+    <picture class="gate-logo">
+      <source srcset="/brand/luminoor-logo.webp" type="image/webp" />
+      <img src="/brand/luminoor-logo.png" alt="Luminoor Paris" width="556" height="166" />
+    </picture>
+    <p id="gate-title" class="gate-title">
+      <span lang="fr">Choisissez votre langue</span>
+      <span lang="en">Choose your language</span>
+    </p>
+    <div class="gate-choices">
+      <a class="gate-choice" href="/" hreflang="fr" lang="fr" data-choose-lang="fr">
+        <span class="gate-name">Français</span>
+        <span class="gate-sub">Continuer en français</span>
+      </a>
+      <a class="gate-choice" href="/en/" hreflang="en" lang="en" data-choose-lang="en">
+        <span class="gate-name">English</span>
+        <span class="gate-sub">Continue in English</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<script is:inline define:vars={{ lang }}>
+  (() => {
+    const root = document.documentElement;
+    const gate = document.querySelector('[data-gate]');
+    if (!root.classList.contains('ask-lang') || !gate) return;
+    const remember = (value) => {
+      try {
+        localStorage.setItem('luminoor-lang', value);
+      } catch {}
+    };
+    const close = () => {
+      remember(lang);
+      root.classList.remove('ask-lang');
+      // The hero's entrance played behind the gate; play it again now that it can be seen.
+      document.querySelectorAll('.hero-mark, .hero h1, .hero-lead, .hero .hero-actions').forEach((el) => {
+        el.style.animation = 'none';
+        void el.offsetWidth;
+        el.style.animation = '';
+      });
+    };
+    // Suggest the visitor's own language first.
+    const prefers = (navigator.language || '').toLowerCase().startsWith('fr') ? 'fr' : 'en';
+    const first = gate.querySelector(`[data-choose-lang="${prefers}"]`);
+    first.classList.add('suggested');
+    gate.querySelectorAll('[data-choose-lang]').forEach((a) =>
+      a.addEventListener('click', (e) => {
+        const chosen = a.dataset.chooseLang;
+        remember(chosen);
+        if (chosen === lang) {
+          e.preventDefault();
+          close();
+        }
+      }),
+    );
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && root.classList.contains('ask-lang')) close();
+    });
+    requestAnimationFrame(() => first.focus());
+  })();
+</script>
+
+<style>
+  .gate {
+    display: none;
+  }
+  :global(html.ask-lang) {
+    overflow: hidden;
+  }
+  :global(html.ask-lang) .gate {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: grid;
+    place-items: center;
+    padding: 1.5rem;
+    background:
+      radial-gradient(45% 45% at 50% 38%, rgb(255 255 255 / 0.09), transparent 70%),
+      var(--bg);
+    animation: gate-in 0.6s var(--ease) both;
+  }
+  @keyframes gate-in {
+    from {
+      opacity: 0;
+    }
+  }
+  .gate-inner {
+    width: min(34rem, 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .gate-logo img {
+    display: block;
+    width: clamp(14rem, 50vw, 22rem);
+    height: auto;
+  }
+  .gate-title {
+    margin-top: 2.5rem;
+    display: grid;
+    gap: 0.2rem;
+    font-size: 1.05rem;
+    color: var(--muted);
+  }
+  .gate-title span:first-child {
+    color: var(--ivory);
+    font-size: 1.35rem;
+    font-weight: 300;
+  }
+  .gate-choices {
+    margin-top: 2rem;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+  .gate-choice {
+    display: grid;
+    gap: 0.25rem;
+    padding: 1.4rem 1rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--line-strong);
+    background: rgb(240 240 240 / 0.04);
+    text-decoration: none;
+    color: var(--ivory);
+    transition:
+      background 0.3s var(--ease),
+      border-color 0.3s var(--ease),
+      transform 0.3s var(--ease);
+  }
+  .gate-choice:hover {
+    background: rgb(240 240 240 / 0.09);
+    transform: translateY(-2px);
+  }
+  .gate-choice.suggested {
+    border-color: var(--accent);
+  }
+  .gate-name {
+    font-size: 1.6rem;
+    font-weight: 300;
+    letter-spacing: -0.01em;
+  }
+  .gate-sub {
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+  @media (max-width: 420px) {
+    .gate-choices {
+      grid-template-columns: 1fr;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    :global(html.ask-lang) .gate {
+      animation: none;
+    }
+  }
+</style>
