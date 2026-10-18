@@ -91,7 +91,8 @@ const { lang } = Astro.props;
     padding: 1.5rem;
     overflow-y: auto;
     background:
-      radial-gradient(45% 45% at 50% 38%, rgb(255 255 255 / 0.09), transparent 70%),
+      radial-gradient(42% 40% at 50% 30%, rgb(226 182 96 / 0.16), transparent 70%),
+      radial-gradient(70% 50% at 50% 115%, rgb(226 182 96 / 0.08), transparent 70%),
       var(--bg);
     animation: gate-in 0.6s var(--ease) both;
   }
@@ -112,17 +113,31 @@ const { lang } = Astro.props;
     width: clamp(14rem, 50vw, 22rem);
     height: auto;
   }
+  /* a thin gold rule under the logo */
+  .gate-logo::after {
+    content: '';
+    display: block;
+    width: 4.5rem;
+    height: 1px;
+    margin: 2rem auto 0;
+    background: linear-gradient(90deg, transparent, #e6c472, transparent);
+  }
   .gate-title {
-    margin-top: 2.5rem;
+    margin-top: 2rem;
     display: grid;
     gap: 0.2rem;
     font-size: 1rem;
     color: var(--muted);
   }
   .gate-title span:first-child {
-    color: var(--ivory);
     font-size: 1.35rem;
     font-weight: 300;
+    background: var(--gold-foil);
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
   }
   .gate-title [lang='fa'] {
     font-family: 'Vazirmatn', var(--body);
@@ -149,11 +164,21 @@ const { lang } = Astro.props;
       transform 0.3s var(--ease);
   }
   .gate-choice:hover {
-    background: rgb(240 240 240 / 0.09);
+    background: rgb(226 182 96 / 0.08);
+    border-color: rgb(226 182 96 / 0.6);
     transform: translateY(-2px);
   }
   .gate-choice.suggested {
-    border-color: var(--accent);
+    border-color: #d9ae55;
+    background: linear-gradient(180deg, rgb(226 182 96 / 0.12), rgb(226 182 96 / 0.03));
+    box-shadow: 0 18px 50px -25px rgb(226 182 96 / 0.6);
+  }
+  .gate-choice.suggested .gate-name {
+    color: #f1d894;
+  }
+  .gate-choice:focus-visible {
+    outline: 2px solid #e6c472;
+    outline-offset: 3px;
   }
   .gate-choice[lang='fa'] {
     font-family: 'Vazirmatn', var(--body);
