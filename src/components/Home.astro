@@ -65,7 +65,7 @@ const strings = {
   <section class="hero" data-hero>
     <div class="hero-light" aria-hidden="true"></div>
     <div class="hero-eiffel" aria-hidden="true"><Eiffel /></div>
-    <div class="hero-beacon" aria-hidden="true"><span></span><span></span></div>
+    <div class="hero-beacon" aria-hidden="true"><div class="beacon-rig"><span></span><span></span></div></div>
     <div class="wrap hero-inner">
       <div class="hero-halo" aria-hidden="true"></div>
       <div class="hero-mark" aria-hidden="true" data-hero-light="waiting">
@@ -455,32 +455,39 @@ const strings = {
     top: calc(34% + 58% * 0.12);
     width: 0;
     height: 0;
-    perspective: 900px;
+    perspective: 700px;
     pointer-events: none;
     animation: fade-in 2.4s var(--ease) 1s both;
+  }
+  /* The plane the beams turn in is seen slightly from below and tilted, as from a Paris street */
+  .beacon-rig {
+    position: absolute;
+    transform-style: preserve-3d;
+    transform: rotateX(-14deg) rotateZ(-4deg);
   }
   .hero-beacon span {
     position: absolute;
     left: 0;
-    top: -1.1rem;
-    width: min(75vw, 62rem);
-    height: 2.2rem;
+    top: -1.75rem;
+    width: min(80vw, 66rem);
+    height: 3.5rem;
     transform-origin: 0 50%;
-    background: linear-gradient(90deg, rgb(255 246 228 / 0.3), rgb(236 220 196 / 0.14) 35%, transparent 100%);
-    clip-path: polygon(0 47%, 100% 0, 100% 100%, 0 53%);
-    filter: blur(3px);
+    background: linear-gradient(90deg, rgb(255 246 228 / 0.26), rgb(236 220 196 / 0.12) 30%, rgb(236 220 196 / 0.04) 70%, transparent 100%);
+    clip-path: polygon(0 48%, 100% 0, 100% 100%, 0 52%);
+    filter: blur(7px);
     mix-blend-mode: screen;
     animation: beacon 9s linear infinite;
   }
   .hero-beacon span + span {
     animation-delay: -4.5s;
   }
+  /* each beam turns around the tower and points slightly upwards */
   @keyframes beacon {
     from {
-      transform: rotateY(0deg);
+      transform: rotateY(0deg) rotateZ(-5deg);
     }
     to {
-      transform: rotateY(-360deg);
+      transform: rotateY(-360deg) rotateZ(-5deg);
     }
   }
   .hero-inner {
