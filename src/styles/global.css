@@ -22,13 +22,13 @@
   color-scheme: dark;
 }
 
-/* Persian: Gulzar (Nastaliq) for headings, Vazirmatn for text (Latin words stay in Jost),
+/* Persian: Reem Kufi for headings, Vazirmatn for text (Latin words stay in Jost),
    no letter-spacing so letters stay joined */
 :root[lang='fa'] {
-  --display: 'Jost', 'Gulzar', 'Vazirmatn', system-ui, sans-serif;
+  --display: 'Jost', 'Reem Kufi', 'Vazirmatn', system-ui, sans-serif;
   --body: 'Jost', 'Vazirmatn', system-ui, sans-serif;
 }
-/* Headings in Gulzar; numbers stay in Vazirmatn, whose Persian digits (۴ ۵ ۶) are drawn the Persian way */
+/* Headings in Reem Kufi; numbers stay in Vazirmatn, whose Persian digits (۴ ۵ ۶) are drawn the Persian way */
 :root[lang='fa'] :is(h1, h2, h3, .ticket-package, .option-name, .light-name, .name-words) {
   font-family: var(--display);
   font-weight: 400;
@@ -41,7 +41,7 @@
   letter-spacing: 0 !important;
 }
 :root[lang='fa'] :is(h1, h2, h3) {
-  line-height: 1.9;
+  line-height: 1.4;
 }
 :root[lang='fa'] body {
   line-height: 1.85;
