@@ -445,11 +445,14 @@ const strings = {
     display: block;
     width: 100%;
     height: auto;
-    transition: filter 1.2s var(--ease);
   }
-  .hero-mark[data-hero-light='waiting'] img,
+  /* While waiting and during the pass, the logo's own brightness is driven by the script (--base),
+     rising to full silver while the light is still on it, so there is no dim moment after the light */
+  .hero-mark[data-hero-light='waiting'] img {
+    filter: brightness(0.35);
+  }
   .hero-mark[data-hero-light='passing'] img {
-    filter: brightness(0.22);
+    filter: brightness(var(--base, 0.35));
   }
   /* if the script never runs, do not leave the logo in shadow */
   .hero-mark[data-hero-light='waiting'] img {

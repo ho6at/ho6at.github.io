@@ -53,6 +53,8 @@ const lightHero = () => {
     heroMark.style.setProperty('--lx', `${-12 + 124 * p}%`);
     heroMark.style.setProperty('--ly', `${78 - 105 * Math.sin(Math.PI * p)}%`);
     heroMark.style.setProperty('--power', (Math.sin(Math.PI * Math.min(1, t * 1.1)) ** 0.6).toFixed(3));
+    // the logo itself brightens through the second half of the pass, reaching full silver as the light leaves
+    heroMark.style.setProperty('--base', (0.35 + 0.65 * smooth(Math.min(1, Math.max(0, (t - 0.4) / 0.55)))).toFixed(3));
     if (t < 1) requestAnimationFrame(frame);
     else {
       heroMark.style.setProperty('--power', '0');
