@@ -74,34 +74,59 @@ else {
   watch.observe(root, { attributes: true, attributeFilter: ['class'] });
 }
 
-/* ---------- Mouse and trackpad: a little scroll glides to the next or previous section ---------- */
+/* ---------- Gliding between sections ---------- */
+// Where each section settles: its heading just under the fixed header (from its scroll-margin).
+const snapPoint = (el: HTMLElement) =>
+  Math.max(0, Math.round(el.getBoundingClientRect().top + window.scrollY - parseFloat(getComputedStyle(el).scrollMarginTop || '0')));
+const stops = () => {
+  const list = $$<HTMLElement>('main > .hero, main > .section, main > .contact').map(snapPoint);
+  list.push(Math.round(document.documentElement.scrollHeight - window.innerHeight)); // the very bottom
+  return list.sort((a, b) => a - b);
+};
+// A slow, gentle glide (the browser's own smooth scroll is too quick and can't be timed). Snapping is
+// paused while it runs, otherwise on touch screens the snap pulls the page back mid-way.
+const duration = 1100;
+const ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+let moving = false;
+const glide = (to: number, done = () => {}) => {
+  moving = true;
+  root.style.scrollSnapType = 'none';
+  const finish = () => {
+    root.style.scrollSnapType = '';
+    setTimeout(() => {
+      moving = false;
+      done();
+    }, 120); // let trackpad momentum die down before the next move
+  };
+  if (reduceMotion) {
+    window.scrollTo({ top: to, behavior: 'instant' });
+    return finish();
+  }
+  const from = window.scrollY;
+  const start = performance.now();
+  const step = (now: number) => {
+    const t = Math.min(1, (now - start) / duration);
+    window.scrollTo({ top: from + (to - from) * ease(t), behavior: 'instant' });
+    if (t < 1) requestAnimationFrame(step);
+    else finish();
+  };
+  requestAnimationFrame(step);
+};
+
+// In-page links (menu, tab bar, hero buttons) glide to their section instead of the browser's jump.
+document.addEventListener('click', (e) => {
+  const link = (e.target as HTMLElement).closest<HTMLAnchorElement>('a[href^="#"]');
+  if (!link || e.defaultPrevented || e.metaKey || e.ctrlKey) return;
+  const id = link.getAttribute('href')!.slice(1);
+  const section = id ? document.getElementById(id) : null;
+  if (!section) return;
+  e.preventDefault();
+  glide(id === 'top' ? 0 : snapPoint(section));
+  history.replaceState(null, '', `#${id}`);
+});
+
+// Mouse and trackpad: a little scroll glides to the next or previous section.
 if (matchMedia('(hover: hover)').matches) {
-  const stops = () => {
-    const list = $$<HTMLElement>('main > .hero, main > .section, main > .contact').map(
-      (el) => el.getBoundingClientRect().top + window.scrollY - parseFloat(getComputedStyle(el).scrollMarginTop || '0'),
-    );
-    list.push(document.documentElement.scrollHeight - window.innerHeight); // the very bottom
-    return list.map((y) => Math.max(0, Math.round(y))).sort((a, b) => a - b);
-  };
-  // A slow, gentle glide (the browser's own smooth scroll is too quick and can't be timed)
-  const duration = 1100;
-  const ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
-  const glide = (to: number, done: () => void) => {
-    if (reduceMotion) {
-      window.scrollTo({ top: to, behavior: 'instant' });
-      return setTimeout(done, 50);
-    }
-    const from = window.scrollY;
-    const start = performance.now();
-    const step = (now: number) => {
-      const t = Math.min(1, (now - start) / duration);
-      window.scrollTo({ top: from + (to - from) * ease(t), behavior: 'instant' });
-      if (t < 1) requestAnimationFrame(step);
-      else setTimeout(done, 120); // let trackpad momentum die down before the next move
-    };
-    requestAnimationFrame(step);
-  };
-  let moving = false;
   addEventListener(
     'wheel',
     (e) => {
@@ -117,8 +142,7 @@ if (matchMedia('(hover: hover)').matches) {
       // inside a section taller than the screen: scroll through it normally until its end is near
       if (Math.abs(next - y) > window.innerHeight * 1.3) return;
       e.preventDefault();
-      moving = true;
-      glide(next, () => (moving = false));
+      glide(next);
     },
     { passive: false },
   );
