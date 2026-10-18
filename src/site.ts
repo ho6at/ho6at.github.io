@@ -5,8 +5,8 @@ export const site = {
   instagram: 'https://www.instagram.com/luminoor.galerie/',
   whatsapp: '', // e.g. 'https://wa.me/33600000000' — leave empty to hide
   city: 'Paris',
-  // Keep search engines out until real photos and contact details are in.
-  indexable: false,
+  // Search engines may index the site (set to false to hide it again).
+  indexable: true,
   // Brand content (reels for brands) is not offered for now; set to true to show its section again.
   showBrands: false,
 };

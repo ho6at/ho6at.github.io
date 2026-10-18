@@ -4,9 +4,11 @@ const en: typeof fr = {
   lang: 'en',
   locale: 'en-GB',
   meta: {
-    title: 'Luminoor — Paris photographer',
+    title: 'Paris Photographer — Photoshoots & Proposal Photography | Luminoor',
     description:
-      'Street style photoshoots in Paris for travellers, couples and proposals. Edited photos and all raw photos, in a private gallery.',
+      'Paris photographer for street style photoshoots, couples and surprise proposals at the Eiffel Tower, Trocadéro and Montmartre. From €220.',
+    h1Prefix: 'Luminoor, Paris photographer. ',
+    ogLocale: 'en_GB',
   },
   nav: {
     home: 'Home',

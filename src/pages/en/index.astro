@@ -2,8 +2,11 @@
 import Base from '../../layouts/Base.astro';
 import Home from '../../components/Home.astro';
 import t from '../../i18n/en';
+import { homeSchema } from '../../lib/schema';
+
+const schema = homeSchema(t, new URL(Astro.url.pathname, Astro.site).href, Astro.site!.href);
 ---
 
-<Base lang="en" title={t.meta.title} description={t.meta.description} home>
+<Base lang="en" title={t.meta.title} description={t.meta.description} ogLocale={t.meta.ogLocale} schema={schema} home>
   <Home t={t} />
 </Base>

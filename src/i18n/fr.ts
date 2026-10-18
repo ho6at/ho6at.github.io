@@ -2,9 +2,11 @@ export default {
   lang: 'fr',
   locale: 'fr-FR',
   meta: {
-    title: 'Luminoor — Photographe à Paris',
+    title: 'Photographe à Paris — Séance photo, demande en mariage | Luminoor',
     description:
-      'Séances photo street style à Paris pour voyageurs, couples et demandes en mariage. Photos retouchées et toutes les photos brutes, en galerie privée.',
+      'Photographe à Paris : séances photo street style, couples et demandes en mariage à la Tour Eiffel, au Trocadéro et à Montmartre. Dès 220 €.',
+    h1Prefix: 'Luminoor, photographe à Paris. ',
+    ogLocale: 'fr_FR',
   },
   nav: {
     home: 'Accueil',
