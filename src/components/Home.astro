@@ -2,6 +2,7 @@
 import Logo from './Logo.astro';
 import Booking from './Booking.astro';
 import LanguageGate from './LanguageGate.astro';
+import { languages } from '../i18n/languages';
 import { site } from '../site';
 import type fr from '../i18n/fr';
 
@@ -9,7 +10,8 @@ interface Props {
   t: typeof fr;
 }
 const { t } = Astro.props;
-const home = t.lang === 'fr' ? '/' : '/en/';
+const home = languages.find((l) => l.code === t.lang)?.href ?? '/';
+const num = (n: number) => new Intl.NumberFormat(t.locale).format(n);
 const quoteHref = `mailto:${site.email}?subject=${encodeURIComponent(t.brands.quoteSubject)}`;
 const packageLight = { minimal: 'day', classic: 'dawn', signature: 'golden', cinestyle: 'blue' } as Record<string, string>;
 const reelLight = ['golden', 'dawn', 'day', 'night'];
@@ -38,9 +40,21 @@ const strings = {
       <a href="#contact">{t.nav.contact}</a>
     </nav>
     <div class="bar-end">
-      <a class="lang" href={t.nav.switchHref} hreflang={t.lang === 'fr' ? 'en' : 'fr'} aria-label={t.nav.switchName}
-        >{t.nav.switchLabel}</a
-      >
+      <nav class="langs" aria-label="Language">
+        {
+          languages.map((l) => (
+            <a
+              href={l.href}
+              hreflang={l.code}
+              lang={l.code}
+              aria-label={l.name}
+              aria-current={l.code === t.lang ? 'page' : undefined}
+            >
+              {l.short}
+            </a>
+          ))
+        }
+      </nav>
       <button class="button bar-book" type="button" data-open-booking>{t.nav.book}</button>
     </div>
   </div>
@@ -84,7 +98,7 @@ const strings = {
             <div class="card-body">
               <div class="pkg-top">
                 <h3>{p.name}</h3>
-                <p class="pkg-price">{p.price} €</p>
+                <p class="pkg-price">{num(p.price)} €</p>
               </div>
               <ul class="pkg-list">
                 <li>
@@ -341,18 +355,34 @@ const strings = {
     align-items: center;
     gap: 0.75rem;
   }
-  .lang {
-    font-size: 0.8rem;
-    font-weight: 600;
-    letter-spacing: 0.06em;
-    text-decoration: none;
-    color: var(--muted);
-    padding: 0.4rem 0.7rem;
+  .langs {
+    display: flex;
+    padding: 0.2rem;
     border-radius: 999px;
     border: 1px solid var(--line);
   }
-  .lang:hover {
+  .langs a {
+    min-width: 2.2rem;
+    padding: 0.3rem 0.55rem;
+    border-radius: 999px;
+    text-align: center;
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-decoration: none;
+    color: var(--muted);
+    transition:
+      color 0.3s var(--ease),
+      background 0.3s var(--ease);
+  }
+  .langs a[lang='fa'] {
+    font-family: 'Vazirmatn', var(--body);
+  }
+  .langs a:hover {
     color: var(--ivory);
+  }
+  .langs a[aria-current] {
+    color: #0a0a0a;
+    background: var(--metal);
   }
   .bar-book {
     min-height: 2.5rem;
@@ -561,7 +591,7 @@ const strings = {
   .pkg-flag {
     position: absolute;
     bottom: 1.1rem;
-    left: 1.25rem;
+    inset-inline-start: 1.25rem;
     padding: 0.3rem 0.7rem;
     border-radius: 999px;
     background: var(--accent);
@@ -605,13 +635,13 @@ const strings = {
     font-size: 0.95rem;
   }
   .pkg-list li {
-    padding-left: 1.1rem;
+    padding-inline-start: 1.1rem;
     position: relative;
   }
   .pkg-list li::before {
     content: '';
     position: absolute;
-    left: 0;
+    inset-inline-start: 0;
     top: 0.62em;
     width: 0.4rem;
     height: 0.4rem;
@@ -697,7 +727,7 @@ const strings = {
     text-decoration: underline;
     text-underline-offset: 0.3em;
     text-decoration-thickness: 1px;
-    text-align: left;
+    text-align: start;
   }
 
   /* ---------- Brands ---------- */
@@ -767,7 +797,7 @@ const strings = {
   .offer-price {
     font-family: var(--display);
     font-size: 1.5rem;
-    text-align: right;
+    text-align: end;
     white-space: nowrap;
     color: var(--accent-soft);
   }
@@ -847,7 +877,7 @@ const strings = {
     margin-bottom: 1.75rem;
   }
   .name-words span + span {
-    padding-left: 1.4em;
+    padding-inline-start: 1.4em;
     color: var(--accent);
   }
   .name-story p:last-child {
@@ -921,7 +951,7 @@ const strings = {
   .contact-mark {
     position: absolute;
     z-index: -1;
-    right: -4vw;
+    inset-inline-end: -4vw;
     bottom: -2vw;
     width: min(70vw, 60rem);
     height: auto;
@@ -1035,7 +1065,7 @@ const strings = {
       grid-template-columns: 1fr;
     }
     .offer-price {
-      text-align: left;
+      text-align: start;
       white-space: normal;
     }
     .steps {

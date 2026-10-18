@@ -22,6 +22,21 @@
   color-scheme: dark;
 }
 
+/* Persian: Vazirmatn for Persian script (Latin words stay in Jost), no letter-spacing so letters stay joined */
+:root[lang='fa'] {
+  --display: 'Jost', 'Vazirmatn', system-ui, sans-serif;
+  --body: 'Jost', 'Vazirmatn', system-ui, sans-serif;
+}
+:root[lang='fa'] body * {
+  letter-spacing: 0 !important;
+}
+:root[lang='fa'] :is(h1, h2, h3) {
+  line-height: 1.35;
+}
+:root[lang='fa'] body {
+  line-height: 1.85;
+}
+
 *,
 *::before,
 *::after {

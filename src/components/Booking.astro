@@ -3,11 +3,13 @@
 import { site } from '../site';
 import type fr from '../i18n/fr';
 
+
 interface Props {
   t: typeof fr;
 }
 const { t } = Astro.props;
 const s = t.sessions;
+const num = (n: number) => new Intl.NumberFormat(t.locale).format(n);
 const packageLight = { minimal: 'day', classic: 'dawn', signature: 'golden', cinestyle: 'blue' } as Record<string, string>;
 const lights = ['dawn', 'day', 'golden', 'blue'] as const;
 ---
@@ -49,7 +51,7 @@ const lights = ['dawn', 'day', 'golden', 'blue'] as const;
                       {p.bonus && <>. {p.bonus}</>}
                     </span>
                   </span>
-                  <span class="option-price">{p.price} €</span>
+                  <span class="option-price">{num(p.price)} €</span>
                 </label>
               ))
             }
@@ -321,7 +323,7 @@ const lights = ['dawn', 'day', 'golden', 'blue'] as const;
     font-family: var(--display);
     font-size: 1.4rem;
     color: var(--accent-soft);
-    padding-right: 0.4rem;
+    padding-inline-end: 0.4rem;
     white-space: nowrap;
   }
 
@@ -520,7 +522,7 @@ const lights = ['dawn', 'day', 'golden', 'blue'] as const;
   }
   dd {
     margin: 0;
-    text-align: right;
+    text-align: end;
     font-weight: 500;
   }
   .ticket-price {

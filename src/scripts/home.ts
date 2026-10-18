@@ -35,15 +35,6 @@ const windows = (day: ReturnType<typeof sunDay>): Record<Light, [Date, Date]> =>
   blue: [day.sunset, day.blueEnd],
 });
 
-/* ---------- Language: switching remembers the choice ---------- */
-$$<HTMLAnchorElement>('a.lang[hreflang]').forEach((a) =>
-  a.addEventListener('click', () => {
-    try {
-      localStorage.setItem('luminoor-lang', a.hreflang);
-    } catch {}
-  }),
-);
-
 /* ---------- Header and current section ---------- */
 const top = $('[data-top]');
 const onScroll = () => top.classList.toggle('scrolled', window.scrollY > 40);
@@ -87,7 +78,9 @@ let step = 0;
 
 function go(n: number) {
   step = Math.max(0, Math.min(panes.length - 1, n));
-  track.style.transform = `translateX(${-step * 100}%)`;
+  // Panes run right to left in Persian, so the track slides the other way.
+  const sign = document.dir === 'rtl' ? 1 : -1;
+  track.style.transform = `translateX(${sign * step * 100}%)`;
   panes.forEach((p, i) => {
     p.inert = i !== step;
     if (i === step) p.scrollTop = 0;

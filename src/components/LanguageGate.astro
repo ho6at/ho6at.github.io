@@ -1,6 +1,9 @@
 ---
-// First visit: ask which language to use, then remember it.
-// The <html> gets the `ask-lang` class from an inline script in Base.astro, so the gate shows before first paint.
+// Asks for a language at the start of every visit. The <html> gets the `ask-lang` class from an
+// inline script in Base.astro, so the gate shows before first paint; the choice is kept in
+// sessionStorage, so it is asked again on the next visit.
+import { languages } from '../i18n/languages';
+
 interface Props {
   lang: string;
 }
@@ -14,18 +17,19 @@ const { lang } = Astro.props;
       <img src="/brand/luminoor-logo.png" alt="Luminoor Paris" width="556" height="166" />
     </picture>
     <p id="gate-title" class="gate-title">
-      <span lang="fr">Choisissez votre langue</span>
-      <span lang="en">Choose your language</span>
+      <span lang="fr" dir="ltr">Choisissez votre langue</span>
+      <span lang="en" dir="ltr">Choose your language</span>
+      <span lang="fa" dir="rtl">زبان خود را انتخاب کنید</span>
     </p>
-    <div class="gate-choices">
-      <a class="gate-choice" href="/" hreflang="fr" lang="fr" data-choose-lang="fr">
-        <span class="gate-name">Français</span>
-        <span class="gate-sub">Continuer en français</span>
-      </a>
-      <a class="gate-choice" href="/en/" hreflang="en" lang="en" data-choose-lang="en">
-        <span class="gate-name">English</span>
-        <span class="gate-sub">Continue in English</span>
-      </a>
+    <div class="gate-choices" dir="ltr">
+      {
+        languages.map((l) => (
+          <a class="gate-choice" href={l.href} hreflang={l.code} lang={l.code} dir={l.dir} data-choose-lang={l.code}>
+            <span class="gate-name">{l.name}</span>
+            <span class="gate-sub">{l.cta}</span>
+          </a>
+        ))
+      }
     </div>
   </div>
 </div>
@@ -35,13 +39,13 @@ const { lang } = Astro.props;
     const root = document.documentElement;
     const gate = document.querySelector('[data-gate]');
     if (!root.classList.contains('ask-lang') || !gate) return;
-    const remember = (value) => {
+    const remember = () => {
       try {
-        localStorage.setItem('luminoor-lang', value);
+        sessionStorage.setItem('luminoor-lang-chosen', '1');
       } catch {}
     };
     const close = () => {
-      remember(lang);
+      remember();
       root.classList.remove('ask-lang');
       // The hero's entrance played behind the gate; play it again now that it can be seen.
       document.querySelectorAll('.hero-mark, .hero h1, .hero-lead, .hero .hero-actions').forEach((el) => {
@@ -51,14 +55,14 @@ const { lang } = Astro.props;
       });
     };
     // Suggest the visitor's own language first.
-    const prefers = (navigator.language || '').toLowerCase().startsWith('fr') ? 'fr' : 'en';
+    const nav = (navigator.language || '').toLowerCase();
+    const prefers = nav.startsWith('fa') ? 'fa' : nav.startsWith('fr') ? 'fr' : 'en';
     const first = gate.querySelector(`[data-choose-lang="${prefers}"]`);
     first.classList.add('suggested');
     gate.querySelectorAll('[data-choose-lang]').forEach((a) =>
       a.addEventListener('click', (e) => {
-        const chosen = a.dataset.chooseLang;
-        remember(chosen);
-        if (chosen === lang) {
+        remember();
+        if (a.dataset.chooseLang === lang) {
           e.preventDefault();
           close();
         }
@@ -85,6 +89,7 @@ const { lang } = Astro.props;
     display: grid;
     place-items: center;
     padding: 1.5rem;
+    overflow-y: auto;
     background:
       radial-gradient(45% 45% at 50% 38%, rgb(255 255 255 / 0.09), transparent 70%),
       var(--bg);
@@ -96,7 +101,7 @@ const { lang } = Astro.props;
     }
   }
   .gate-inner {
-    width: min(34rem, 100%);
+    width: min(46rem, 100%);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -111,7 +116,7 @@ const { lang } = Astro.props;
     margin-top: 2.5rem;
     display: grid;
     gap: 0.2rem;
-    font-size: 1.05rem;
+    font-size: 1rem;
     color: var(--muted);
   }
   .gate-title span:first-child {
@@ -119,11 +124,14 @@ const { lang } = Astro.props;
     font-size: 1.35rem;
     font-weight: 300;
   }
+  .gate-title [lang='fa'] {
+    font-family: 'Vazirmatn', var(--body);
+  }
   .gate-choices {
     margin-top: 2rem;
     width: 100%;
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 0.75rem;
   }
   .gate-choice {
@@ -147,18 +155,23 @@ const { lang } = Astro.props;
   .gate-choice.suggested {
     border-color: var(--accent);
   }
+  .gate-choice[lang='fa'] {
+    font-family: 'Vazirmatn', var(--body);
+  }
   .gate-name {
     font-size: 1.6rem;
     font-weight: 300;
-    letter-spacing: -0.01em;
   }
   .gate-sub {
     font-size: 0.85rem;
     color: var(--muted);
   }
-  @media (max-width: 420px) {
+  @media (max-width: 560px) {
     .gate-choices {
       grid-template-columns: 1fr;
+    }
+    .gate-choice {
+      padding: 1rem;
     }
   }
   @media (prefers-reduced-motion: reduce) {

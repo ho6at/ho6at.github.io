@@ -16,9 +16,6 @@ const en: typeof fr = {
     brands: 'Brands',
     about: 'Team',
     contact: 'Contact',
-    switchLabel: 'FR',
-    switchName: 'Français',
-    switchHref: '/',
   },
   hero: {
     title: 'Paris, in your best light.',

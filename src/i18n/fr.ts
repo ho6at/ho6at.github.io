@@ -14,9 +14,6 @@ export default {
     brands: 'Marques',
     about: 'Équipe',
     contact: 'Contact',
-    switchLabel: 'EN',
-    switchName: 'English',
-    switchHref: '/en/',
   },
   hero: {
     title: 'Paris, sous votre plus belle lumière.',

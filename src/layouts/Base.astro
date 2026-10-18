@@ -1,32 +1,32 @@
 ---
 import '../styles/global.css';
 import { site } from '../site';
+import { languages } from '../i18n/languages';
 
 interface Props {
   lang: string;
   title: string;
   description: string;
-  altHref: string;
-  altLang: string;
-  askLanguage?: boolean;
+  /** Home pages: link the three language versions and ask for a language on each visit. */
+  home?: boolean;
 }
-const { lang, title, description, altHref, altLang, askLanguage = false } = Astro.props;
+const { lang, title, description, home = false } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
+const dir = languages.find((l) => l.code === lang)?.dir ?? 'ltr';
+// Vazirmatn covers Persian; Google Fonts only downloads its glyphs on pages that use them.
+const fonts = 'family=Jost:ital,wght@0,300..600;1,300..400&family=Vazirmatn:wght@200..600';
 ---
 
 <!doctype html>
-<html lang={lang}>
+<html lang={lang} dir={dir}>
   <head>
     <meta charset="utf-8" />
     {
-      askLanguage && (
-        <script is:inline define:vars={{ lang }}>
-          // First visit: ask for a language (LanguageGate). Later visits to the French home page go
-          // straight to English for visitors who chose it. A shared /en/ link is always respected.
+      home && (
+        <script is:inline>
+          // Ask for a language once per visit (LanguageGate); the choice lasts until the tab is closed.
           try {
-            const saved = localStorage.getItem('luminoor-lang');
-            if (!saved) document.documentElement.classList.add('ask-lang');
-            else if (saved === 'en' && lang === 'fr' && location.pathname === '/') location.replace('/en/' + location.hash);
+            if (!sessionStorage.getItem('luminoor-lang-chosen')) document.documentElement.classList.add('ask-lang');
           } catch {}
         </script>
       )
@@ -36,8 +36,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
     {!site.indexable && <meta name="robots" content="noindex" />}
-    <link rel="alternate" hreflang={altLang} href={new URL(altHref, Astro.site)} />
-    <link rel="alternate" hreflang={lang} href={canonical} />
+    {home && languages.map((l) => <link rel="alternate" hreflang={l.code} href={new URL(l.href, Astro.site)} />)}
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
@@ -50,10 +49,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,300..600;1,300..400&display=swap"
-      rel="stylesheet"
-    />
+    <link href={`https://fonts.googleapis.com/css2?${fonts}&display=swap`} rel="stylesheet" />
   </head>
   <body>
     <slot />
