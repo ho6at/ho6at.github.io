@@ -427,7 +427,7 @@ const strings = {
       transform: translate(-50%, -12%) scale(0.94);
     }
   }
-  /* A faint line drawing of the Eiffel Tower behind the logo, dissolving towards the bottom */
+  /* The Eiffel Tower behind the logo, out of focus like a distant background, dissolving towards the bottom */
   .hero-eiffel {
     position: absolute;
     z-index: -1;
@@ -437,10 +437,10 @@ const strings = {
     aspect-ratio: 1 / 2;
     transform: translateX(-50%);
     color: #e6d6bd;
-    opacity: 0.12;
-    filter: blur(0.4px);
-    -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 12%, #000 55%, transparent 100%);
-    mask-image: linear-gradient(180deg, transparent 0%, #000 12%, #000 55%, transparent 100%);
+    opacity: 0.2;
+    filter: blur(4px) drop-shadow(0 0 40px rgb(230 214 189 / 0.35));
+    -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 50%, transparent 98%);
+    mask-image: linear-gradient(180deg, #000 0%, #000 50%, transparent 98%);
     pointer-events: none;
     animation: fade-in 2.4s var(--ease) 0.4s both;
   }

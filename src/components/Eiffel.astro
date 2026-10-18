@@ -1,27 +1,34 @@
 ---
-// An iconic line drawing of the Eiffel Tower, drawn for the hero background.
+// A filled silhouette of the Eiffel Tower at its true proportions (330 m tall, 125 m wide at the base,
+// platforms at 57, 115 and 276 m), lit warmly from below like the tower at night. The hero blurs it.
 ---
 
 <svg class="eiffel" viewBox="0 0 200 400" aria-hidden="true" focusable="false">
-  <g fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke">
-    <!-- antenna and lantern -->
-    <path d="M100 6V34M96 34h8M95 34l-1 10h12l-1-10"></path>
-    <!-- upper shaft, its lattice and the second floor -->
-    <path d="M94 44C93 80 90 118 86 150M106 44C107 80 110 118 114 150"></path>
-    <path d="M95 60h10M94 78h12M93 96h14M91 116h18M89 134h22"></path>
-    <path d="M95 60l11 18M105 60l-11 18M94 78l13 18M106 78l-13 18M93 96l16 20M107 96l-16 20M91 116l20 18M109 116l-20 18"></path>
-    <path d="M80 150h40M78 157h44M80 150v7M120 150v7"></path>
-    <!-- middle section and the first floor -->
-    <path d="M86 157C82 186 76 214 68 240M114 157C118 186 124 214 132 240"></path>
-    <path d="M84 176h32M80 198h40M75 220h50"></path>
-    <path d="M84 176l36 22M116 176l-36 22M80 198l45 22M120 198l-45 22"></path>
-    <path d="M56 240h88M53 249h94M56 240v9M144 240v9"></path>
+  <defs>
+    <linearGradient id="eiffel-light" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="currentColor" stop-opacity="1"></stop>
+      <stop offset="0.55" stop-color="currentColor" stop-opacity="0.85"></stop>
+      <stop offset="1" stop-color="currentColor" stop-opacity="0.6"></stop>
+    </linearGradient>
+    <pattern id="eiffel-lattice" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <rect width="6" height="6" fill="url(#eiffel-light)"></rect>
+      <path d="M0 0V6" stroke="#000" stroke-opacity="0.35" stroke-width="1.4"></path>
+    </pattern>
+  </defs>
+  <g fill="url(#eiffel-lattice)" fill-rule="evenodd">
+    <!-- antenna, lantern and third floor -->
+    <rect x="99.2" y="4" width="1.6" height="34"></rect>
+    <path d="M97 44C97 39 98.5 36 100 36S103 39 103 44Z"></path>
+    <path d="M94.5 66L96 44H104L105.5 66Z"></path>
+    <rect x="90" y="66" width="20" height="6" rx="1"></rect>
+    <!-- upper shaft down to the second floor -->
+    <path d="M93 72C92 120 88 190 80 254H120C112 190 108 120 107 72Z"></path>
+    <rect x="73" y="254" width="54" height="8" rx="1"></rect>
+    <!-- middle section with its inner opening, down to the first floor -->
+    <path d="M78 262C74 280 70 300 62 324H138C130 300 126 280 122 262Z M96 268C95 284 92 302 88 324H112C108 302 105 284 104 268Z"></path>
+    <rect x="50" y="324" width="100" height="9" rx="1"></rect>
     <!-- legs and the great arch -->
-    <path d="M62 249C52 300 36 350 16 394M80 249C74 300 64 350 52 394"></path>
-    <path d="M138 249C148 300 164 350 184 394M120 249C126 300 136 350 148 394"></path>
-    <path d="M52 394C64 330 136 330 148 394"></path>
-    <path d="M67 270h16M60 300h18M52 330h20M117 270h16M122 300h18M128 330h20"></path>
-    <path d="M10 394h52M138 394h52"></path>
+    <path d="M58 333C50 348 38 370 26 396H57C70 357 130 357 143 396H174C162 370 150 348 142 333Z"></path>
   </g>
 </svg>
 
