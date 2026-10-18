@@ -35,6 +35,43 @@ const windows = (day: ReturnType<typeof sunDay>): Record<Light, [Date, Date]> =>
   blue: [day.sunset, day.blueEnd],
 });
 
+/* ---------- Hero logo: one pass of light, once the splash and language picker are gone ---------- */
+const heroMark = $('[data-hero-light]');
+const lightHero = () => {
+  if (heroMark.dataset.heroLight !== 'waiting') return;
+  if (reduceMotion) {
+    heroMark.dataset.heroLight = 'done';
+    return;
+  }
+  heroMark.dataset.heroLight = 'passing';
+  const pass = 2600;
+  const smooth = (x: number) => x * x * (3 - 2 * x);
+  const start = performance.now() + 300;
+  const frame = (now: number) => {
+    const t = Math.min(1, Math.max(0, now - start) / pass);
+    const p = smooth(t);
+    heroMark.style.setProperty('--lx', `${-12 + 124 * p}%`);
+    heroMark.style.setProperty('--ly', `${78 - 105 * Math.sin(Math.PI * p)}%`);
+    heroMark.style.setProperty('--power', (Math.sin(Math.PI * Math.min(1, t * 1.1)) ** 0.6).toFixed(3));
+    if (t < 1) requestAnimationFrame(frame);
+    else {
+      heroMark.style.setProperty('--power', '0');
+      heroMark.dataset.heroLight = 'done';
+    }
+  };
+  requestAnimationFrame(frame);
+};
+const heroVisible = () => !root.classList.contains('splash') && !root.classList.contains('ask-lang');
+if (heroVisible()) lightHero();
+else {
+  const watch = new MutationObserver(() => {
+    if (!heroVisible()) return;
+    watch.disconnect();
+    lightHero();
+  });
+  watch.observe(root, { attributes: true, attributeFilter: ['class'] });
+}
+
 /* ---------- Header and current section ---------- */
 const top = $('[data-top]');
 const onScroll = () => top.classList.toggle('scrolled', window.scrollY > 40);

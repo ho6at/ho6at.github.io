@@ -48,7 +48,7 @@ const { lang } = Astro.props;
       remember();
       root.classList.remove('ask-lang');
       // The hero's entrance played behind the gate; play it again now that it can be seen.
-      document.querySelectorAll('.hero-mark, .hero h1, .hero-lead, .hero .hero-actions').forEach((el) => {
+      document.querySelectorAll('.hero h1, .hero-lead, .hero .hero-actions').forEach((el) => {
         el.style.animation = 'none';
         void el.offsetWidth;
         el.style.animation = '';

@@ -65,11 +65,13 @@ const strings = {
     <div class="hero-light" aria-hidden="true"></div>
     <div class="wrap hero-inner">
       <div class="hero-halo" aria-hidden="true"></div>
-      <div class="hero-mark" aria-hidden="true">
+      <div class="hero-mark" aria-hidden="true" data-hero-light="waiting">
         <picture>
           <source srcset="/brand/luminoor-logo.webp" type="image/webp" />
           <img src="/brand/luminoor-logo.png" alt="" width="556" height="166" fetchpriority="high" />
         </picture>
+        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) => <span class="ray" style={`--i: ${i}`} />)}
+        <span class="lit" />
       </div>
       <h1><span class="sr-only">Luminoor Paris. </span>{t.hero.title}</h1>
       <p class="hero-lead">{t.hero.lead}</p>
@@ -429,51 +431,58 @@ const strings = {
     align-items: center;
     text-align: center;
   }
-  /* The script logo as the hero's mark: written in once, then a single sheen of light */
+  /* The logo, lit once by a passing light (same effect as the splash; driven by scripts/home.ts):
+     it waits in shadow, the light crosses it, then it settles at full brightness */
   .hero-mark {
+    --lx: -12%;
+    --ly: 78%;
+    --power: 0;
     position: relative;
     width: clamp(17rem, 46vw, 40rem);
     filter: drop-shadow(0 18px 40px rgb(0 0 0 / 0.55));
-    -webkit-mask-image: linear-gradient(90deg, #000 45%, transparent 55%);
-    mask-image: linear-gradient(90deg, #000 45%, transparent 55%);
-    -webkit-mask-size: 260% 100%;
-    mask-size: 260% 100%;
-    animation: write 2.2s cubic-bezier(0.45, 0.05, 0.25, 1) 0.2s both;
   }
   .hero-mark img {
     display: block;
     width: 100%;
     height: auto;
+    transition: filter 1.2s var(--ease);
   }
-  .hero-mark::after {
-    content: '';
+  .hero-mark[data-hero-light='waiting'] img,
+  .hero-mark[data-hero-light='passing'] img {
+    filter: brightness(0.22);
+  }
+  /* if the script never runs, do not leave the logo in shadow */
+  .hero-mark[data-hero-light='waiting'] img {
+    animation: unlit-fallback 0s 8s forwards;
+  }
+  @keyframes unlit-fallback {
+    to {
+      filter: none;
+    }
+  }
+  .hero-mark .lit,
+  .hero-mark .ray {
     position: absolute;
     inset: 0;
-    background: linear-gradient(105deg, transparent 40%, rgb(255 244 214 / 0.95) 50%, transparent 60%) 120% 0 / 260% 100%
-      no-repeat;
-    -webkit-mask: url('/brand/luminoor-logo.png') center / contain no-repeat;
-    mask: url('/brand/luminoor-logo.png') center / contain no-repeat;
-    animation: sheen 8s var(--ease) 2.4s infinite;
+    background: radial-gradient(
+      circle at var(--lx) var(--ly),
+      #fffaf0 0%,
+      #ffe2a6 9%,
+      rgb(236 184 98 / 0.85) 20%,
+      rgb(200 150 80 / 0.35) 36%,
+      transparent 58%
+    );
+    -webkit-mask: url('/brand/luminoor-logo.png') center / 100% 100% no-repeat;
+    mask: url('/brand/luminoor-logo.png') center / 100% 100% no-repeat;
+    opacity: var(--power);
+    pointer-events: none;
   }
-  @keyframes write {
-    from {
-      -webkit-mask-position: 100% 0;
-      mask-position: 100% 0;
-    }
-    to {
-      -webkit-mask-position: 0% 0;
-      mask-position: 0% 0;
-    }
-  }
-  /* A pass of light across the logo, then a long pause, then again */
-  @keyframes sheen {
-    0% {
-      background-position: 120% 0;
-    }
-    30%,
-    100% {
-      background-position: -20% 0;
-    }
+  .hero-mark .ray {
+    transform-origin: var(--lx) var(--ly);
+    transform: scale(calc(1 + var(--i) * 0.026));
+    opacity: calc(var(--power) * (0.3 - var(--i) * 0.026));
+    mix-blend-mode: screen;
+    filter: blur(calc(var(--i) * 1.1px));
   }
   h1 {
     margin-top: clamp(2rem, 5vh, 3rem);
@@ -938,8 +947,6 @@ const strings = {
     h1,
     .hero-lead,
     .hero .hero-actions,
-    .hero-mark,
-    .hero-mark::after,
     .hero-halo {
       animation: none;
     }
