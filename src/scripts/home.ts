@@ -1,5 +1,5 @@
 import { phaseAt, sunDay, type Phase } from '../lib/sun';
-import { skyAt } from '../lib/sky';
+import { glowAt } from '../lib/sky';
 
 type Strings = {
   names: Record<Phase, string>;
@@ -11,58 +11,93 @@ type Strings = {
   message: string;
   around: string;
   packages: { id: string; name: string; price: number }[];
-  people: string[];
+  stepOf: string;
+  steps: string[];
 };
+type Light = 'dawn' | 'day' | 'golden' | 'blue';
 
 const main = document.querySelector<HTMLElement>('main[data-strings]')!;
 const S: Strings = JSON.parse(main.dataset.strings!);
 const MIN = 60000;
+const DAY = 86400000;
 const root = document.documentElement;
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 const $ = <T extends Element = HTMLElement>(sel: string, scope: ParentNode = document) => scope.querySelector<T>(sel)!;
+const $$ = <T extends Element = HTMLElement>(sel: string, scope: ParentNode = document) => [
+  ...scope.querySelectorAll<T>(sel),
+];
 const time = (d: Date) =>
   d.toLocaleTimeString(S.locale, { timeZone: 'Europe/Paris', hour: '2-digit', minute: '2-digit' });
 const parisDate = (d: Date) => d.toLocaleDateString('en-CA', { timeZone: 'Europe/Paris' }); // YYYY-MM-DD
+const noonOf = (ymd: string) => new Date(`${ymd}T12:00:00Z`);
+const windows = (day: ReturnType<typeof sunDay>): Record<Light, [Date, Date]> => ({
+  dawn: [day.sunrise, day.dawnEnd],
+  day: [day.dawnEnd, day.goldenStart],
+  golden: [day.goldenStart, day.sunset],
+  blue: [day.sunset, day.blueEnd],
+});
 
-/* ---------- Header ---------- */
+/* ---------- Header and current section ---------- */
 const top = $('[data-top]');
 const onScroll = () => top.classList.toggle('scrolled', window.scrollY > 40);
 addEventListener('scroll', onScroll, { passive: true });
 onScroll();
 
-/* ---------- Sky + light dial ---------- */
+const navLinks = $$<HTMLAnchorElement>('.pill a, .tabbar a');
+const observer = new IntersectionObserver(
+  (entries) => {
+    for (const e of entries) {
+      if (!e.isIntersecting) continue;
+      const id = e.target.id || 'top';
+      navLinks.forEach((a) => a.classList.toggle('current', a.getAttribute('href') === `#${id}`));
+    }
+  },
+  { rootMargin: '-45% 0px -50% 0px' },
+);
+$$('main > section').forEach((s) => observer.observe(s));
+
+/* ---------- Hero light and time scrubber ---------- */
 const today = sunDay(new Date());
 const start = today.dawnStart.getTime() - 45 * MIN;
 const end = today.blueEnd.getTime() + 45 * MIN;
 const span = end - start;
 const frac = (t: number) => (t - start) / span;
-
-// Sun height: 1 at solar noon, 0 on the horizon, below it before sunrise and after sunset.
 const rise = today.sunrise.getTime();
 const set = today.sunset.getTime();
 const height = (t: number) => Math.max(-0.45, Math.sin((Math.PI * (t - rise)) / (set - rise)));
-const HORIZON = 150; // in the 0–200 viewBox
-const yOf = (t: number) => HORIZON - 125 * height(t);
 
-const arc = $<SVGPathElement>('[data-arc]');
-arc.setAttribute(
-  'd',
-  Array.from({ length: 121 }, (_, i) => {
-    const t = start + (span * i) / 120;
-    return `${i ? 'L' : 'M'}${(frac(t) * 1000).toFixed(1)} ${yOf(t).toFixed(1)}`;
-  }).join(''),
-);
-for (const [key, at] of [
-  ['sunrise', today.sunrise],
-  ['sunset', today.sunset],
-] as const) {
-  const tick = $(`[data-tick="${key}"]`);
-  tick.style.left = `${frac(at.getTime()) * 100}%`;
-  $('time', tick).textContent = time(at);
+// Hour ticks along the scrubber
+const ticks = $('[data-ticks]');
+const firstHalf = Math.ceil(start / (30 * MIN)) * 30 * MIN;
+for (let t = firstHalf; t <= end; t += 30 * MIN) {
+  const tick = document.createElement('i');
+  const d = new Date(t);
+  const minutes = Number(time(d).slice(-2));
+  tick.style.left = `${frac(t) * 100}%`;
+  if (minutes === 0) {
+    tick.className = 'hour';
+    const hour = Number(time(d).slice(0, 2));
+    if (hour % 2 === 0) {
+      const label = document.createElement('b');
+      label.textContent = time(d).slice(0, 2) + 'h';
+      label.style.left = tick.style.left;
+      ticks.append(label);
+    }
+  }
+  ticks.append(tick);
 }
+const markers = (['sunrise', 'sunset'] as const).map((key) => {
+  const el = $(`[data-tick="${key}"]`);
+  const at = key === 'sunrise' ? today.sunrise : today.sunset;
+  el.style.left = `${frac(at.getTime()) * 100}%`;
+  $('time', el).textContent = time(at);
+  return { el, f: frac(at.getTime()) };
+});
 
 const dial = $<HTMLInputElement>('[data-dial]');
-const sun = $('[data-sun]');
+const knob = $('[data-sun]');
+const knobLabel = $('[data-knob-label]');
 const dialName = $('[data-dial-name]');
 const dialTime = $('[data-dial-time]');
 const dialMood = $('[data-dial-mood]');
@@ -70,13 +105,19 @@ let touched = false;
 let dialPhase: Phase = 'golden';
 
 function paint(at: Date) {
-  const { colours, dark } = skyAt(at);
-  colours.forEach((c, i) => root.style.setProperty(`--sky-${i + 1}`, c));
-  root.style.setProperty('--sky-ink', dark ? '#f4f1ea' : '#1f2a33');
-
   const t = at.getTime();
-  sun.style.left = `${frac(t) * 100}%`;
-  sun.style.top = `${(yOf(t) / 200) * 100}%`;
+  const f = Math.min(1, Math.max(0, frac(t)));
+  const h = height(t);
+  const [glowB, glowA, core] = glowAt(at);
+  root.style.setProperty('--glow-a', glowA);
+  root.style.setProperty('--glow-b', glowB);
+  root.style.setProperty('--glow-core', core);
+  root.style.setProperty('--sun-x', `${8 + f * 84}%`);
+  root.style.setProperty('--sun-y', `${78 - 46 * h}%`);
+
+  knob.style.left = `${f * 100}%`;
+  knobLabel.style.setProperty('--label-shift', f < 0.12 ? '-12%' : f > 0.88 ? '-88%' : '-50%');
+  markers.forEach((m) => m.el.classList.toggle('hidden', Math.abs(m.f - f) < 0.17));
 
   dialPhase = phaseAt(at).phase;
   dialName.textContent = S.names[dialPhase];
@@ -90,7 +131,6 @@ function setDial(t: number) {
   dial.value = String(Math.round(Math.min(1, Math.max(0, frac(t))) * 1000));
   paint(fromDial());
 }
-
 dial.addEventListener('input', () => {
   touched = true;
   paint(fromDial());
@@ -104,60 +144,105 @@ function tick() {
   livePhase.textContent = S.names[phaseAt(now).phase];
   if (!touched) {
     const t = now.getTime();
-    // Outside today's light (late night), show the coming golden hour instead of a black sky.
+    // Late at night there is nothing to show; preview today's golden hour instead.
     setDial(t >= start && t <= end ? t : today.goldenStart.getTime() + 15 * MIN);
   }
 }
 tick();
 setInterval(tick, 30000);
 
-/* ---------- Session composer ---------- */
-const form = $<HTMLFormElement>('[data-composer]');
-const dateInput = $<HTMLInputElement>('[data-date]');
+// Today's window for each place's light
+const todayWindows = windows(today);
+$$('[data-light-today]').forEach((el) => {
+  const [a, b] = todayWindows[el.dataset.lightToday as Light];
+  el.textContent = `${time(a)}–${time(b)}`;
+});
+
+/* ---------- Booking sheet ---------- */
+const sheet = $<HTMLDialogElement>('[data-sheet]');
+const form = $<HTMLFormElement>('[data-booking]');
+const track = $('[data-track-steps]');
+const panes = $$('[data-pane]', form);
+const progress = $$('.progress span', form);
+const stepLabel = $('[data-step-label]', form);
+const stepTitle = $('[data-step-title]', form);
+const back = $<HTMLButtonElement>('[data-back]', form);
+const next = $<HTMLButtonElement>('[data-next]', form);
+let step = 0;
+
+function go(n: number) {
+  step = Math.max(0, Math.min(panes.length - 1, n));
+  track.style.transform = `translateX(${-step * 100}%)`;
+  panes.forEach((p, i) => {
+    p.inert = i !== step;
+    if (i === step) p.scrollTop = 0;
+  });
+  progress.forEach((p, i) => p.classList.toggle('on', i <= step));
+  stepLabel.textContent = S.stepOf.replace('{n}', String(step + 1)).replace('{total}', String(panes.length));
+  stepTitle.textContent = S.steps.at(step) ?? '';
+  back.classList.toggle('hidden', step === 0);
+  next.classList.toggle('hidden', step === panes.length - 1);
+  update();
+}
+back.addEventListener('click', () => go(step - 1));
+next.addEventListener('click', () => go(step + 1));
+
+// Date strip: the next three weeks, each with that day's golden hour
+const dates = $('[data-dates]', form);
 const now = new Date();
-dateInput.min = parisDate(now);
-dateInput.value = parisDate(new Date(now.getTime() + 86400000));
+for (let i = 0; i < 21; i++) {
+  const d = new Date(now.getTime() + i * DAY);
+  const ymd = parisDate(d);
+  const noon = noonOf(ymd);
+  const label = document.createElement('label');
+  const opts = { timeZone: 'Europe/Paris' } as const;
+  label.innerHTML = `
+    <input type="radio" name="date" value="${ymd}" ${i === 1 ? 'checked' : ''} />
+    <span class="wd">${noon.toLocaleDateString(S.locale, { ...opts, weekday: 'short' })}</span>
+    <span class="dn">${noon.toLocaleDateString(S.locale, { ...opts, day: 'numeric' })}</span>
+    <span class="wd">${noon.toLocaleDateString(S.locale, { ...opts, month: 'short' })}</span>
+    <span class="gt">${time(sunDay(noon).goldenStart)}</span>`;
+  dates.append(label);
+}
+
+// People stepper
+const peopleInput = $<HTMLInputElement>('input[name="people"]', form);
+const peopleOut = $('[data-people-value]', form);
+$$<HTMLButtonElement>('[data-people]', form).forEach((b) =>
+  b.addEventListener('click', () => {
+    const n = Math.min(10, Math.max(1, Number(peopleInput.value) + Number(b.dataset.people)));
+    peopleInput.value = String(n);
+    peopleOut.textContent = String(n);
+    update();
+  }),
+);
 
 const sum = {
-  pkg: $('[data-sum-package]'),
-  date: $('[data-sum-date]'),
-  light: $('[data-sum-light]'),
-  price: $('[data-sum-price]'),
-  group: $('[data-group-note]'),
+  pkg: $('[data-sum-package]', form),
+  date: $('[data-sum-date]', form),
+  light: $('[data-sum-light]', form),
+  people: $('[data-sum-people]', form),
+  price: $('[data-sum-price]', form),
+  group: $('[data-group-note]', form),
+  ticket: $('[data-ticket]', form),
 };
-const sendEmail = $<HTMLAnchorElement>('[data-send-email]');
-const sendWa = document.querySelector<HTMLAnchorElement>('[data-send-wa]');
+const sendEmail = $<HTMLAnchorElement>('[data-send-email]', form);
+const sendWa = form.querySelector<HTMLAnchorElement>('[data-send-wa]');
 
-function windows(day: ReturnType<typeof sunDay>) {
-  return {
-    dawn: [day.sunrise, day.dawnEnd],
-    day: [day.dawnEnd, day.goldenStart],
-    golden: [day.goldenStart, day.sunset],
-    blue: [day.sunset, day.blueEnd],
-  } as Record<'dawn' | 'day' | 'golden' | 'blue', [Date, Date]>;
-}
-
-function setLight(light: string) {
-  const input = form.querySelector<HTMLInputElement>(`input[name="light"][value="${light}"]`);
-  if (input) input.checked = true;
-  updateComposer();
-}
-
-function updateComposer() {
+function update() {
   const data = new FormData(form);
   const pkg = S.packages.find((p) => p.id === data.get('package')) ?? S.packages[1];
-  const dateValue = String(data.get('date') || dateInput.min);
-  const light = String(data.get('light') || 'golden') as keyof ReturnType<typeof windows>;
-  const peopleIndex = Number(data.get('people') || 2) - 1;
+  const ymd = String(data.get('date') || parisDate(new Date(now.getTime() + DAY)));
+  const light = String(data.get('light') || 'golden') as Light;
+  const people = Number(data.get('people') || 2);
   const name = String(data.get('name') || '').trim();
+  const note = String(data.get('note') || '').trim();
 
-  const day = sunDay(new Date(`${dateValue}T12:00:00Z`));
-  const w = windows(day);
+  const w = windows(sunDay(noonOf(ymd)));
   for (const [key, [a, b]] of Object.entries(w)) {
     $(`[data-light-time="${key}"]`, form).textContent = `${time(a)}–${time(b)}`;
   }
-
-  const dateLabel = new Date(`${dateValue}T12:00:00Z`).toLocaleDateString(S.locale, {
+  const dateLabel = noonOf(ymd).toLocaleDateString(S.locale, {
     weekday: 'long',
     day: 'numeric',
     month: 'long',
@@ -167,50 +252,52 @@ function updateComposer() {
     pkg.price,
   );
   const [from, to] = w[light];
-  const lightLabel = S.names[light];
-  const lightTime = `${S.around} ${time(from)}`;
 
   sum.pkg.textContent = pkg.name;
   sum.date.textContent = dateLabel.charAt(0).toUpperCase() + dateLabel.slice(1);
-  sum.light.textContent = `${lightLabel}, ${time(from)}–${time(to)}`;
+  sum.light.textContent = `${S.names[light]}, ${time(from)}–${time(to)}`;
+  sum.people.textContent = String(people);
   sum.price.textContent = price;
-  sum.group.hidden = peopleIndex < 2;
+  sum.group.hidden = people < 3;
+  sum.ticket.className = `ticket plate plate-${light}`;
 
   const body = S.message
     .replace('{package}', pkg.name)
     .replace('{price}', price)
     .replace('{date}', dateLabel)
-    .replace('{light}', lightLabel.toLowerCase())
-    .replace('{time}', lightTime)
-    .replace('{people}', S.people.at(peopleIndex) ?? '2')
+    .replace('{light}', S.names[light].toLowerCase())
+    .replace('{time}', `${S.around} ${time(from)}`)
+    .replace('{people}', String(people))
+    .replace('{note}', note)
     .replace('{name}', name)
+    .replace(/\n{3,}/g, '\n\n')
     .trim();
   sendEmail.href = `mailto:${S.email}?subject=${encodeURIComponent(`${S.subject} — ${pkg.name}`)}&body=${encodeURIComponent(body)}`;
   if (sendWa && S.whatsapp) sendWa.href = `${S.whatsapp}?text=${encodeURIComponent(body)}`;
 }
-
-form.addEventListener('input', updateComposer);
-form.addEventListener('change', updateComposer);
+form.addEventListener('input', update);
+form.addEventListener('change', update);
 form.addEventListener('submit', (e) => e.preventDefault());
-updateComposer();
 
-$('[data-dial-book]').addEventListener('click', () => {
-  setLight(dialPhase === 'night' ? 'blue' : dialPhase);
-});
-
-/* ---------- Places ---------- */
-const places = [...document.querySelectorAll<HTMLElement>('[data-place]')];
-const previews = [...document.querySelectorAll<HTMLElement>('[data-preview-photo]')];
-function activate(i: number) {
-  places.forEach((p, j) => p.classList.toggle('active', i === j));
-  previews.forEach((p, j) => p.classList.toggle('shown', i === j));
+function check(name: string, value?: string) {
+  if (!value) return;
+  const input = form.querySelector<HTMLInputElement>(`input[name="${name}"][value="${value}"]`);
+  if (input) input.checked = true;
 }
-places.forEach((place, i) => {
-  place.addEventListener('mouseenter', () => activate(i));
-  place.addEventListener('focusin', () => activate(i));
-  $('button', place).addEventListener('click', () => {
-    setLight(place.dataset.light!);
-    $('#sessions').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
-  });
+
+$$<HTMLElement>('[data-open-booking]').forEach((b) =>
+  b.addEventListener('click', () => {
+    check('package', b.dataset.package);
+    // The hero's button books the light currently shown on the scrubber.
+    const light = b.dataset.light ?? (b.closest('[data-hero]') ? (dialPhase === 'night' ? 'blue' : dialPhase) : undefined);
+    check('light', light);
+    go(b.dataset.package ? 1 : 0);
+    sheet.showModal();
+  }),
+);
+$('[data-close]', form).addEventListener('click', () => sheet.close());
+sheet.addEventListener('click', (e) => {
+  if (e.target === sheet) sheet.close(); // tap on the backdrop
 });
-activate(0);
+if (reduceMotion) track.style.transition = 'none';
+go(0);

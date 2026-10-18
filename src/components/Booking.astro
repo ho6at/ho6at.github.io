@@ -1,0 +1,597 @@
+---
+// App-style booking sheet: package → date and light → details → summary.
+import { site } from '../site';
+import type fr from '../i18n/fr';
+
+interface Props {
+  t: typeof fr;
+}
+const { t } = Astro.props;
+const s = t.sessions;
+const packageLight = { essentiel: 'day', signature: 'golden', lumiere: 'blue' } as Record<string, string>;
+const lights = ['dawn', 'day', 'golden', 'blue'] as const;
+---
+
+<dialog class="sheet" data-sheet aria-labelledby="sheet-title">
+  <form class="sheet-inner" data-booking>
+    <header class="sheet-head">
+      <span class="grabber" aria-hidden="true"></span>
+      <div>
+        <p class="sheet-step" data-step-label></p>
+        <h2 id="sheet-title" data-step-title>{s.steps[0]}</h2>
+      </div>
+      <button type="button" class="close" data-close aria-label={s.close}>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"></path></svg>
+      </button>
+      <div class="progress" aria-hidden="true">
+        {s.steps.map(() => <span />)}
+      </div>
+    </header>
+
+    <div class="viewport">
+      <div class="track" data-track-steps>
+        <!-- 1. Package -->
+        <fieldset class="pane" data-pane>
+          <legend class="sr-only">{s.packageLabel}</legend>
+          <div class="options">
+            {
+              s.packages.map((p, i) => (
+                <label class="option">
+                  <input type="radio" name="package" value={p.id} checked={i === 1} />
+                  <span class={`thumb plate plate-${packageLight[p.id]}`} aria-hidden="true" />
+                  <span class="option-text">
+                    <span class="option-name">{p.name}</span>
+                    <span class="option-meta">
+                      {p.duration} · {p.places}
+                    </span>
+                    <span class="option-body">{p.includes}</span>
+                  </span>
+                  <span class="option-price">{p.price} €</span>
+                </label>
+              ))
+            }
+          </div>
+        </fieldset>
+
+        <!-- 2. Date and light -->
+        <div class="pane" data-pane>
+          <fieldset>
+            <legend class="field-label">{s.dateLabel}</legend>
+            <div class="dates" data-dates></div>
+          </fieldset>
+          <fieldset>
+            <legend class="field-label">{s.lightLabel}</legend>
+            <div class="lights">
+              {
+                lights.map((l) => (
+                  <label class={`light plate plate-${l}`}>
+                    <input type="radio" name="light" value={l} checked={l === 'golden'} />
+                    <span class="light-name">{t.light.names[l]}</span>
+                    <span class="light-time" data-light-time={l} />
+                  </label>
+                ))
+              }
+            </div>
+          </fieldset>
+        </div>
+
+        <!-- 3. Details -->
+        <div class="pane" data-pane>
+          <div class="field">
+            <span class="field-label" id="people-label">{s.peopleLabel}</span>
+            <div class="stepper" role="group" aria-labelledby="people-label">
+              <button type="button" data-people="-1" aria-label="−">−</button>
+              <output data-people-value>2</output>
+              <button type="button" data-people="1" aria-label="+">+</button>
+            </div>
+            <input type="hidden" name="people" value="2" />
+            <p class="hint" data-group-note hidden>{s.groupNote}</p>
+          </div>
+          <label class="field">
+            <span class="field-label">{s.nameLabel}</span>
+            <input type="text" name="name" autocomplete="given-name" placeholder={s.namePlaceholder} />
+          </label>
+          <label class="field">
+            <span class="field-label">{s.noteLabel}</span>
+            <textarea name="note" rows="3" placeholder={s.notePlaceholder}></textarea>
+          </label>
+        </div>
+
+        <!-- 4. Summary -->
+        <div class="pane" data-pane>
+          <div class="ticket plate plate-golden" data-ticket>
+            <div class="ticket-inner">
+              <p class="ticket-package" data-sum-package></p>
+              <dl>
+                <div><dt>{s.dateLabel}</dt><dd data-sum-date></dd></div>
+                <div><dt>{s.lightLabel}</dt><dd data-sum-light></dd></div>
+                <div><dt>{s.peopleLabel}</dt><dd data-sum-people></dd></div>
+              </dl>
+              <p class="ticket-price" data-sum-price></p>
+              <p class="ticket-note">{s.priceNote}</p>
+            </div>
+          </div>
+          <div class="send">
+            <a class="button" data-send-email href={`mailto:${site.email}`}>{s.sendEmail}</a>
+            {site.whatsapp && <a class="button ghost" data-send-wa href={site.whatsapp}>{s.sendWhatsapp}</a>}
+          </div>
+          <p class="hint">{s.reassurance}</p>
+        </div>
+      </div>
+    </div>
+
+    <footer class="sheet-foot">
+      <button type="button" class="button ghost" data-back>{s.back}</button>
+      <button type="button" class="button" data-next>{s.next}</button>
+    </footer>
+  </form>
+</dialog>
+
+<style>
+  .sheet {
+    padding: 0;
+    border: 0;
+    margin: auto;
+    width: min(40rem, calc(100vw - 2rem));
+    max-height: min(52rem, calc(100svh - 3rem));
+    border-radius: 28px;
+    background: var(--surface);
+    color: var(--ivory);
+    box-shadow:
+      0 0 0 1px var(--line),
+      0 40px 120px -20px rgb(0 0 0 / 0.85);
+    overflow: hidden;
+  }
+  .sheet::backdrop {
+    background: rgb(5 5 4 / 0.6);
+    backdrop-filter: blur(10px);
+  }
+  .sheet[open] {
+    animation: sheet-in 0.55s var(--ease);
+  }
+  .sheet[open]::backdrop {
+    animation: fade 0.4s ease;
+  }
+  @keyframes sheet-in {
+    from {
+      opacity: 0;
+      transform: translateY(28px) scale(0.98);
+    }
+  }
+  @keyframes fade {
+    from {
+      opacity: 0;
+    }
+  }
+  .sheet-inner {
+    display: flex;
+    flex-direction: column;
+    max-height: inherit;
+  }
+
+  .sheet-head {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0.25rem 1rem;
+    padding: 1.5rem 1.5rem 1rem;
+  }
+  .grabber {
+    display: none;
+  }
+  .sheet-step {
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+  .sheet-head h2 {
+    font-size: 1.9rem;
+  }
+  .close {
+    width: 2.4rem;
+    height: 2.4rem;
+    border-radius: 50%;
+    border: 1px solid var(--line);
+    background: rgb(236 228 214 / 0.05);
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+  }
+  .close svg {
+    width: 1.1rem;
+    height: 1.1rem;
+    stroke: currentColor;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+  }
+  .progress {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.35rem;
+    margin-top: 1rem;
+  }
+  .progress span {
+    height: 3px;
+    border-radius: 3px;
+    background: var(--line);
+    transition: background 0.5s var(--ease);
+  }
+  .progress span:global(.on) {
+    background: var(--gold);
+  }
+
+  .viewport {
+    overflow: hidden;
+    flex: 1;
+    min-height: 0;
+  }
+  .track {
+    display: flex;
+    height: 100%;
+    transition: transform 0.55s var(--ease);
+  }
+  .pane {
+    flex: 0 0 100%;
+    min-width: 0;
+    border: 0;
+    margin: 0;
+    padding: 0.5rem 1.5rem 1.5rem;
+    overflow-y: auto;
+    max-height: min(36rem, calc(100svh - 15rem));
+    display: grid;
+    grid-auto-rows: max-content;
+    gap: 1.5rem;
+    align-content: start;
+  }
+  fieldset {
+    border: 0;
+    margin: 0;
+    padding: 0;
+    min-width: 0;
+  }
+  .field-label {
+    display: block;
+    padding: 0;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--muted);
+    margin-bottom: 0.7rem;
+  }
+  input[type='radio'],
+  .dates :global(input) {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* Package options */
+  .options {
+    display: grid;
+    gap: 0.75rem;
+  }
+  .option {
+    position: relative;
+    display: grid;
+    grid-template-columns: 4.5rem minmax(0, 1fr) auto;
+    gap: 1rem;
+    align-items: center;
+    padding: 0.75rem;
+    border-radius: 20px;
+    border: 1px solid var(--line);
+    background: var(--raised);
+    cursor: pointer;
+    transition:
+      border-color 0.3s var(--ease),
+      background 0.3s var(--ease);
+  }
+  .option:has(input:checked) {
+    border-color: var(--gold);
+    background: linear-gradient(90deg, rgb(201 169 107 / 0.14), rgb(201 169 107 / 0.03));
+  }
+  .option:has(input:focus-visible) {
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
+  }
+  .thumb {
+    aspect-ratio: 1;
+    border-radius: 14px;
+  }
+  .option-text {
+    display: grid;
+    gap: 0.1rem;
+  }
+  .option-name {
+    font-family: var(--display);
+    font-size: 1.45rem;
+    line-height: 1.15;
+  }
+  .option-meta {
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+  .option-body {
+    font-size: 0.875rem;
+    color: rgb(236 228 214 / 0.8);
+  }
+  .option-price {
+    font-family: var(--display);
+    font-size: 1.4rem;
+    color: var(--gold-soft);
+    padding-right: 0.4rem;
+    white-space: nowrap;
+  }
+
+  /* Date strip */
+  .dates {
+    display: flex;
+    gap: 0.5rem;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+    margin-inline: -1.5rem;
+    padding: 0.2rem 1.5rem 0.4rem;
+  }
+  .dates::-webkit-scrollbar {
+    display: none;
+  }
+  .dates :global(label) {
+    position: relative;
+    flex: 0 0 4.4rem;
+    scroll-snap-align: start;
+    display: grid;
+    justify-items: center;
+    gap: 0.1rem;
+    padding: 0.7rem 0.3rem 0.65rem;
+    border-radius: 18px;
+    border: 1px solid var(--line);
+    background: var(--raised);
+    cursor: pointer;
+    transition:
+      background 0.3s var(--ease),
+      border-color 0.3s var(--ease),
+      color 0.3s var(--ease);
+  }
+  .dates :global(label .wd) {
+    font-size: 0.72rem;
+    color: var(--muted);
+    text-transform: capitalize;
+  }
+  .dates :global(label .dn) {
+    font-family: var(--display);
+    font-size: 1.6rem;
+    line-height: 1.1;
+  }
+  .dates :global(label .gt) {
+    font-size: 0.68rem;
+    color: var(--gold-soft);
+    font-variant-numeric: tabular-nums;
+  }
+  .dates :global(label:has(input:checked)) {
+    background: var(--ivory);
+    border-color: var(--ivory);
+    color: #17120a;
+  }
+  .dates :global(label:has(input:checked) .wd),
+  .dates :global(label:has(input:checked) .gt) {
+    color: #5b4a2c;
+  }
+  .dates :global(label:has(input:focus-visible)) {
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
+  }
+
+  /* Light options */
+  .lights {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.6rem;
+  }
+  .light {
+    aspect-ratio: 16 / 10;
+    padding: 0.85rem 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    cursor: pointer;
+    border-radius: 18px;
+    outline: 1px solid var(--line);
+    outline-offset: -1px;
+    transition: outline-color 0.3s var(--ease);
+  }
+  .light > span {
+    position: relative;
+    z-index: 2;
+  }
+  .light:has(input:checked) {
+    outline: 2px solid var(--gold);
+    outline-offset: -2px;
+  }
+  .light:has(input:focus-visible) {
+    outline: 2px solid var(--ivory);
+  }
+  .light-name {
+    font-family: var(--display);
+    font-size: 1.3rem;
+  }
+  .light-time {
+    font-size: 0.8rem;
+    color: rgb(236 228 214 / 0.82);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Details */
+  .field {
+    display: grid;
+  }
+  .field input[type='text'],
+  .field textarea {
+    font: inherit;
+    color: var(--ivory);
+    background: var(--raised);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 0.9rem 1rem;
+    resize: vertical;
+  }
+  .field input::placeholder,
+  .field textarea::placeholder {
+    color: rgb(155 147 135 / 0.7);
+  }
+  .field input:focus-visible,
+  .field textarea:focus-visible {
+    outline: none;
+    border-color: var(--gold);
+  }
+  .stepper {
+    display: inline-flex;
+    align-items: center;
+    justify-self: start;
+    gap: 0.25rem;
+    padding: 0.3rem;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: var(--raised);
+  }
+  .stepper button {
+    width: 2.6rem;
+    height: 2.6rem;
+    border-radius: 50%;
+    border: 0;
+    background: rgb(236 228 214 / 0.08);
+    font-size: 1.25rem;
+    cursor: pointer;
+  }
+  .stepper button:hover {
+    background: rgb(236 228 214 / 0.16);
+  }
+  .stepper output {
+    min-width: 2.5rem;
+    text-align: center;
+    font-family: var(--display);
+    font-size: 1.5rem;
+  }
+  .hint {
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-top: 0.6rem;
+  }
+
+  /* Summary */
+  .ticket {
+    border-radius: 24px;
+  }
+  .ticket-inner {
+    position: relative;
+    z-index: 2;
+    padding: 1.5rem;
+    background: linear-gradient(180deg, rgb(13 12 11 / 0.15), rgb(13 12 11 / 0.72));
+  }
+  .ticket-package {
+    font-family: var(--display);
+    font-size: 2.4rem;
+    line-height: 1;
+  }
+  dl {
+    margin: 1.25rem 0 0;
+    display: grid;
+    gap: 0.6rem;
+  }
+  dl div {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid rgb(236 228 214 / 0.15);
+  }
+  dt {
+    color: rgb(236 228 214 / 0.7);
+    font-size: 0.9rem;
+  }
+  dd {
+    margin: 0;
+    text-align: right;
+    font-weight: 500;
+  }
+  .ticket-price {
+    font-family: var(--display);
+    font-size: 3rem;
+    line-height: 1;
+    margin-top: 1.25rem;
+    color: var(--gold-soft);
+  }
+  .ticket-note {
+    font-size: 0.8rem;
+    color: rgb(236 228 214 / 0.7);
+    margin-top: 0.5rem;
+  }
+  .send {
+    display: grid;
+    gap: 0.6rem;
+  }
+
+  .sheet-foot {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 1rem 1.5rem 1.5rem;
+    border-top: 1px solid var(--line);
+  }
+  .sheet-foot .button {
+    flex: 1;
+  }
+  .sheet-foot :global(.hidden) {
+    visibility: hidden;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .sheet[open],
+    .sheet[open]::backdrop {
+      animation: none;
+    }
+    .track {
+      transition: none;
+    }
+  }
+
+  /* Phones: a bottom sheet */
+  @media (max-width: 640px) {
+    .sheet {
+      width: 100%;
+      max-width: none;
+      max-height: 94svh;
+      margin: auto 0 0;
+      border-radius: 28px 28px 0 0;
+    }
+    .sheet[open] {
+      animation: sheet-up 0.5s var(--ease);
+    }
+    @keyframes sheet-up {
+      from {
+        transform: translateY(100%);
+      }
+    }
+    .grabber {
+      display: block;
+      position: absolute;
+      top: 0.55rem;
+      left: 50%;
+      width: 2.5rem;
+      height: 4px;
+      margin-left: -1.25rem;
+      border-radius: 4px;
+      background: var(--line-strong);
+    }
+    .pane {
+      max-height: calc(94svh - 13.5rem);
+    }
+    .option {
+      grid-template-columns: 3.5rem minmax(0, 1fr) auto;
+    }
+    .option-body {
+      display: none;
+    }
+    .sheet-foot {
+      padding-bottom: max(1.25rem, env(safe-area-inset-bottom));
+    }
+  }
+</style>

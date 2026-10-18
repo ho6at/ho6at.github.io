@@ -7,7 +7,9 @@ export default {
       'Séances photo à Paris pour voyageurs, couples et demandes en mariage. Reels et contenu photo pour les marques, avec photographe et modèle dans la même équipe.',
   },
   nav: {
+    home: 'Accueil',
     sessions: 'Séances',
+    book: 'Réserver',
     places: 'Lieux',
     brands: 'Marques',
     about: 'Équipe',
@@ -19,7 +21,8 @@ export default {
   hero: {
     title: 'Paris, sous votre plus belle lumière.',
     lead: 'Séances photo pour celles et ceux qui visitent Paris, et contenu vidéo pour les marques. Photographe et modèle dans la même équipe.',
-    ctaSecondary: 'Contenu pour marques',
+    cta: 'Réserver une séance',
+    ctaSecondary: 'Pour les marques',
   },
   light: {
     now: 'À Paris, il est',
@@ -44,8 +47,10 @@ export default {
     },
   },
   sessions: {
-    title: 'Composez votre séance',
-    lead: 'Choisissez la formule, la date et la lumière. On calcule l’heure exacte du soleil ce jour-là et vous envoyez la demande en un clic.',
+    title: 'Les séances',
+    lead: 'Trois formules, une seule règle : on photographie à la bonne lumière. Photos retouchées livrées en galerie privée sous 72 heures.',
+    choose: 'Choisir',
+    from: 'TTC',
     packageLabel: 'Formule',
     packages: [
       { id: 'essentiel', name: 'Essentiel', duration: '45 min', places: '1 lieu', includes: '25 photos retouchées', price: 190 },
@@ -69,8 +74,9 @@ export default {
     dateLabel: 'Date',
     lightLabel: 'Lumière',
     peopleLabel: 'Personnes',
-    people: ['1', '2', '3 ou plus'],
     groupNote: 'À partir de 3 personnes, on vous envoie un devis.',
+    noteLabel: 'Un mot pour nous (facultatif)',
+    notePlaceholder: 'Demande en mariage, tenues, idées…',
     nameLabel: 'Votre prénom',
     namePlaceholder: 'Camille',
     summary: 'Votre demande',
@@ -81,8 +87,15 @@ export default {
     extras: 'En option : coiffure et maquillage, retouche express sous 24 h, album imprimé.',
     subject: 'Demande de séance',
     message:
-      'Bonjour Luminoor,\n\nJe souhaite réserver la séance {package} ({price}) le {date}, {light} ({time}), pour {people} personne(s).\n\nMerci,\n{name}',
+      'Bonjour Luminoor,\n\nJe souhaite réserver la séance {package} ({price}) le {date}, {light} ({time}), pour {people} personne(s).\n\n{note}\n\nMerci,\n{name}',
     around: 'vers',
+    sheetTitle: 'Réserver une séance',
+    steps: ['Formule', 'Date et lumière', 'Vos informations', 'Récapitulatif'],
+    next: 'Continuer',
+    back: 'Retour',
+    close: 'Fermer',
+    goldenShort: 'dorée',
+    stepOf: 'Étape {n} sur {total}',
   },
   places: {
     title: 'Nos lieux, à leur meilleure heure',
@@ -94,7 +107,8 @@ export default {
       { name: 'Pont Alexandre III', light: 'golden', note: 'Dorures, Seine et Invalides en fond.' },
       { name: 'Montmartre', light: 'blue', note: 'Ruelles pavées et Paris qui s’allume en contrebas.' },
     ],
-    choose: 'Choisir cette lumière',
+    choose: 'Réserver à cette lumière',
+    today: 'Aujourd’hui',
   },
   brands: {
     title: 'Contenu pour les marques',

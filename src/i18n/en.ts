@@ -9,7 +9,9 @@ const en: typeof fr = {
       'Photoshoots in Paris for travellers, couples and proposals. Reels and photo content for brands, with photographer and model on the same team.',
   },
   nav: {
+    home: 'Home',
     sessions: 'Sessions',
+    book: 'Book',
     places: 'Places',
     brands: 'Brands',
     about: 'Team',
@@ -21,7 +23,8 @@ const en: typeof fr = {
   hero: {
     title: 'Paris, in your best light.',
     lead: 'Photoshoots for people visiting Paris, and video content for brands. Photographer and model on the same team.',
-    ctaSecondary: 'Content for brands',
+    cta: 'Book a session',
+    ctaSecondary: 'For brands',
   },
   light: {
     now: 'In Paris it is',
@@ -46,8 +49,10 @@ const en: typeof fr = {
     },
   },
   sessions: {
-    title: 'Plan your session',
-    lead: 'Pick the package, the date and the light. We work out the exact sun times for that day, and you send the request in one click.',
+    title: 'Sessions',
+    lead: 'Three packages, one rule: we shoot in the right light. Edited photos delivered in a private gallery within 72 hours.',
+    choose: 'Choose',
+    from: 'incl. VAT',
     packageLabel: 'Package',
     packages: [
       { id: 'essentiel', name: 'Essentiel', duration: '45 min', places: '1 location', includes: '25 edited photos', price: 190 },
@@ -71,8 +76,9 @@ const en: typeof fr = {
     dateLabel: 'Date',
     lightLabel: 'Light',
     peopleLabel: 'People',
-    people: ['1', '2', '3 or more'],
     groupNote: 'For 3 people or more, we’ll send you a quote.',
+    noteLabel: 'A note for us (optional)',
+    notePlaceholder: 'Proposal, outfits, ideas…',
     nameLabel: 'Your first name',
     namePlaceholder: 'Alex',
     summary: 'Your request',
@@ -83,8 +89,15 @@ const en: typeof fr = {
     extras: 'Add-ons: hair and make-up, 24-hour express editing, printed album.',
     subject: 'Session request',
     message:
-      'Hello Luminoor,\n\nI’d like to book the {package} session ({price}) on {date}, {light} ({time}), for {people} people.\n\nThanks,\n{name}',
+      'Hello Luminoor,\n\nI’d like to book the {package} session ({price}) on {date}, {light} ({time}), for {people} people.\n\n{note}\n\nThanks,\n{name}',
     around: 'around',
+    sheetTitle: 'Book a session',
+    steps: ['Package', 'Date and light', 'Your details', 'Summary'],
+    next: 'Continue',
+    back: 'Back',
+    close: 'Close',
+    goldenShort: 'golden',
+    stepOf: 'Step {n} of {total}',
   },
   places: {
     title: 'Our places, at their best hour',
@@ -96,7 +109,8 @@ const en: typeof fr = {
       { name: 'Pont Alexandre III', light: 'golden', note: 'Gilded statues, the Seine and Les Invalides behind.' },
       { name: 'Montmartre', light: 'blue', note: 'Cobbled lanes and Paris lighting up below.' },
     ],
-    choose: 'Choose this light',
+    choose: 'Book in this light',
+    today: 'Today',
   },
   brands: {
     title: 'Content for brands',

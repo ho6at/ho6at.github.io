@@ -1,17 +1,5 @@
 import { sunDay } from './sun';
 
-// The colour of the Paris sky through the day, as three gradient stops (top, middle, bottom).
-type Sky = [string, string, string];
-
-const NIGHT: Sky = ['#0b1426', '#152240', '#26344f'];
-const PREDAWN: Sky = ['#26355e', '#6b5a7e', '#c98c8f'];
-const SUNRISE: Sky = ['#eea58c', '#f5c6b0', '#f8e7dc'];
-const MORNING: Sky = ['#c9d9e6', '#e4ecf1', '#fbfbf9'];
-const MIDDAY: Sky = ['#a9c6de', '#d6e4ee', '#f6f8f9'];
-const GOLDEN: Sky = ['#efbd74', '#f6d7a4', '#fbefdc'];
-const SUNSET: Sky = ['#cf6a55', '#ec9a70', '#f6cda2'];
-const BLUE: Sky = ['#1b2e5a', '#2f4a7a', '#6a7aa0'];
-
 const HOUR = 3600000;
 
 const hex = (h: string) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
@@ -20,37 +8,37 @@ const mix = (a: string, b: string, k: number) =>
     .map((v, i) => Math.round(v + (hex(b).at(i)! - v) * k))
     .join(' ')})`;
 
-function luminance(h: string) {
-  const [r, g, b] = hex(h).map((v) => v / 255);
-  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
-}
+// The glow that lights the dark hero: [haze, glow, core] per moment of the day, kept saturated so
+// mixes between them stay clean rather than muddy.
+type Glow = [string, string, string];
+const G_NIGHT: Glow = ['#0f1a33', '#22345e', '#8fa3d6'];
+const G_PREDAWN: Glow = ['#2a2148', '#5b4778', '#d9b3c8'];
+const G_SUNRISE: Glow = ['#4a2436', '#e0907a', '#ffe0cc'];
+const G_MORNING: Glow = ['#2b3a4a', '#a9bfcf', '#ffffff'];
+const G_MIDDAY: Glow = ['#2e3f50', '#c4d4de', '#ffffff'];
+const G_GOLDEN: Glow = ['#5a3b1c', '#e6a95a', '#ffe6b8'];
+const G_SUNSET: Glow = ['#5a1f24', '#e2734e', '#ffd2a6'];
+const G_BLUE: Glow = ['#0e1d42', '#4566b0', '#c8d6ff'];
 
-export function skyAt(time: Date) {
+export function glowAt(time: Date): Glow {
   const s = sunDay(time);
-  const midday = new Date((s.dawnEnd.getTime() + s.goldenStart.getTime()) / 2);
-  const stops: [number, Sky][] = [
-    [s.dawnStart.getTime() - HOUR, NIGHT],
-    [s.dawnStart.getTime(), PREDAWN],
-    [s.sunrise.getTime(), SUNRISE],
-    [s.dawnEnd.getTime(), MORNING],
-    [midday.getTime(), MIDDAY],
-    [s.goldenStart.getTime(), GOLDEN],
-    [s.sunset.getTime(), SUNSET],
-    [s.blueEnd.getTime(), BLUE],
-    [s.blueEnd.getTime() + HOUR, NIGHT],
+  const midday = (s.dawnEnd.getTime() + s.goldenStart.getTime()) / 2;
+  const stops: [number, Glow][] = [
+    [s.dawnStart.getTime() - HOUR, G_NIGHT],
+    [s.dawnStart.getTime(), G_PREDAWN],
+    [s.sunrise.getTime(), G_SUNRISE],
+    [s.dawnEnd.getTime(), G_MORNING],
+    [midday, G_MIDDAY],
+    [s.goldenStart.getTime(), G_GOLDEN],
+    [s.sunset.getTime() - 10 * 60000, G_SUNSET],
+    [s.sunset.getTime() + 12 * 60000, G_BLUE],
+    [s.blueEnd.getTime() + HOUR, G_NIGHT],
   ];
   const t = time.getTime();
-  let colours: string[] = NIGHT;
-  let dark = true;
   for (let i = 0; i < stops.length - 1; i++) {
     const [t0, a] = stops.at(i)!;
     const [t1, b] = stops.at(i + 1)!;
-    if (t >= t0 && t <= t1) {
-      const k = (t - t0) / (t1 - t0);
-      colours = a.map((c, j) => mix(c, b.at(j)!, k));
-      dark = luminance(k < 0.5 ? a[1] : b[1]) < 0.45;
-      break;
-    }
+    if (t >= t0 && t <= t1) return a.map((c, j) => mix(c, b.at(j)!, (t - t0) / (t1 - t0))) as Glow;
   }
-  return { colours, dark };
+  return G_NIGHT;
 }
