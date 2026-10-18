@@ -83,6 +83,24 @@ if (matchMedia('(hover: hover)').matches) {
     list.push(document.documentElement.scrollHeight - window.innerHeight); // the very bottom
     return list.map((y) => Math.max(0, Math.round(y))).sort((a, b) => a - b);
   };
+  // A slow, gentle glide (the browser's own smooth scroll is too quick and can't be timed)
+  const duration = 1100;
+  const ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+  const glide = (to: number, done: () => void) => {
+    if (reduceMotion) {
+      window.scrollTo({ top: to, behavior: 'instant' });
+      return setTimeout(done, 50);
+    }
+    const from = window.scrollY;
+    const start = performance.now();
+    const step = (now: number) => {
+      const t = Math.min(1, (now - start) / duration);
+      window.scrollTo({ top: from + (to - from) * ease(t), behavior: 'instant' });
+      if (t < 1) requestAnimationFrame(step);
+      else setTimeout(done, 120); // let trackpad momentum die down before the next move
+    };
+    requestAnimationFrame(step);
+  };
   let moving = false;
   addEventListener(
     'wheel',
@@ -97,11 +115,10 @@ if (matchMedia('(hover: hover)').matches) {
       const next = down ? points.find((p) => p > y + 2) : [...points].reverse().find((p) => p < y - 2);
       if (next === undefined) return;
       // inside a section taller than the screen: scroll through it normally until its end is near
-      if (Math.abs(next - y) > window.innerHeight) return;
+      if (Math.abs(next - y) > window.innerHeight * 1.3) return;
       e.preventDefault();
       moving = true;
-      window.scrollTo({ top: next, behavior: reduceMotion ? 'auto' : 'smooth' });
-      setTimeout(() => (moving = false), reduceMotion ? 50 : 850);
+      glide(next, () => (moving = false));
     },
     { passive: false },
   );
