@@ -74,6 +74,55 @@ else {
   watch.observe(root, { attributes: true, attributeFilter: ['class'] });
 }
 
+/* ---------- Mouse and trackpad: a little scroll glides to the next or previous section ---------- */
+if (matchMedia('(hover: hover)').matches) {
+  const stops = () => {
+    const list = $$<HTMLElement>('main > .hero, main > .section, main > .contact').map(
+      (el) => el.getBoundingClientRect().top + window.scrollY - parseFloat(getComputedStyle(el).scrollMarginTop || '0'),
+    );
+    list.push(document.documentElement.scrollHeight - window.innerHeight); // the very bottom
+    return list.map((y) => Math.max(0, Math.round(y))).sort((a, b) => a - b);
+  };
+  let moving = false;
+  addEventListener(
+    'wheel',
+    (e) => {
+      if (e.ctrlKey || Math.abs(e.deltaY) < Math.abs(e.deltaX)) return;
+      if (root.classList.contains('splash') || root.classList.contains('ask-lang') || document.querySelector('dialog[open]')) return;
+      if (moving) return e.preventDefault();
+      if (Math.abs(e.deltaY) < 4) return;
+      const y = window.scrollY;
+      const down = e.deltaY > 0;
+      const points = stops();
+      const next = down ? points.find((p) => p > y + 2) : [...points].reverse().find((p) => p < y - 2);
+      if (next === undefined) return;
+      // inside a section taller than the screen: scroll through it normally until its end is near
+      if (Math.abs(next - y) > window.innerHeight) return;
+      e.preventDefault();
+      moving = true;
+      window.scrollTo({ top: next, behavior: reduceMotion ? 'auto' : 'smooth' });
+      setTimeout(() => (moving = false), reduceMotion ? 50 : 850);
+    },
+    { passive: false },
+  );
+}
+
+/* ---------- Sections fade in once as they arrive (see html.reveal in global.css) ---------- */
+if (!reduceMotion && 'IntersectionObserver' in window) {
+  root.classList.add('reveal');
+  const arrive = new IntersectionObserver(
+    (entries) => {
+      for (const e of entries) {
+        if (!e.isIntersecting) continue;
+        e.target.classList.add('in');
+        arrive.unobserve(e.target);
+      }
+    },
+    { rootMargin: '0px 0px -15% 0px' },
+  );
+  $$('main > section:not(.hero)').forEach((s) => arrive.observe(s));
+}
+
 /* ---------- Header and current section ---------- */
 const top = $('[data-top]');
 const onScroll = () => top.classList.toggle('scrolled', window.scrollY > 40);

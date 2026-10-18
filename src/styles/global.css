@@ -68,6 +68,49 @@ html {
   -webkit-text-size-adjust: 100%;
   scroll-behavior: smooth;
   background: var(--bg);
+  /* Section by section: on touch screens the swipe settles on the next section's heading (whole
+     sections are the snap areas, so one taller than the screen can still be scrolled through).
+     With a mouse or trackpad, scripts/home.ts moves to the next section instead. */
+}
+@media (hover: none) {
+  html {
+    scroll-snap-type: y mandatory;
+  }
+}
+.hero,
+main > .section,
+main > .contact {
+  scroll-snap-align: start;
+}
+/* land on the heading, just under the fixed header, not on the section's empty top padding */
+main > .section {
+  scroll-margin-top: calc(5.5rem - clamp(6rem, 13vw, 11rem));
+}
+main > .contact {
+  scroll-margin-top: calc(5.5rem - clamp(6rem, 12vw, 10rem));
+}
+body > footer {
+  scroll-snap-align: end;
+}
+
+/* A simple arrival: each section's content fades in and rises once, when it comes into view.
+   Only when the script has marked the page (html.reveal), so nothing stays hidden without it. */
+html.reveal main > section:not(.hero) > * {
+  opacity: 0;
+  transform: translateY(28px);
+  transition:
+    opacity 0.9s var(--ease),
+    transform 0.9s var(--ease);
+}
+html.reveal main > section.in > * {
+  opacity: 1;
+  transform: none;
+}
+html.reveal main > section.in > :nth-child(2) {
+  transition-delay: 0.12s;
+}
+html.reveal main > section.in > :nth-child(3) {
+  transition-delay: 0.24s;
 }
 @media (prefers-reduced-motion: reduce) {
   html {
