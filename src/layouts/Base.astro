@@ -28,8 +28,12 @@ const fonts =
       home && (
         <script is:inline>
           // Ask for a language once per visit (LanguageGate); the choice lasts until the tab is closed.
+          // The opening splash (Splash) also plays once per visit, before the language picker.
           try {
-            if (!sessionStorage.getItem('luminoor-lang-chosen')) document.documentElement.classList.add('ask-lang');
+            const root = document.documentElement;
+            if (!sessionStorage.getItem('luminoor-lang-chosen')) root.classList.add('ask-lang');
+            const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+            if (!still && !sessionStorage.getItem('luminoor-splash')) root.classList.add('splash');
           } catch {}
         </script>
       )

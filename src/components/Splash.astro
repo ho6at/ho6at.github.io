@@ -1,0 +1,118 @@
+---
+// Opening splash, once per visit: the "L" of the logo is written by an invisible pen following its
+// stroke, then the rest of the logo sweeps in and the splash fades away. The <html> gets the `splash`
+// class from an inline script in Base.astro (skipped for reduced motion or a repeat in the same visit).
+// The pen path was traced by hand over the logo image, in the image's own pixels (556 × 166).
+const pen =
+  'M137,47 C133,40 128,34 120,31 C105,25 80,25 66,36 C55,45 58,62 75,68 C92,74 120,70 140,60 ' +
+  'C158,50 175,30 181,15 C185,5 178,1 172,4 C160,10 140,28 125,42 C108,60 90,78 75,92 ' +
+  'C65,101 58,108 50,112 C38,119 15,121 5,113 C-2,105 5,94 22,91 C38,89 52,98 62,107 ' +
+  'C78,120 100,128 125,128 C145,128 160,118 158,106 C156,95 140,92 128,95 C120,97 115,99 112,101';
+---
+
+<div class="splash" data-splash aria-hidden="true">
+  <svg class="splash-logo" viewBox="-6 -6 568 178" role="presentation">
+    <defs>
+      <mask id="splash-pen" maskUnits="userSpaceOnUse" x="-6" y="-6" width="568" height="178">
+        <path class="pen" d={pen} pathLength="1"></path>
+      </mask>
+      <mask id="splash-rest" maskUnits="userSpaceOnUse" x="-6" y="-6" width="568" height="178">
+        <rect class="sweep" x="150" y="-6" width="412" height="178"></rect>
+      </mask>
+    </defs>
+    <image href="/brand/luminoor-logo.png" width="556" height="166" mask="url(#splash-pen)"></image>
+    <image class="rest" href="/brand/luminoor-logo.png" width="556" height="166" mask="url(#splash-rest)"></image>
+  </svg>
+</div>
+
+<script is:inline>
+  (() => {
+    const root = document.documentElement;
+    const splash = document.querySelector('[data-splash]');
+    if (!root.classList.contains('splash') || !splash) return;
+    let done = false;
+    const finish = () => {
+      if (done) return;
+      done = true;
+      try {
+        sessionStorage.setItem('luminoor-splash', '1');
+      } catch {}
+      splash.classList.add('leaving');
+      setTimeout(() => {
+        root.classList.remove('splash');
+        // The hero's entrance played under the splash; play it again unless the language picker is up
+        // (the picker replays it when it closes).
+        if (!root.classList.contains('ask-lang')) {
+          document.querySelectorAll('.hero-mark, .hero h1, .hero-lead, .hero .hero-actions').forEach((el) => {
+            el.style.animation = 'none';
+            void el.offsetWidth;
+            el.style.animation = '';
+          });
+        }
+      }, 650);
+    };
+    splash.addEventListener('click', finish);
+    setTimeout(finish, 3300);
+  })();
+</script>
+
+<style>
+  .splash {
+    display: none;
+  }
+  :global(html.splash) {
+    overflow: hidden;
+  }
+  :global(html.splash) .splash {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    display: grid;
+    place-items: center;
+    background:
+      radial-gradient(40% 40% at 50% 50%, rgb(226 182 96 / 0.12), transparent 70%),
+      var(--bg);
+    cursor: pointer;
+    transition: opacity 0.65s var(--ease);
+  }
+  .splash.leaving {
+    opacity: 0;
+  }
+  .splash-logo {
+    width: min(78vw, 30rem);
+    height: auto;
+    overflow: visible;
+    filter: drop-shadow(0 12px 30px rgb(0 0 0 / 0.6));
+  }
+
+  /* The pen: a wide stroke drawn along the L's path, used as a mask over the real logo */
+  .pen {
+    fill: none;
+    stroke: #fff;
+    stroke-width: 16;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: write-l 1.9s cubic-bezier(0.55, 0.1, 0.35, 1) 0.25s forwards;
+  }
+  @keyframes write-l {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  /* Then the rest of the word sweeps in, left to right */
+  .sweep {
+    fill: #fff;
+    transform-box: fill-box;
+    transform-origin: left center;
+    transform: scaleX(0);
+    animation: sweep-in 0.9s cubic-bezier(0.45, 0.05, 0.25, 1) 2s forwards;
+  }
+  @keyframes sweep-in {
+    to {
+      transform: scaleX(1);
+    }
+  }
+</style>
