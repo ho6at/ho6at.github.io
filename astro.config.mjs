@@ -1,7 +1,7 @@
 import { defineConfig } from 'astro/config';
 
 export default defineConfig({
-  site: 'https://ho6at.github.io',
+  site: 'https://luminoor.studio',
   i18n: {
     defaultLocale: 'fr',
     locales: ['fr', 'en', 'fa'],
