@@ -91,8 +91,8 @@ const { lang } = Astro.props;
     padding: 1.5rem;
     overflow-y: auto;
     background:
-      radial-gradient(42% 40% at 50% 30%, rgb(226 182 96 / 0.16), transparent 70%),
-      radial-gradient(70% 50% at 50% 115%, rgb(226 182 96 / 0.08), transparent 70%),
+      radial-gradient(42% 40% at 50% 30%, rgb(220 200 170 / 0.16), transparent 70%),
+      radial-gradient(70% 50% at 50% 115%, rgb(220 200 170 / 0.08), transparent 70%),
       var(--bg);
     animation: gate-in 0.6s var(--ease) both;
   }
@@ -120,7 +120,7 @@ const { lang } = Astro.props;
     width: 4.5rem;
     height: 1px;
     margin: 2rem auto 0;
-    background: linear-gradient(90deg, transparent, #e6c472, transparent);
+    background: linear-gradient(90deg, transparent, #e6d6bd, transparent);
   }
   .gate-title {
     margin-top: 2rem;
@@ -132,7 +132,7 @@ const { lang } = Astro.props;
   .gate-title span:first-child {
     font-size: 1.35rem;
     font-weight: 300;
-    background: var(--gold-foil);
+    background: var(--champagne-foil);
     background-size: 200% 100%;
     -webkit-background-clip: text;
     background-clip: text;
@@ -164,20 +164,20 @@ const { lang } = Astro.props;
       transform 0.3s var(--ease);
   }
   .gate-choice:hover {
-    background: rgb(226 182 96 / 0.08);
-    border-color: rgb(226 182 96 / 0.6);
+    background: rgb(220 200 170 / 0.08);
+    border-color: rgb(220 200 170 / 0.6);
     transform: translateY(-2px);
   }
   .gate-choice.suggested {
-    border-color: #d9ae55;
-    background: linear-gradient(180deg, rgb(226 182 96 / 0.12), rgb(226 182 96 / 0.03));
-    box-shadow: 0 18px 50px -25px rgb(226 182 96 / 0.6);
+    border-color: #dcc9ab;
+    background: linear-gradient(180deg, rgb(220 200 170 / 0.12), rgb(220 200 170 / 0.03));
+    box-shadow: 0 18px 50px -25px rgb(220 200 170 / 0.6);
   }
   .gate-choice.suggested .gate-name {
-    color: #f1d894;
+    color: #efe3cf;
   }
   .gate-choice:focus-visible {
-    outline: 2px solid #e6c472;
+    outline: 2px solid #e6d6bd;
     outline-offset: 3px;
   }
   .gate-choice[lang='fa'] {
