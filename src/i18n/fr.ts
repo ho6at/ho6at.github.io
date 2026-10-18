@@ -33,6 +33,9 @@ export default {
   sessions: {
     title: 'Séances street style',
     lead: 'Que vous soyez de passage à Paris ou en quête d’un regard plus artistique sur votre quotidien, nos séances capturent des moments vrais, avec émotion et singularité.',
+    inviteCount: 'Quatre formules, d’une à cinq heures',
+    inviteText: 'Choisissez votre formule, votre date et votre lumière : le détail et les tarifs s’affichent dès la première étape.',
+    inviteCta: 'Découvrir les formules',
     choose: 'Choisir',
     bestForLabel: 'Idéal pour',
     featuredLabel: 'Meilleure offre',

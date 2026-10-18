@@ -46,11 +46,14 @@ const lights = ['dawn', 'day', 'golden', 'blue'] as const;
                     <span class="option-meta">
                       {p.duration} · {p.places}
                     </span>
-                    <span class="option-body">
-                      {p.photos}
-                      {p.bonus && <>. {p.bonus}</>}
+                    <span class="option-body">{p.photos}</span>
+                    {p.bonus && <span class="option-bonus">{p.bonus}</span>}
+                    <span class="option-best">
+                      <b>{s.bestForLabel}</b>
+                      {p.bestFor}
                     </span>
                   </span>
+                  {p.featured && <span class="option-flag">{s.featuredLabel}</span>}
                   <span class="option-price">{num(p.price)} €</span>
                 </label>
               ))
@@ -318,6 +321,30 @@ const lights = ['dawn', 'day', 'golden', 'blue'] as const;
   .option-body {
     font-size: 0.875rem;
     color: rgb(240 240 240 / 0.8);
+  }
+  .option-bonus {
+    font-size: 0.85rem;
+    color: #e6c472;
+  }
+  .option-best {
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-top: 0.15rem;
+  }
+  .option-best b {
+    font-weight: 500;
+    color: var(--ivory);
+  }
+  .option-flag {
+    position: absolute;
+    top: -0.6rem;
+    inset-inline-end: 1rem;
+    padding: 0.15rem 0.6rem;
+    border-radius: 999px;
+    background: var(--gold-foil);
+    color: #2a1d08;
+    font-size: 0.7rem;
+    font-weight: 600;
   }
   .option-price {
     font-family: var(--display);
@@ -599,9 +626,6 @@ const lights = ['dawn', 'day', 'golden', 'blue'] as const;
     }
     .option {
       grid-template-columns: 3.5rem minmax(0, 1fr) auto;
-    }
-    .option-body {
-      display: none;
     }
     .sheet-foot {
       padding-bottom: max(1.25rem, env(safe-area-inset-bottom));

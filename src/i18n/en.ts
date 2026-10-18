@@ -35,6 +35,9 @@ const en: typeof fr = {
   sessions: {
     title: 'Street style sessions',
     lead: 'Whether you’re visiting Paris or want a more artistic view of your everyday life, our sessions capture real moments with feeling and character.',
+    inviteCount: 'Four packages, from one to five hours',
+    inviteText: 'Choose your package, your date and your light: details and prices appear in the very first step.',
+    inviteCta: 'Discover the packages',
     choose: 'Choose',
     bestForLabel: 'Best for',
     featuredLabel: 'Best offer',
