@@ -10,7 +10,7 @@ type Strings = {
   subject: string;
   message: string;
   around: string;
-  packages: { id: string; name: string; price: number }[];
+  packages: { id: string; name: string; price: number; featured: boolean }[];
   stepOf: string;
   steps: string[];
 };
@@ -231,7 +231,7 @@ const sendWa = form.querySelector<HTMLAnchorElement>('[data-send-wa]');
 
 function update() {
   const data = new FormData(form);
-  const pkg = S.packages.find((p) => p.id === data.get('package')) ?? S.packages[1];
+  const pkg = S.packages.find((p) => p.id === data.get('package')) ?? S.packages.find((p) => p.featured)!;
   const ymd = String(data.get('date') || parisDate(new Date(now.getTime() + DAY)));
   const light = String(data.get('light') || 'golden') as Light;
   const people = Number(data.get('people') || 2);

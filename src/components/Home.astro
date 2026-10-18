@@ -10,7 +10,7 @@ interface Props {
 const { t } = Astro.props;
 const home = t.lang === 'fr' ? '/' : '/en/';
 const quoteHref = `mailto:${site.email}?subject=${encodeURIComponent(t.brands.quoteSubject)}`;
-const packageLight = { essentiel: 'day', signature: 'golden', lumiere: 'blue' } as Record<string, string>;
+const packageLight = { minimal: 'day', classic: 'dawn', signature: 'golden', cinestyle: 'blue' } as Record<string, string>;
 const reelLight = ['golden', 'dawn', 'day', 'night'];
 const strings = {
   names: t.light.names,
@@ -29,7 +29,7 @@ const strings = {
 
 <header class="top" data-top>
   <div class="wrap bar">
-    <Logo href={home} rise />
+    <Logo href={home} />
     <nav class="pill" aria-label="Main">
       <a href="#sessions">{t.nav.sessions}</a>
       <a href="#places">{t.nav.places}</a>
@@ -83,27 +83,31 @@ const strings = {
       <h2>{t.sessions.title}</h2>
       <p class="lead">{t.sessions.lead}</p>
     </div>
-    <div class="rail rail-3">
+    <div class="rail rail-4">
       {
         t.sessions.packages.map((p) => (
-          <article class="card pkg">
+          <article class:list={['card pkg', { featured: p.featured }]}>
             <div class={`plate plate-${packageLight[p.id]} pkg-plate`}>
-              <span class={`badge dot-${packageLight[p.id]}`}>
-                <span class="dot" />
-                {t.light.names[packageLight[p.id] as keyof typeof t.light.names]}
-              </span>
+              <span class="pkg-duration">{p.duration}</span>
+              {p.featured && <span class="pkg-flag">{t.sessions.featuredLabel}</span>}
             </div>
             <div class="card-body">
               <div class="pkg-top">
                 <h3>{p.name}</h3>
-                <p class="pkg-price">
-                  {p.price} €<span>{t.sessions.from}</span>
-                </p>
+                <p class="pkg-price">{p.price} €</p>
               </div>
-              <p class="pkg-meta">
-                {p.duration} · {p.places}
+              <ul class="pkg-list">
+                <li>
+                  {p.places}
+                  {p.placesNote && <span>{p.placesNote}</span>}
+                </li>
+                <li>{p.photos}</li>
+                {p.bonus && <li class="pkg-bonus">{p.bonus}</li>}
+                <li>{p.style}</li>
+              </ul>
+              <p class="pkg-best">
+                <span>{t.sessions.bestForLabel}</span> {p.bestFor}
               </p>
-              <p class="pkg-body">{p.includes}</p>
               <button class="button ghost pkg-choose" type="button" data-open-booking data-package={p.id}>
                 {t.sessions.choose}
               </button>
@@ -250,7 +254,7 @@ const strings = {
 </main>
 
 <footer class="wrap foot">
-  <Logo href={home} />
+  <Logo href={home} size="footer" />
   <p>© {new Date().getFullYear()} Luminoor, {site.city}. {t.footer.rights}</p>
   <a href={t.footer.legalHref}>{t.footer.legal}</a>
 </footer>
@@ -605,8 +609,8 @@ const strings = {
     margin-inline: auto;
     padding-inline: var(--gutter);
   }
-  .rail-3 {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+  .rail-4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
   .rail-places {
     grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -632,13 +636,42 @@ const strings = {
     border-color: var(--line-strong);
   }
   .pkg-plate {
-    aspect-ratio: 4 / 3;
+    aspect-ratio: 16 / 10;
     border-radius: 0;
-    padding: 1rem;
+    padding: 1.1rem 1.25rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
   }
-  .pkg-plate .badge {
+  .pkg-duration {
     position: relative;
     z-index: 2;
+  }
+  .pkg-flag {
+    z-index: 2;
+  }
+  .pkg-duration {
+    white-space: nowrap;
+    font-size: 2.6rem;
+    font-weight: 300;
+    letter-spacing: -0.03em;
+    line-height: 1;
+  }
+  .pkg-flag {
+    position: absolute;
+    bottom: 1.1rem;
+    left: 1.25rem;
+    padding: 0.3rem 0.7rem;
+    border-radius: 999px;
+    background: var(--gold);
+    color: #17120a;
+    font-size: 0.75rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .pkg.featured {
+    border-color: rgb(201 169 107 / 0.55);
+    box-shadow: 0 30px 80px -40px rgb(201 169 107 / 0.45);
   }
   .card-body {
     padding: 1.5rem 1.5rem 1.6rem;
@@ -654,26 +687,57 @@ const strings = {
     gap: 1rem;
   }
   .pkg h3 {
-    font-size: 2rem;
+    font-size: 1.85rem;
   }
   .pkg-price {
-    font-family: var(--display);
-    font-size: 1.75rem;
+    font-size: 1.6rem;
+    font-weight: 300;
     white-space: nowrap;
     color: var(--gold-soft);
   }
-  .pkg-price span {
-    font-family: var(--body);
-    font-size: 0.72rem;
-    color: var(--muted);
-    margin-left: 0.35rem;
+  .pkg-list {
+    list-style: none;
+    margin: 0.25rem 0 0;
+    padding: 0;
+    display: grid;
+    gap: 0.6rem;
+    font-size: 0.95rem;
   }
-  .pkg-meta {
+  .pkg-list li {
+    padding-left: 1.1rem;
+    position: relative;
+  }
+  .pkg-list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.62em;
+    width: 0.4rem;
+    height: 0.4rem;
+    border-radius: 50%;
+    border: 1px solid var(--gold);
+  }
+  .pkg-list li span {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+  .pkg-bonus {
+    color: var(--gold-soft);
+  }
+  .pkg-best {
+    flex: 1;
+    padding-top: 0.9rem;
+    margin-top: 0.4rem;
+    border-top: 1px solid var(--line);
     font-size: 0.9rem;
     color: var(--muted);
   }
-  .pkg-body {
-    flex: 1;
+  .pkg-best span {
+    display: block;
+    color: var(--ivory);
+    font-weight: 500;
+    margin-bottom: 0.15rem;
   }
   .pkg-choose {
     margin-top: 0.75rem;
@@ -997,6 +1061,12 @@ const strings = {
     .place,
     .reel-screen {
       transition: none;
+    }
+  }
+
+  @media (max-width: 1180px) {
+    .rail-4 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
 

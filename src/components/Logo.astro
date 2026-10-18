@@ -1,61 +1,29 @@
 ---
-// Wordmark: LUMINOOR in tracked capitals, the first O drawn as a sun resting on the horizon.
+// The Luminoor Paris script logo, as used on the client brochure.
 interface Props {
   href: string;
-  rise?: boolean;
+  size?: 'header' | 'footer';
 }
-const { href, rise = false } = Astro.props;
+const { href, size = 'header' } = Astro.props;
 ---
 
-<a class:list={['logo', { rise }]} href={href} aria-label="Luminoor">
-  <span aria-hidden="true">LUMIN<span class="sun"><span></span></span>OR</span>
+<a class:list={['logo', size]} href={href}>
+  <picture>
+    <source srcset="/brand/luminoor-logo.webp" type="image/webp" />
+    <img src="/brand/luminoor-logo.png" alt="Luminoor Paris" width="556" height="166" />
+  </picture>
 </a>
 
 <style>
   .logo {
-    font-family: var(--display);
-    font-size: 1.15rem;
-    font-weight: 400;
-    letter-spacing: 0.34em;
-    text-decoration: none;
-    color: inherit;
-    white-space: nowrap;
-    isolation: isolate;
-  }
-  .sun {
     display: inline-block;
-    width: 0.74em;
-    height: 0.7em;
-    margin-right: 0.34em;
-    overflow: hidden;
-    position: relative;
-    vertical-align: -0.02em;
-    box-shadow: inset 0 -0.06em 0 currentColor;
+    line-height: 0;
   }
-  .sun > span {
-    position: absolute;
-    left: 0.02em;
-    top: 0;
-    width: 0.7em;
-    height: 0.7em;
-    border-radius: 50%;
-    background: var(--gold);
-    z-index: -1;
+  img {
+    width: auto;
+    height: 2.6rem;
   }
-  .rise .sun > span {
-    animation: rise 1.6s cubic-bezier(0.2, 0.7, 0.2, 1) 0.2s both;
-  }
-  @keyframes rise {
-    from {
-      transform: translateY(100%);
-    }
-    to {
-      transform: translateY(0);
-    }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .rise .sun > span {
-      animation: none;
-    }
+  .footer img {
+    height: 2.2rem;
   }
 </style>

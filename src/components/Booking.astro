@@ -8,7 +8,7 @@ interface Props {
 }
 const { t } = Astro.props;
 const s = t.sessions;
-const packageLight = { essentiel: 'day', signature: 'golden', lumiere: 'blue' } as Record<string, string>;
+const packageLight = { minimal: 'day', classic: 'dawn', signature: 'golden', cinestyle: 'blue' } as Record<string, string>;
 const lights = ['dawn', 'day', 'golden', 'blue'] as const;
 ---
 
@@ -35,16 +35,19 @@ const lights = ['dawn', 'day', 'golden', 'blue'] as const;
           <legend class="sr-only">{s.packageLabel}</legend>
           <div class="options">
             {
-              s.packages.map((p, i) => (
+              s.packages.map((p) => (
                 <label class="option">
-                  <input type="radio" name="package" value={p.id} checked={i === 1} />
+                  <input type="radio" name="package" value={p.id} checked={p.featured} />
                   <span class={`thumb plate plate-${packageLight[p.id]}`} aria-hidden="true" />
                   <span class="option-text">
                     <span class="option-name">{p.name}</span>
                     <span class="option-meta">
                       {p.duration} · {p.places}
                     </span>
-                    <span class="option-body">{p.includes}</span>
+                    <span class="option-body">
+                      {p.photos}
+                      {p.bonus && <>. {p.bonus}</>}
+                    </span>
                   </span>
                   <span class="option-price">{p.price} €</span>
                 </label>
