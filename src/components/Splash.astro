@@ -1,14 +1,19 @@
 ---
-// Opening splash, once per visit: the whole logo, dimmed, with a strong band of warm light sweeping
-// across it while the page loads (the logo is near-white silver, so it is dimmed for the light to show). It closes once the page has loaded and the light has passed at least once.
-// The <html> gets the `splash` class from an inline script in Base.astro (skipped for reduced motion or
-// a repeat in the same visit; that script also clears it after a few seconds whatever happens).
+// Opening splash, once per visit: a light source (a bright point with an anamorphic lens flare) travels
+// in an arc over the logo. The letters are lit by their distance to it, and light streams out of them
+// away from it (god rays, made from copies of the lit letters scaled out from the light's position).
+// It closes once the page has loaded and the light has crossed at least once. The <html> gets the
+// `splash` class from an inline script in Base.astro (skipped for reduced motion or a repeat in the same
+// visit; that script also clears it after a few seconds whatever happens).
+const rays = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 ---
 
 <div class="splash" data-splash aria-hidden="true">
-  <div class="splash-logo">
-    <img src="/brand/luminoor-logo.png" alt="" width="556" height="166" />
-    <span class="splash-light"></span>
+  <div class="stage" data-stage>
+    <img class="base" src="/brand/luminoor-logo.png" alt="" width="556" height="166" />
+    {rays.map((i) => <span class="ray" style={`--i: ${i}`} />)}
+    <span class="lit"></span>
+    <span class="source"><span class="flare"></span></span>
   </div>
 </div>
 
@@ -17,6 +22,7 @@
     const root = document.documentElement;
     const splash = document.querySelector('[data-splash]');
     if (!root.classList.contains('splash') || !splash) return;
+    const stage = splash.querySelector('[data-stage]');
 
     let done = false;
     const finish = () => {
@@ -40,14 +46,31 @@
       }, 650);
     };
     splash.addEventListener('click', finish);
+    setTimeout(finish, 6500); // never hold the page longer than this
 
-    // Close once the page has loaded and the light has crossed the logo at least once.
-    const minimum = new Promise((resolve) => setTimeout(resolve, 2100));
-    const loaded = new Promise((resolve) =>
-      document.readyState === 'complete' ? resolve() : addEventListener('load', resolve, { once: true }),
-    );
-    Promise.all([minimum, loaded]).then(finish);
-    setTimeout(finish, 6000); // never hold the page longer than this
+    let loaded = document.readyState === 'complete';
+    if (!loaded) addEventListener('load', () => (loaded = true), { once: true });
+
+    // One pass of the light: an arc from the lower left, over the logo, to the lower right. Its power
+    // rises as it enters and falls as it leaves. Passes repeat until the page has loaded.
+    const pass = 2600;
+    const smooth = (x) => x * x * (3 - 2 * x);
+    const start = performance.now() + 200;
+    const frame = (now) => {
+      if (done) return;
+      const elapsed = Math.max(0, now - start);
+      const t = (elapsed % pass) / pass;
+      const p = smooth(t);
+      const x = -12 + 124 * p; // % of the logo's width
+      const y = 78 - 105 * Math.sin(Math.PI * p); // % of its height: rises above the logo mid-way
+      const power = Math.sin(Math.PI * Math.min(1, t * 1.1)) ** 0.6;
+      stage.style.setProperty('--lx', `${x}%`);
+      stage.style.setProperty('--ly', `${y}%`);
+      stage.style.setProperty('--power', power.toFixed(3));
+      if (elapsed >= pass && loaded) return finish();
+      requestAnimationFrame(frame);
+    };
+    requestAnimationFrame(frame);
   })();
 </script>
 
@@ -64,75 +87,111 @@
     z-index: 200;
     display: grid;
     place-items: center;
-    background: var(--bg);
+    background: #050505;
     cursor: pointer;
     transition: opacity 0.65s var(--ease);
-  }
-  /* A warm glow behind the logo that swells as each band of light passes */
-  :global(html.splash) .splash::before {
-    content: '';
-    position: absolute;
-    width: min(110vw, 46rem);
-    aspect-ratio: 2 / 1;
-    background: radial-gradient(closest-side, rgb(236 196 116 / 0.3), rgb(236 196 116 / 0.08) 55%, transparent 75%);
-    filter: blur(6px);
-    animation: glow 1.6s ease-in-out infinite;
   }
   .splash.leaving {
     opacity: 0;
   }
-  .splash-logo {
+
+  .stage {
+    --lx: -12%;
+    --ly: 78%;
+    --power: 0;
     position: relative;
-    width: min(78vw, 30rem);
-    animation: logo-in 0.8s var(--ease) both;
+    width: min(80vw, 32rem);
+    aspect-ratio: 556 / 166;
   }
-  .splash-logo img {
-    display: block;
-    width: 100%;
-    height: auto;
-    filter: brightness(0.42) drop-shadow(0 12px 30px rgb(0 0 0 / 0.6));
-  }
-  /* The light: a bright warm band, cut to the shape of the logo, crossing it from left to right */
-  .splash-light {
+  .stage > * {
     position: absolute;
     inset: 0;
-    background: linear-gradient(
-        105deg,
-        transparent 38%,
-        rgb(240 196 110 / 0.7) 44%,
-        rgb(255 248 228 / 1) 50%,
-        rgb(240 196 110 / 0.7) 56%,
-        transparent 62%
-      )
-      0 0 / 300% 100% no-repeat;
+  }
+
+  /* The logo in darkness: just enough to read its shape */
+  .base {
+    width: 100%;
+    height: 100%;
+    filter: brightness(0.22);
+  }
+
+  /* Light falling on the letters: brightest nearest the source, falling off with distance */
+  .lit,
+  .ray {
+    background: radial-gradient(
+      circle at var(--lx) var(--ly),
+      #fffaf0 0%,
+      #ffe2a6 9%,
+      rgb(236 184 98 / 0.85) 20%,
+      rgb(200 150 80 / 0.35) 36%,
+      transparent 58%
+    );
     -webkit-mask: url('/brand/luminoor-logo.png') center / 100% 100% no-repeat;
     mask: url('/brand/luminoor-logo.png') center / 100% 100% no-repeat;
-    filter: drop-shadow(0 0 6px rgb(255 214 140 / 0.9));
-    animation: light 1.6s cubic-bezier(0.45, 0.05, 0.25, 1) 0.3s infinite both;
+    opacity: var(--power);
   }
-  @keyframes logo-in {
-    from {
-      opacity: 0;
-      transform: scale(0.97);
-    }
+
+  /* Rays: copies of the lit letters, each pushed further out from the light, blended as light */
+  .ray {
+    transform-origin: var(--lx) var(--ly);
+    transform: scale(calc(1 + var(--i) * 0.026));
+    opacity: calc(var(--power) * (0.3 - var(--i) * 0.026));
+    mix-blend-mode: screen;
+    filter: blur(calc(var(--i) * 1.1px));
   }
-  @keyframes light {
-    from {
-      background-position: 100% 0;
-    }
-    to {
-      background-position: 0% 0;
-    }
+
+  /* The light source itself: a hot core, a soft halo and a horizontal anamorphic flare */
+  .stage > .source {
+    inset: auto;
+    left: var(--lx);
+    top: var(--ly);
+    width: 0;
+    height: 0;
+    opacity: var(--power);
   }
-  @keyframes glow {
-    0%,
-    100% {
-      opacity: 0.45;
-      transform: scale(0.94);
-    }
-    50% {
-      opacity: 1;
-      transform: scale(1.04);
-    }
+  .source::before {
+    content: '';
+    position: absolute;
+    width: 9rem;
+    height: 9rem;
+    left: -4.5rem;
+    top: -4.5rem;
+    border-radius: 50%;
+    background: radial-gradient(
+      circle,
+      #fffdf6 0%,
+      #fff1cf 6%,
+      rgb(255 214 140 / 0.55) 16%,
+      rgb(236 170 80 / 0.18) 38%,
+      transparent 70%
+    );
+    mix-blend-mode: screen;
+  }
+  .flare {
+    position: absolute;
+    width: min(150vw, 70rem);
+    height: 3px;
+    left: calc(min(150vw, 70rem) / -2);
+    top: -1.5px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgb(140 180 255 / 0.25) 22%,
+      rgb(255 236 200 / 0.9) 48%,
+      #fff 50%,
+      rgb(255 236 200 / 0.9) 52%,
+      rgb(140 180 255 / 0.25) 78%,
+      transparent
+    );
+    filter: blur(0.6px);
+    mix-blend-mode: screen;
+  }
+  .flare::after {
+    /* a faint second, wider streak gives the flare its glow */
+    content: '';
+    position: absolute;
+    inset: -7px 15%;
+    background: linear-gradient(90deg, transparent, rgb(255 210 140 / 0.22) 50%, transparent);
+    filter: blur(4px);
   }
 </style>
