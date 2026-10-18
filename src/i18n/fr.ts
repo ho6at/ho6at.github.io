@@ -2,9 +2,9 @@ export default {
   lang: 'fr',
   locale: 'fr-FR',
   meta: {
-    title: 'Luminoor — Photographe et contenu de marque à Paris',
+    title: 'Luminoor — Photographe à Paris',
     description:
-      'Séances photo à Paris pour voyageurs, couples et demandes en mariage. Reels et contenu photo pour les marques, avec photographe et modèle dans la même équipe.',
+      'Séances photo street style à Paris pour voyageurs, couples et demandes en mariage. Photos retouchées et toutes les photos brutes, en galerie privée.',
   },
   nav: {
     home: 'Accueil',
@@ -17,9 +17,9 @@ export default {
   },
   hero: {
     title: 'Paris, sous votre plus belle lumière.',
-    lead: 'Séances photo pour celles et ceux qui visitent Paris, et contenu vidéo pour les marques. Photographe et modèle dans la même équipe.',
+    lead: 'Séances photo street style pour celles et ceux qui visitent Paris : couples, demandes en mariage, voyages en solo ou entre amis.',
     cta: 'Réserver une séance',
-    ctaSecondary: 'Pour les marques',
+    ctaSecondary: 'Nos lieux',
   },
   light: {
     names: {
@@ -126,7 +126,7 @@ export default {
     items: [
       { name: 'Trocadéro', light: 'dawn', note: 'La tour Eiffel sans la foule, au lever du soleil.' },
       { name: 'Pont de Bir-Hakeim', light: 'golden', note: 'Colonnes de métal et lumière rasante.' },
-      { name: 'Palais-Royal', light: 'day', note: 'Colonnes de Buren et arcades, parfait pour les marques.' },
+      { name: 'Palais-Royal', light: 'day', note: 'Colonnes de Buren et arcades, un décor graphique.' },
       { name: 'Pont Alexandre III', light: 'golden', note: 'Dorures, Seine et Invalides en fond.' },
       { name: 'Montmartre', light: 'blue', note: 'Ruelles pavées et Paris qui s’allume en contrebas.' },
     ],
@@ -158,17 +158,12 @@ export default {
     quoteSubject: 'Demande de devis — contenu de marque',
   },
   about: {
-    title: 'L’équipe',
+    title: 'Derrière l’objectif',
     people: [
       {
         name: 'Hojjat',
         role: 'Photographe et cofondateur',
-        body: 'Derrière l’appareil et derrière l’organisation : lieux, lumière, planning et relation avec les marques.',
-      },
-      {
-        name: 'Saba Majlesi',
-        role: 'Modèle et direction créative',
-        body: 'Devant la caméra pour les marques, et à côté de vous pendant les séances pour trouver les bonnes poses.',
+        body: 'Derrière l’appareil et derrière l’organisation : lieux, lumière, planning, et votre séance du début à la fin.',
       },
     ],
     nameTitle: 'Pourquoi Luminoor',
@@ -189,7 +184,7 @@ export default {
   },
   contact: {
     title: 'Parlons de votre projet',
-    lead: 'Dites-nous la date, le nombre de personnes ou le produit. On répond sous 24 heures.',
+    lead: 'Dites-nous la date et le nombre de personnes. On répond sous 24 heures.',
     email: 'Écrire un e-mail',
     instagram: 'Instagram',
     whatsapp: 'WhatsApp',

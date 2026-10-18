@@ -4,9 +4,9 @@ const en: typeof fr = {
   lang: 'en',
   locale: 'en-GB',
   meta: {
-    title: 'Luminoor — Paris photographer and brand content',
+    title: 'Luminoor — Paris photographer',
     description:
-      'Photoshoots in Paris for travellers, couples and proposals. Reels and photo content for brands, with photographer and model on the same team.',
+      'Street style photoshoots in Paris for travellers, couples and proposals. Edited photos and all raw photos, in a private gallery.',
   },
   nav: {
     home: 'Home',
@@ -19,9 +19,9 @@ const en: typeof fr = {
   },
   hero: {
     title: 'Paris, in your best light.',
-    lead: 'Photoshoots for people visiting Paris, and video content for brands. Photographer and model on the same team.',
+    lead: 'Street style photoshoots for people visiting Paris: couples, proposals, solo trips and friends.',
     cta: 'Book a session',
-    ctaSecondary: 'For brands',
+    ctaSecondary: 'Our places',
   },
   light: {
     names: {
@@ -128,7 +128,7 @@ const en: typeof fr = {
     items: [
       { name: 'Trocadéro', light: 'dawn', note: 'The Eiffel Tower without the crowds, at sunrise.' },
       { name: 'Pont de Bir-Hakeim', light: 'golden', note: 'Iron columns and low, raking light.' },
-      { name: 'Palais-Royal', light: 'day', note: 'Buren columns and arcades, perfect for brands.' },
+      { name: 'Palais-Royal', light: 'day', note: 'Buren columns and arcades, a graphic backdrop.' },
       { name: 'Pont Alexandre III', light: 'golden', note: 'Gilded statues, the Seine and Les Invalides behind.' },
       { name: 'Montmartre', light: 'blue', note: 'Cobbled lanes and Paris lighting up below.' },
     ],
@@ -160,17 +160,12 @@ const en: typeof fr = {
     quoteSubject: 'Quote request — brand content',
   },
   about: {
-    title: 'The team',
+    title: 'Behind the lens',
     people: [
       {
         name: 'Hojjat',
         role: 'Photographer and co-founder',
-        body: 'Behind the camera and behind the planning: locations, light, scheduling and brand relationships.',
-      },
-      {
-        name: 'Saba Majlesi',
-        role: 'Model and creative direction',
-        body: 'In front of the camera for brands, and beside you during sessions to find the right poses.',
+        body: 'Behind the camera and behind the planning: locations, light, scheduling, and your session from start to finish.',
       },
     ],
     nameTitle: 'Why Luminoor',
@@ -188,7 +183,7 @@ const en: typeof fr = {
   },
   contact: {
     title: 'Tell us about your plans',
-    lead: 'Send us the date, how many people, or the product. We reply within 24 hours.',
+    lead: 'Send us the date and how many people. We reply within 24 hours.',
     email: 'Send an email',
     instagram: 'Instagram',
     whatsapp: 'WhatsApp',

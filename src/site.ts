@@ -7,4 +7,6 @@ export const site = {
   city: 'Paris',
   // Keep search engines out until real photos and contact details are in.
   indexable: false,
+  // Brand content (reels for brands) is not offered for now; set to true to show its section again.
+  showBrands: false,
 };
