@@ -1,30 +1,18 @@
 ---
 // Opening splash, once per visit: the "L" of the logo is written stroke by stroke, then the rest of the
 // logo sweeps in and the splash fades away. The <html> gets the `splash` class from an inline script in
-// Base.astro (skipped for reduced motion or a repeat in the same visit).
+// Base.astro (skipped for reduced motion or a repeat in the same visit; that script also clears it after
+// a few seconds whatever happens, so the site can never stay hidden).
 //
 // How the writing works: public/brand/luminoor-splash-map.png (made by scripts/splash-map.py) gives every
-// pixel of the logo the moment it should appear, as brightness. A filter turns that map into a mask that
-// lets through only pixels whose moment has come, and the script below moves that moment forward. Pixels
-// where two strokes of the L cross belong to whichever stroke passes there, so crossings stay clean.
+// pixel of the logo the moment it should appear, as brightness. Each frame, the script below draws the
+// logo on a canvas keeping only the pixels whose moment has come. Pixels where two strokes of the L cross
+// belong to the stroke that passes there last, so crossings stay clean. A canvas behaves the same in every
+// browser (an SVG filter inside a mask does not render in Safari).
 ---
 
 <div class="splash" data-splash aria-hidden="true">
-  <svg class="splash-logo" viewBox="-6 -6 568 178" role="presentation">
-    <defs>
-      <filter id="splash-threshold" x="0" y="0" width="1" height="1" color-interpolation-filters="sRGB">
-        <feComponentTransfer>
-          <feFuncR type="linear" slope="36" intercept="-35" data-threshold></feFuncR>
-          <feFuncG type="linear" slope="36" intercept="-35" data-threshold></feFuncG>
-          <feFuncB type="linear" slope="36" intercept="-35" data-threshold></feFuncB>
-        </feComponentTransfer>
-      </filter>
-      <mask id="splash-reveal" maskUnits="userSpaceOnUse" x="0" y="0" width="556" height="166">
-        <image href="/brand/luminoor-splash-map.png" width="556" height="166" filter="url(#splash-threshold)"></image>
-      </mask>
-    </defs>
-    <image href="/brand/luminoor-logo.png" width="556" height="166" mask="url(#splash-reveal)"></image>
-  </svg>
+  <canvas class="splash-logo" width="556" height="166" data-splash-canvas></canvas>
 </div>
 
 <script is:inline>
@@ -32,6 +20,7 @@
     const root = document.documentElement;
     const splash = document.querySelector('[data-splash]');
     if (!root.classList.contains('splash') || !splash) return;
+
     let done = false;
     const finish = () => {
       if (done) return;
@@ -54,36 +43,77 @@
       }, 650);
     };
     splash.addEventListener('click', finish);
+    setTimeout(finish, 6000); // whatever happens below, never hold the page longer than this
 
-    // Move the reveal moment forward: the L over the first 70% of the map (2 s), the rest of the word
-    // over the last 30% (0.9 s). Each pixel shows once its moment has passed, with a soft pen tip.
-    const funcs = splash.querySelectorAll('[data-threshold]');
-    const slope = 36;
-    const ease = (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
-    const phases = [
-      { from: 0, to: 0.7, ms: 2000 },
-      { from: 0.7, to: 1, ms: 900 },
-    ];
-    const total = phases.reduce((sum, p) => sum + p.ms, 0);
-    const delay = 250;
-    const start = performance.now() + delay;
-    const frame = (now) => {
-      let elapsed = Math.max(0, now - start);
-      let progress = 1;
-      for (const p of phases) {
-        if (elapsed < p.ms) {
-          progress = p.from + (p.to - p.from) * ease(elapsed / p.ms);
-          break;
+    const load = (src) =>
+      new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+        img.src = src;
+      });
+
+    Promise.all([load('/brand/luminoor-logo.png'), load('/brand/luminoor-splash-map.png')])
+      .then(([logo, map]) => {
+        const canvas = splash.querySelector('[data-splash-canvas]');
+        const ctx = canvas.getContext('2d');
+        const w = canvas.width;
+        const h = canvas.height;
+        const read = (img) => {
+          ctx.clearRect(0, 0, w, h);
+          ctx.drawImage(img, 0, 0, w, h);
+          return ctx.getImageData(0, 0, w, h).data;
+        };
+        const logoPx = read(logo);
+        const mapPx = read(map);
+        ctx.clearRect(0, 0, w, h);
+        const frameData = ctx.createImageData(w, h);
+        const out = frameData.data;
+        // colour never changes, only alpha: copy it once
+        for (let i = 0; i < out.length; i += 4) {
+          out[i] = logoPx[i];
+          out[i + 1] = logoPx[i + 1];
+          out[i + 2] = logoPx[i + 2];
         }
-        elapsed -= p.ms;
-      }
-      const intercept = String(1 - slope * (1 - progress));
-      funcs.forEach((f) => f.setAttribute('intercept', intercept));
-      if (now - start < total) requestAnimationFrame(frame);
-      else setTimeout(finish, 350);
-    };
-    requestAnimationFrame(frame);
-    setTimeout(finish, delay + total + 1500); // safety net if frames are throttled
+
+        // The L over the first 70% of the map (2 s), the rest of the word over the last 30% (0.9 s).
+        // A pixel appears once its moment has passed, fading in over a short soft edge (the pen tip).
+        const soft = 36;
+        const ease = (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+        const phases = [
+          { from: 0, to: 0.7, ms: 2000 },
+          { from: 0.7, to: 1, ms: 900 },
+        ];
+        const total = phases.reduce((sum, p) => sum + p.ms, 0);
+        const start = performance.now() + 250;
+
+        const draw = (progress) => {
+          const offset = 1 - soft * (1 - progress);
+          for (let i = 0; i < out.length; i += 4) {
+            const reveal = Math.min(1, Math.max(0, (soft * mapPx[i]) / 255 + offset));
+            out[i + 3] = logoPx[i + 3] * reveal;
+          }
+          ctx.putImageData(frameData, 0, 0);
+        };
+
+        const frame = (now) => {
+          if (done) return;
+          let elapsed = Math.max(0, now - start);
+          let progress = 1;
+          for (const p of phases) {
+            if (elapsed < p.ms) {
+              progress = p.from + (p.to - p.from) * ease(elapsed / p.ms);
+              break;
+            }
+            elapsed -= p.ms;
+          }
+          draw(progress);
+          if (now - start < total) requestAnimationFrame(frame);
+          else setTimeout(finish, 350);
+        };
+        requestAnimationFrame(frame);
+      })
+      .catch(finish);
   })();
 </script>
 
@@ -112,8 +142,6 @@
   .splash-logo {
     width: min(78vw, 30rem);
     height: auto;
-    overflow: visible;
     filter: drop-shadow(0 12px 30px rgb(0 0 0 / 0.6));
   }
-
 </style>

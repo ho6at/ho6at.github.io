@@ -33,7 +33,11 @@ const fonts =
             const root = document.documentElement;
             if (!sessionStorage.getItem('luminoor-lang-chosen')) root.classList.add('ask-lang');
             const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
-            if (!still && !sessionStorage.getItem('luminoor-splash')) root.classList.add('splash');
+            if (!still && !sessionStorage.getItem('luminoor-splash')) {
+              root.classList.add('splash');
+              // Fail-safe: never leave the site hidden behind the splash.
+              setTimeout(() => root.classList.remove('splash'), 7000);
+            }
           } catch {}
         </script>
       )
