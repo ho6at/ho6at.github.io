@@ -517,6 +517,15 @@ const strings = {
       enter 1.4s var(--ease) 1.2s both,
       foil 10s ease-in-out 2.6s infinite;
   }
+  /* French and English: engraved Roman capitals (Persian keeps Reem Kufi) */
+  :global(:root:not([lang='fa'])) h1 {
+    font-family: 'Cinzel', serif;
+    font-weight: 400;
+    font-size: clamp(1.85rem, 3.3vw, 3.1rem);
+    line-height: 1.25;
+    letter-spacing: 0.04em;
+    max-width: 22em;
+  }
   /* Light slowly travelling across the gold */
   @keyframes foil {
     0%,
