@@ -13,8 +13,11 @@ interface Props {
 const { lang, title, description, home = false } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const dir = languages.find((l) => l.code === lang)?.dir ?? 'ltr';
-// Vazirmatn covers Persian; Google Fonts only downloads its glyphs on pages that use them.
-const fonts = 'family=Jost:ital,wght@0,300..600;1,300..400&family=Vazirmatn:wght@200..600';
+// Vazirmatn covers Persian text (the language picker uses it on every page; Google Fonts only downloads
+// its glyphs where they appear). Reem Kufi sets the Persian headings.
+const fonts =
+  'family=Jost:ital,wght@0,300..600;1,300..400&family=Vazirmatn:wght@200..600' +
+  (lang === 'fa' ? '&family=Reem+Kufi:wght@400..600' : '');
 ---
 
 <!doctype html>

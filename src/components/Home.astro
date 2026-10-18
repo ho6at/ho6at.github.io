@@ -834,6 +834,9 @@ const strings = {
     font-size: 1.1rem;
     margin-bottom: 1.25rem;
   }
+  :global(:root[lang='fa']) .steps li::before {
+    content: counter(step, persian);
+  }
   .steps p {
     color: var(--muted);
     margin-top: 0.35rem;
