@@ -1,6 +1,6 @@
 ---
-// Opening splash, once per visit: a light source (a bright point with an anamorphic lens flare) travels
-// in an arc over the logo. The letters are lit by their distance to it, and light streams out of them
+// Opening splash, once per visit: an unseen light source travels in an arc over the logo (only a soft,
+// diffuse glow shows where it is). The letters are lit by their distance to it, and light streams out of them
 // away from it (god rays, made from copies of the lit letters scaled out from the light's position).
 // It closes once the page has loaded and the light has crossed at least once. The <html> gets the
 // `splash` class from an inline script in Base.astro (skipped for reduced motion or a repeat in the same
@@ -13,7 +13,7 @@ const rays = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
     <img class="base" src="/brand/luminoor-logo.png" alt="" width="556" height="166" />
     {rays.map((i) => <span class="ray" style={`--i: ${i}`} />)}
     <span class="lit"></span>
-    <span class="source"><span class="flare"></span></span>
+    <span class="source"></span>
   </div>
 </div>
 
@@ -140,7 +140,7 @@ const rays = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
     filter: blur(calc(var(--i) * 1.1px));
   }
 
-  /* The light source itself: a hot core, a soft halo and a horizontal anamorphic flare */
+  /* Where the light is: only a soft, diffuse glow, no visible point */
   .stage > .source {
     inset: auto;
     left: var(--lx);
@@ -152,46 +152,13 @@ const rays = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
   .source::before {
     content: '';
     position: absolute;
-    width: 9rem;
-    height: 9rem;
-    left: -4.5rem;
-    top: -4.5rem;
+    width: 16rem;
+    height: 16rem;
+    left: -8rem;
+    top: -8rem;
     border-radius: 50%;
-    background: radial-gradient(
-      circle,
-      #fffdf6 0%,
-      #fff1cf 6%,
-      rgb(255 214 140 / 0.55) 16%,
-      rgb(236 170 80 / 0.18) 38%,
-      transparent 70%
-    );
+    background: radial-gradient(circle, rgb(255 214 140 / 0.16) 0%, rgb(236 170 80 / 0.07) 35%, transparent 70%);
+    filter: blur(10px);
     mix-blend-mode: screen;
-  }
-  .flare {
-    position: absolute;
-    width: min(150vw, 70rem);
-    height: 3px;
-    left: calc(min(150vw, 70rem) / -2);
-    top: -1.5px;
-    background: linear-gradient(
-      90deg,
-      transparent,
-      rgb(140 180 255 / 0.25) 22%,
-      rgb(255 236 200 / 0.9) 48%,
-      #fff 50%,
-      rgb(255 236 200 / 0.9) 52%,
-      rgb(140 180 255 / 0.25) 78%,
-      transparent
-    );
-    filter: blur(0.6px);
-    mix-blend-mode: screen;
-  }
-  .flare::after {
-    /* a faint second, wider streak gives the flare its glow */
-    content: '';
-    position: absolute;
-    inset: -7px 15%;
-    background: linear-gradient(90deg, transparent, rgb(255 210 140 / 0.22) 50%, transparent);
-    filter: blur(4px);
   }
 </style>
