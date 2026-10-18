@@ -14,7 +14,6 @@ const packageLight = { minimal: 'day', classic: 'dawn', signature: 'golden', cin
 const reelLight = ['golden', 'dawn', 'day', 'night'];
 const strings = {
   names: t.light.names,
-  moods: t.light.moods,
   locale: t.locale,
   email: site.email,
   whatsapp: site.whatsapp,
@@ -47,14 +46,10 @@ const strings = {
 </header>
 
 <main id="top" data-strings={JSON.stringify(strings)}>
-  <!-- Hero: a dark scene lit by the light of the chosen hour in Paris -->
+  <!-- Hero: the Luminoor Paris logo under a soft studio light -->
   <section class="hero" data-hero>
     <div class="hero-light" aria-hidden="true"></div>
     <div class="wrap hero-inner">
-      <p class="badge status" aria-live="polite">
-        <span class="dot live-dot"></span>
-        {t.light.now}&nbsp;<strong data-clock>--:--</strong>&nbsp;·&nbsp;<span data-live-phase></span>
-      </p>
       <div class="hero-mark" aria-hidden="true">
         <picture>
           <source srcset="/brand/luminoor-logo.webp" type="image/webp" />
@@ -69,18 +64,6 @@ const strings = {
       </div>
     </div>
 
-    <div class="wrap scrub-wrap">
-      <div class="scrub-track" data-track>
-        <div class="ticks" data-ticks aria-hidden="true"></div>
-        <span class="marker" data-tick="sunrise" aria-hidden="true"><i></i><span>{t.light.sunrise}</span> <time></time></span>
-        <span class="marker" data-tick="sunset" aria-hidden="true"><i></i><span>{t.light.sunset}</span> <time></time></span>
-        <span class="knob" data-sun aria-hidden="true">
-          <span class="knob-label" data-knob-label><span data-dial-name></span> <strong data-dial-time></strong></span>
-        </span>
-        <input type="range" min="0" max="1000" step="1" value="700" data-dial aria-label={t.light.dialLabel} />
-      </div>
-      <p class="scrub-mood"><span data-dial-mood></span> <span class="scrub-hint">{t.light.hint}</span></p>
-    </div>
   </section>
 
   <!-- Sessions -->
@@ -380,8 +363,8 @@ const strings = {
     min-height: min(100svh, 64rem);
     display: flex;
     flex-direction: column;
-    justify-content: flex-end;
-    padding-block: 7rem 2rem;
+    justify-content: center;
+    padding-block: 8rem 5rem;
     overflow: hidden;
     isolation: isolate;
   }
@@ -390,13 +373,8 @@ const strings = {
     inset: 0;
     z-index: -1;
     background:
-      radial-gradient(circle at var(--sun-x, 70%) var(--sun-y, 60%), var(--glow-core, #ffe6b8) 0, transparent 6%),
-      radial-gradient(
-        46% 58% at var(--sun-x, 70%) var(--sun-y, 60%),
-        color-mix(in srgb, var(--glow-a, #e6a95a) 72%, transparent),
-        transparent 72%
-      ),
-      radial-gradient(130% 70% at 50% 115%, color-mix(in srgb, var(--glow-b, #5a3b1c) 55%, transparent), transparent 70%),
+      radial-gradient(38% 42% at 50% 34%, rgb(255 255 255 / 0.11), transparent 70%),
+      radial-gradient(80% 55% at 50% 118%, rgb(255 255 255 / 0.07), transparent 70%),
       var(--bg);
   }
   .hero-light::after {
@@ -407,21 +385,6 @@ const strings = {
       linear-gradient(180deg, rgb(10 10 10 / 0.6), transparent 28%, transparent 50%, rgb(10 10 10 / 0.92)),
       url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='.3'/></svg>");
     opacity: var(--shade, 1);
-  }
-  .status {
-    margin-bottom: clamp(2rem, 5vh, 3.25rem);
-    font-weight: 500;
-  }
-  .status strong {
-    font-variant-numeric: tabular-nums;
-  }
-  .live-dot {
-    animation: breathe 2.8s ease-in-out infinite;
-  }
-  @keyframes breathe {
-    50% {
-      opacity: 0.4;
-    }
   }
   .hero-inner {
     display: flex;
@@ -510,140 +473,6 @@ const strings = {
       transform: none;
       filter: none;
     }
-  }
-
-  /* Time scrubber */
-  .scrub-wrap {
-    margin-top: clamp(4rem, 10vh, 6.5rem);
-  }
-  .scrub-track {
-    position: relative;
-    height: 3.25rem;
-  }
-  .ticks {
-    position: absolute;
-    inset: 0;
-  }
-  .ticks :global(i) {
-    position: absolute;
-    bottom: 1.2rem;
-    width: 1px;
-    height: 0.5rem;
-    background: rgb(240 240 240 / 0.22);
-  }
-  .ticks :global(i.hour) {
-    height: 0.95rem;
-    background: rgb(240 240 240 / 0.5);
-  }
-  .ticks :global(b) {
-    position: absolute;
-    bottom: 0;
-    transform: translateX(-50%);
-    font-size: 0.72rem;
-    font-weight: 500;
-    color: var(--muted);
-    font-variant-numeric: tabular-nums;
-  }
-  .scrub-track::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 1.2rem;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--line-strong) 6%, var(--line-strong) 94%, transparent);
-  }
-  .marker {
-    position: absolute;
-    bottom: 2.5rem;
-    transform: translateX(-50%);
-    font-size: 0.72rem;
-    color: var(--muted);
-    white-space: nowrap;
-    display: flex;
-    gap: 0.3rem;
-    align-items: center;
-    transition: opacity 0.3s var(--ease);
-  }
-  .marker:global(.hidden) {
-    opacity: 0;
-  }
-  .marker time {
-    color: var(--ivory);
-    font-weight: 600;
-  }
-  .marker i {
-    width: 0.45rem;
-    height: 0.45rem;
-    border-radius: 50%;
-    border: 1px solid var(--accent);
-  }
-  .knob {
-    position: absolute;
-    bottom: 1.2rem;
-    width: 1.3rem;
-    height: 1.3rem;
-    margin: 0 0 -0.65rem -0.65rem;
-    border-radius: 50%;
-    background: radial-gradient(circle at 40% 35%, #ffffff, #bdbdbd 72%);
-    box-shadow:
-      0 0 0 6px rgb(225 225 225 / 0.18),
-      0 0 28px 6px rgb(255 255 255 / 0.35);
-    pointer-events: none;
-  }
-  .scrub-track:has(input:focus-visible) .knob {
-    outline: 2px solid var(--ivory);
-    outline-offset: 5px;
-  }
-  .knob-label {
-    position: absolute;
-    bottom: calc(100% + 0.8rem);
-    left: 50%;
-    transform: translateX(var(--label-shift, -50%));
-    white-space: nowrap;
-    padding: 0.45rem 0.9rem;
-    border-radius: 999px;
-    background: rgb(19 19 19 / 0.6);
-    border: 1px solid var(--line-strong);
-    backdrop-filter: blur(16px);
-    font-size: 0.85rem;
-    font-weight: 600;
-    transition: transform 0.3s var(--ease);
-  }
-  .scrub-track:hover .knob-label,
-  .scrub-track:has(input:active) .knob-label {
-    transform: translateX(var(--label-shift, -50%)) translateY(-3px);
-  }
-  .knob-label strong {
-    font-family: var(--display);
-    font-weight: 300;
-    font-size: 1.05rem;
-    margin-left: 0.2rem;
-    color: var(--accent-soft);
-    font-variant-numeric: tabular-nums;
-  }
-  .scrub-track input {
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    width: 100%;
-    height: 4.5rem;
-    margin: 0;
-    opacity: 0;
-    cursor: ew-resize;
-    touch-action: pan-y;
-  }
-  .scrub-mood {
-    margin-top: 0.9rem;
-    font-size: 0.9rem;
-    color: rgb(240 240 240 / 0.78);
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    gap: 0.25rem 1rem;
-  }
-  .scrub-hint {
-    color: var(--muted);
   }
 
   /* ---------- Sections ---------- */
@@ -1085,9 +914,7 @@ const strings = {
     position: absolute;
     inset: 0;
     z-index: -1;
-    background:
-      radial-gradient(40% 60% at 82% 100%, color-mix(in srgb, var(--glow-a, #e6a95a) 50%, transparent), transparent 70%),
-      radial-gradient(50% 50% at 8% 0%, color-mix(in srgb, var(--glow-b, #5a3b1c) 40%, transparent), transparent 70%);
+    background: radial-gradient(45% 60% at 80% 100%, rgb(255 255 255 / 0.08), transparent 70%);
   }
   .contact-mark {
     position: absolute;
@@ -1136,8 +963,7 @@ const strings = {
     .hero-lead,
     .hero .hero-actions,
     .hero-mark,
-    .hero-mark::after,
-    .live-dot {
+    .hero-mark::after {
       animation: none;
     }
     .card,
@@ -1275,9 +1101,6 @@ const strings = {
   @media (max-width: 560px) {
     .steps {
       grid-template-columns: 1fr;
-    }
-    .scrub-hint {
-      display: none;
     }
     .hero {
       padding-top: 6rem;

@@ -1,9 +1,7 @@
-import { phaseAt, sunDay, type Phase } from '../lib/sun';
-import { glowAt } from '../lib/sky';
+import { sunDay, type Phase } from '../lib/sun';
 
 type Strings = {
   names: Record<Phase, string>;
-  moods: Record<Phase, string>;
   locale: string;
   email: string;
   whatsapp: string;
@@ -18,7 +16,6 @@ type Light = 'dawn' | 'day' | 'golden' | 'blue';
 
 const main = document.querySelector<HTMLElement>('main[data-strings]')!;
 const S: Strings = JSON.parse(main.dataset.strings!);
-const MIN = 60000;
 const DAY = 86400000;
 const root = document.documentElement;
 const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -57,99 +54,8 @@ const observer = new IntersectionObserver(
 );
 $$('main > section').forEach((s) => observer.observe(s));
 
-/* ---------- Hero light and time scrubber ---------- */
+/* ---------- Today's sun times in Paris ---------- */
 const today = sunDay(new Date());
-const start = today.dawnStart.getTime() - 45 * MIN;
-const end = today.blueEnd.getTime() + 45 * MIN;
-const span = end - start;
-const frac = (t: number) => (t - start) / span;
-const rise = today.sunrise.getTime();
-const set = today.sunset.getTime();
-const height = (t: number) => Math.max(-0.45, Math.sin((Math.PI * (t - rise)) / (set - rise)));
-
-// Hour ticks along the scrubber
-const ticks = $('[data-ticks]');
-const firstHalf = Math.ceil(start / (30 * MIN)) * 30 * MIN;
-for (let t = firstHalf; t <= end; t += 30 * MIN) {
-  const tick = document.createElement('i');
-  const d = new Date(t);
-  const minutes = Number(time(d).slice(-2));
-  tick.style.left = `${frac(t) * 100}%`;
-  if (minutes === 0) {
-    tick.className = 'hour';
-    const hour = Number(time(d).slice(0, 2));
-    if (hour % 2 === 0) {
-      const label = document.createElement('b');
-      label.textContent = time(d).slice(0, 2) + 'h';
-      label.style.left = tick.style.left;
-      ticks.append(label);
-    }
-  }
-  ticks.append(tick);
-}
-const markers = (['sunrise', 'sunset'] as const).map((key) => {
-  const el = $(`[data-tick="${key}"]`);
-  const at = key === 'sunrise' ? today.sunrise : today.sunset;
-  el.style.left = `${frac(at.getTime()) * 100}%`;
-  $('time', el).textContent = time(at);
-  return { el, f: frac(at.getTime()) };
-});
-
-const dial = $<HTMLInputElement>('[data-dial]');
-const knob = $('[data-sun]');
-const knobLabel = $('[data-knob-label]');
-const dialName = $('[data-dial-name]');
-const dialTime = $('[data-dial-time]');
-const dialMood = $('[data-dial-mood]');
-let touched = false;
-let dialPhase: Phase = 'golden';
-
-function paint(at: Date) {
-  const t = at.getTime();
-  const f = Math.min(1, Math.max(0, frac(t)));
-  const h = height(t);
-  const [glowB, glowA, core] = glowAt(at);
-  root.style.setProperty('--glow-a', glowA);
-  root.style.setProperty('--glow-b', glowB);
-  root.style.setProperty('--glow-core', core);
-  root.style.setProperty('--sun-x', `${8 + f * 84}%`);
-  root.style.setProperty('--sun-y', `${78 - 46 * h}%`);
-
-  knob.style.left = `${f * 100}%`;
-  knobLabel.style.setProperty('--label-shift', f < 0.12 ? '-12%' : f > 0.88 ? '-88%' : '-50%');
-  markers.forEach((m) => m.el.classList.toggle('hidden', Math.abs(m.f - f) < 0.17));
-
-  dialPhase = phaseAt(at).phase;
-  dialName.textContent = S.names[dialPhase];
-  dialTime.textContent = time(at);
-  dialMood.textContent = S.moods[dialPhase];
-  dial.setAttribute('aria-valuetext', `${time(at)}, ${S.names[dialPhase]}`);
-}
-
-const fromDial = () => new Date(start + (span * Number(dial.value)) / 1000);
-function setDial(t: number) {
-  dial.value = String(Math.round(Math.min(1, Math.max(0, frac(t))) * 1000));
-  paint(fromDial());
-}
-dial.addEventListener('input', () => {
-  touched = true;
-  paint(fromDial());
-});
-
-const clock = $('[data-clock]');
-const livePhase = $('[data-live-phase]');
-function tick() {
-  const now = new Date();
-  clock.textContent = time(now);
-  livePhase.textContent = S.names[phaseAt(now).phase];
-  if (!touched) {
-    const t = now.getTime();
-    // Late at night there is nothing to show; preview today's golden hour instead.
-    setDial(t >= start && t <= end ? t : today.goldenStart.getTime() + 15 * MIN);
-  }
-}
-tick();
-setInterval(tick, 30000);
 
 // Today's window for each place's light
 const todayWindows = windows(today);
@@ -288,9 +194,7 @@ function check(name: string, value?: string) {
 $$<HTMLElement>('[data-open-booking]').forEach((b) =>
   b.addEventListener('click', () => {
     check('package', b.dataset.package);
-    // The hero's button books the light currently shown on the scrubber.
-    const light = b.dataset.light ?? (b.closest('[data-hero]') ? (dialPhase === 'night' ? 'blue' : dialPhase) : undefined);
-    check('light', light);
+    check('light', b.dataset.light);
     go(b.dataset.package ? 1 : 0);
     sheet.showModal();
   }),

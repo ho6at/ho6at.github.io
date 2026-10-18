@@ -25,25 +25,12 @@ export default {
     ctaSecondary: 'Pour les marques',
   },
   light: {
-    now: 'À Paris, il est',
-    dialLabel: 'Heure de la séance',
-    hint: 'Faites glisser le soleil pour voir chaque lumière de la journée.',
-    sunrise: 'Lever',
-    sunset: 'Coucher',
-    book: 'Réserver cette lumière',
     names: {
       night: 'Nuit',
       dawn: 'Aube',
       day: 'Plein jour',
       golden: 'Heure dorée',
       blue: 'Heure bleue',
-    },
-    moods: {
-      night: 'Les monuments éclairés, les rues vides.',
-      dawn: 'La lumière la plus douce, Paris encore endormi.',
-      day: 'Lumière franche, couleurs nettes, idéale pour les marques.',
-      golden: 'Peau dorée, ombres longues, la lumière préférée des couples.',
-      blue: 'Ciel bleu profond, les façades s’allument.',
     },
   },
   sessions: {

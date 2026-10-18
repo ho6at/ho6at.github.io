@@ -27,25 +27,12 @@ const en: typeof fr = {
     ctaSecondary: 'For brands',
   },
   light: {
-    now: 'In Paris it is',
-    dialLabel: 'Session time',
-    hint: 'Drag the sun to see each light of the day.',
-    sunrise: 'Sunrise',
-    sunset: 'Sunset',
-    book: 'Book this light',
     names: {
       night: 'Night',
       dawn: 'Dawn',
       day: 'Daylight',
       golden: 'Golden hour',
       blue: 'Blue hour',
-    },
-    moods: {
-      night: 'Lit-up monuments, empty streets.',
-      dawn: 'The softest light, Paris still asleep.',
-      day: 'Clear light and crisp colour, ideal for brands.',
-      golden: 'Warm skin, long shadows, the light couples love.',
-      blue: 'Deep blue sky, the façades lighting up.',
     },
   },
   sessions: {
