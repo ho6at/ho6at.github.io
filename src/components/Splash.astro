@@ -1,6 +1,6 @@
 ---
-// Opening splash, once per visit: an unseen light source travels in an arc over the logo; a soft glow and
-// a horizontal anamorphic lens flare (with no bright point at its centre) show where it is. The letters are lit by their distance to it, and light streams out of them
+// Opening splash, once per visit: an unseen light source travels in an arc over the logo. Only its effect
+// shows: the letters lit by their distance to it. The letters are lit by their distance to it, and light streams out of them
 // away from it (god rays, made from copies of the lit letters scaled out from the light's position).
 // It closes once the page has loaded and the light has crossed at least once. The <html> gets the
 // `splash` class from an inline script in Base.astro (skipped for reduced motion or a repeat in the same
@@ -13,7 +13,6 @@ const rays = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
     <img class="base" src="/brand/luminoor-logo.png" alt="" width="556" height="166" />
     {rays.map((i) => <span class="ray" style={`--i: ${i}`} />)}
     <span class="lit"></span>
-    <span class="source"><span class="flare"></span></span>
   </div>
 </div>
 
@@ -100,7 +99,7 @@ const rays = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
     --ly: 78%;
     --power: 0;
     position: relative;
-    width: min(80vw, 32rem);
+    width: min(40vw, 16rem);
     aspect-ratio: 556 / 166;
   }
   .stage > * {
@@ -140,51 +139,4 @@ const rays = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
     filter: blur(calc(var(--i) * 1.1px));
   }
 
-  /* Where the light is: a soft, diffuse glow and a lens-flare line, no visible point */
-  .stage > .source {
-    inset: auto;
-    left: var(--lx);
-    top: var(--ly);
-    width: 0;
-    height: 0;
-    opacity: var(--power);
-  }
-  .source::before {
-    content: '';
-    position: absolute;
-    width: 16rem;
-    height: 16rem;
-    left: -8rem;
-    top: -8rem;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgb(255 214 140 / 0.16) 0%, rgb(236 170 80 / 0.07) 35%, transparent 70%);
-    filter: blur(10px);
-    mix-blend-mode: screen;
-  }
-  /* The anamorphic flare: a thin horizontal streak, even along its length so no point forms at its centre */
-  .flare {
-    position: absolute;
-    width: min(150vw, 70rem);
-    height: 2px;
-    left: calc(min(150vw, 70rem) / -2);
-    top: -1px;
-    background: linear-gradient(
-      90deg,
-      transparent,
-      rgb(140 180 255 / 0.18) 20%,
-      rgb(255 226 170 / 0.55) 40%,
-      rgb(255 226 170 / 0.6) 60%,
-      rgb(140 180 255 / 0.18) 80%,
-      transparent
-    );
-    filter: blur(0.8px);
-    mix-blend-mode: screen;
-  }
-  .flare::after {
-    content: '';
-    position: absolute;
-    inset: -6px 18%;
-    background: linear-gradient(90deg, transparent, rgb(255 210 140 / 0.16) 30%, rgb(255 210 140 / 0.16) 70%, transparent);
-    filter: blur(5px);
-  }
 </style>
