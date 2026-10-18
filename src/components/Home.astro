@@ -55,7 +55,13 @@ const strings = {
         <span class="dot live-dot"></span>
         {t.light.now}&nbsp;<strong data-clock>--:--</strong>&nbsp;·&nbsp;<span data-live-phase></span>
       </p>
-      <h1>{t.hero.title}</h1>
+      <div class="hero-mark" aria-hidden="true">
+        <picture>
+          <source srcset="/brand/luminoor-logo.webp" type="image/webp" />
+          <img src="/brand/luminoor-logo.png" alt="" width="556" height="166" fetchpriority="high" />
+        </picture>
+      </div>
+      <h1><span class="sr-only">Luminoor Paris. </span>{t.hero.title}</h1>
       <p class="hero-lead">{t.hero.lead}</p>
       <div class="hero-actions">
         <button class="button" type="button" data-open-booking>{t.hero.cta}</button>
@@ -240,6 +246,7 @@ const strings = {
   <!-- Contact -->
   <section class="contact" id="contact">
     <div class="contact-glow" aria-hidden="true"></div>
+    <img class="contact-mark" src="/brand/luminoor-logo.png" alt="" aria-hidden="true" width="556" height="166" loading="lazy" />
     <div class="wrap">
       <h2>{t.contact.title}</h2>
       <p class="lead">{t.contact.lead}</p>
@@ -298,9 +305,19 @@ const strings = {
     transition: background 0.5s var(--ease);
   }
   .top:global(.scrolled) {
-    background: rgb(13 12 11 / 0.6);
+    background: rgb(10 10 10 / 0.6);
     backdrop-filter: blur(18px) saturate(1.2);
     box-shadow: 0 1px 0 var(--line);
+  }
+  .bar :global(.logo) {
+    transition:
+      opacity 0.5s var(--ease),
+      transform 0.5s var(--ease);
+  }
+  :global(.top:not(.scrolled)) .bar :global(.logo) {
+    opacity: 0;
+    transform: translateY(-6px);
+    pointer-events: none;
   }
   .bar {
     display: grid;
@@ -314,7 +331,7 @@ const strings = {
     gap: 0.25rem;
     padding: 0.3rem;
     border-radius: 999px;
-    background: rgb(236 228 214 / 0.06);
+    background: rgb(240 240 240 / 0.06);
     border: 1px solid var(--line);
     backdrop-filter: blur(16px);
   }
@@ -331,7 +348,7 @@ const strings = {
   .pill a:hover,
   .pill a:global(.current) {
     color: var(--ivory);
-    background: rgb(236 228 214 / 0.09);
+    background: rgb(240 240 240 / 0.09);
   }
   .bar-end {
     display: flex;
@@ -387,12 +404,12 @@ const strings = {
     position: absolute;
     inset: 0;
     background:
-      linear-gradient(180deg, rgb(13 12 11 / 0.6), transparent 28%, transparent 50%, rgb(13 12 11 / 0.92)),
+      linear-gradient(180deg, rgb(10 10 10 / 0.6), transparent 28%, transparent 50%, rgb(10 10 10 / 0.92)),
       url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='.3'/></svg>");
     opacity: var(--shade, 1);
   }
   .status {
-    margin-bottom: 2rem;
+    margin-bottom: clamp(2rem, 5vh, 3.25rem);
     font-weight: 500;
   }
   .status strong {
@@ -406,19 +423,71 @@ const strings = {
       opacity: 0.4;
     }
   }
+  .hero-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  /* The script logo as the hero's mark: written in once, then a single sheen of light */
+  .hero-mark {
+    position: relative;
+    width: clamp(17rem, 46vw, 40rem);
+    filter: drop-shadow(0 18px 40px rgb(0 0 0 / 0.55));
+    -webkit-mask-image: linear-gradient(90deg, #000 45%, transparent 55%);
+    mask-image: linear-gradient(90deg, #000 45%, transparent 55%);
+    -webkit-mask-size: 260% 100%;
+    mask-size: 260% 100%;
+    animation: write 2.2s cubic-bezier(0.45, 0.05, 0.25, 1) 0.2s both;
+  }
+  .hero-mark img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .hero-mark::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(105deg, transparent 42%, rgb(255 255 255 / 0.95) 50%, transparent 58%) 120% 0 / 260% 100%
+      no-repeat;
+    -webkit-mask: url('/brand/luminoor-logo.png') center / contain no-repeat;
+    mask: url('/brand/luminoor-logo.png') center / contain no-repeat;
+    mix-blend-mode: overlay;
+    animation: sheen 2.4s var(--ease) 2.4s both;
+  }
+  @keyframes write {
+    from {
+      -webkit-mask-position: 100% 0;
+      mask-position: 100% 0;
+    }
+    to {
+      -webkit-mask-position: 0% 0;
+      mask-position: 0% 0;
+    }
+  }
+  @keyframes sheen {
+    from {
+      background-position: 120% 0;
+    }
+    to {
+      background-position: -20% 0;
+    }
+  }
   h1 {
-    font-size: clamp(3rem, 8.4vw, 8.25rem);
-    line-height: 0.98;
-    letter-spacing: -0.045em;
-    max-width: 10.5em;
-    animation: enter 1.4s var(--ease) 0.25s both;
+    margin-top: clamp(2rem, 5vh, 3rem);
+    font-size: clamp(1.9rem, 4.2vw, 3.9rem);
+    line-height: 1.08;
+    letter-spacing: -0.03em;
+    max-width: 16em;
+    animation: enter 1.4s var(--ease) 1.2s both;
   }
   .hero-lead {
-    margin-top: 2.75rem;
-    font-size: 1.15rem;
+    margin-top: 1.5rem;
+    font-size: 1.1rem;
     max-width: 30em;
-    color: rgb(236 228 214 / 0.78);
-    animation: enter 1.4s var(--ease) 0.45s both;
+    color: rgb(240 240 240 / 0.78);
+    animation: enter 1.4s var(--ease) 1.35s both;
   }
   .hero-actions {
     display: flex;
@@ -427,7 +496,8 @@ const strings = {
     margin-top: 2.25rem;
   }
   .hero .hero-actions {
-    animation: enter 1.4s var(--ease) 0.6s both;
+    justify-content: center;
+    animation: enter 1.4s var(--ease) 1.5s both;
   }
   @keyframes enter {
     from {
@@ -459,11 +529,11 @@ const strings = {
     bottom: 1.2rem;
     width: 1px;
     height: 0.5rem;
-    background: rgb(236 228 214 / 0.22);
+    background: rgb(240 240 240 / 0.22);
   }
   .ticks :global(i.hour) {
     height: 0.95rem;
-    background: rgb(236 228 214 / 0.5);
+    background: rgb(240 240 240 / 0.5);
   }
   .ticks :global(b) {
     position: absolute;
@@ -506,7 +576,7 @@ const strings = {
     width: 0.45rem;
     height: 0.45rem;
     border-radius: 50%;
-    border: 1px solid var(--gold);
+    border: 1px solid var(--accent);
   }
   .knob {
     position: absolute;
@@ -515,10 +585,10 @@ const strings = {
     height: 1.3rem;
     margin: 0 0 -0.65rem -0.65rem;
     border-radius: 50%;
-    background: radial-gradient(circle at 40% 35%, #fff3d6, var(--gold) 70%);
+    background: radial-gradient(circle at 40% 35%, #ffffff, #bdbdbd 72%);
     box-shadow:
-      0 0 0 6px rgb(201 169 107 / 0.18),
-      0 0 28px 6px rgb(230 180 100 / 0.45);
+      0 0 0 6px rgb(225 225 225 / 0.18),
+      0 0 28px 6px rgb(255 255 255 / 0.35);
     pointer-events: none;
   }
   .scrub-track:has(input:focus-visible) .knob {
@@ -533,7 +603,7 @@ const strings = {
     white-space: nowrap;
     padding: 0.45rem 0.9rem;
     border-radius: 999px;
-    background: rgb(22 20 18 / 0.6);
+    background: rgb(19 19 19 / 0.6);
     border: 1px solid var(--line-strong);
     backdrop-filter: blur(16px);
     font-size: 0.85rem;
@@ -549,7 +619,7 @@ const strings = {
     font-weight: 300;
     font-size: 1.05rem;
     margin-left: 0.2rem;
-    color: var(--gold-soft);
+    color: var(--accent-soft);
     font-variant-numeric: tabular-nums;
   }
   .scrub-track input {
@@ -566,7 +636,7 @@ const strings = {
   .scrub-mood {
     margin-top: 0.9rem;
     font-size: 0.9rem;
-    color: rgb(236 228 214 / 0.78);
+    color: rgb(240 240 240 / 0.78);
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
@@ -597,7 +667,7 @@ const strings = {
     margin: 0;
     padding: 0.5rem 1.75rem;
     border-radius: var(--radius);
-    background: linear-gradient(180deg, rgb(236 228 214 / 0.05), rgb(236 228 214 / 0.015));
+    background: linear-gradient(180deg, rgb(240 240 240 / 0.05), rgb(240 240 240 / 0.015));
     border: 1px solid var(--line);
   }
 
@@ -663,15 +733,15 @@ const strings = {
     left: 1.25rem;
     padding: 0.3rem 0.7rem;
     border-radius: 999px;
-    background: var(--gold);
-    color: #17120a;
+    background: var(--accent);
+    color: #0a0a0a;
     font-size: 0.75rem;
     font-weight: 600;
     white-space: nowrap;
   }
   .pkg.featured {
-    border-color: rgb(201 169 107 / 0.55);
-    box-shadow: 0 30px 80px -40px rgb(201 169 107 / 0.45);
+    border-color: rgb(225 225 225 / 0.55);
+    box-shadow: 0 30px 80px -40px rgb(225 225 225 / 0.45);
   }
   .card-body {
     padding: 1.5rem 1.5rem 1.6rem;
@@ -693,7 +763,7 @@ const strings = {
     font-size: 1.6rem;
     font-weight: 300;
     white-space: nowrap;
-    color: var(--gold-soft);
+    color: var(--accent-soft);
   }
   .pkg-list {
     list-style: none;
@@ -715,7 +785,7 @@ const strings = {
     width: 0.4rem;
     height: 0.4rem;
     border-radius: 50%;
-    border: 1px solid var(--gold);
+    border: 1px solid var(--accent);
   }
   .pkg-list li span {
     display: block;
@@ -723,7 +793,7 @@ const strings = {
     color: var(--muted);
   }
   .pkg-bonus {
-    color: var(--gold-soft);
+    color: var(--accent-soft);
   }
   .pkg-best {
     flex: 1;
@@ -773,7 +843,7 @@ const strings = {
     position: absolute;
     inset: -5rem -1rem -1rem;
     z-index: -1;
-    background: linear-gradient(180deg, transparent, rgb(7 6 5 / 0.8) 60%);
+    background: linear-gradient(180deg, transparent, rgb(5 5 5 / 0.8) 60%);
     border-radius: 0 0 var(--radius) var(--radius);
   }
   .place h3 {
@@ -781,7 +851,7 @@ const strings = {
   }
   .place-body p {
     font-size: 0.875rem;
-    color: rgb(236 228 214 / 0.75);
+    color: rgb(240 240 240 / 0.75);
     margin-top: 0.35rem;
   }
   .place-book {
@@ -791,7 +861,7 @@ const strings = {
     padding: 0;
     font-size: 0.85rem;
     font-weight: 600;
-    color: var(--gold-soft);
+    color: var(--accent-soft);
     cursor: pointer;
     text-decoration: underline;
     text-underline-offset: 0.3em;
@@ -811,7 +881,7 @@ const strings = {
     border-radius: 1.75rem;
     box-shadow:
       0 0 0 6px #050505,
-      0 0 0 7px rgb(236 228 214 / 0.14),
+      0 0 0 7px rgb(240 240 240 / 0.14),
       0 30px 60px -20px rgb(0 0 0 / 0.7);
     display: grid;
     place-items: center;
@@ -826,8 +896,8 @@ const strings = {
     width: 3.25rem;
     height: 3.25rem;
     border-radius: 50%;
-    background: rgb(236 228 214 / 0.16);
-    border: 1px solid rgb(236 228 214 / 0.3);
+    background: rgb(240 240 240 / 0.16);
+    border: 1px solid rgb(240 240 240 / 0.3);
     backdrop-filter: blur(10px);
   }
   .reel-play::after {
@@ -868,7 +938,7 @@ const strings = {
     font-size: 1.5rem;
     text-align: right;
     white-space: nowrap;
-    color: var(--gold-soft);
+    color: var(--accent-soft);
   }
   .steps-title {
     margin-top: 5rem;
@@ -897,8 +967,8 @@ const strings = {
     width: 2.25rem;
     height: 2.25rem;
     border-radius: 50%;
-    border: 1px solid var(--gold);
-    color: var(--gold-soft);
+    border: 1px solid var(--accent);
+    color: var(--accent-soft);
     font-family: var(--display);
     font-size: 1.1rem;
     margin-bottom: 1.25rem;
@@ -927,7 +997,7 @@ const strings = {
     font-size: 2rem;
   }
   .role {
-    color: var(--gold-soft);
+    color: var(--accent-soft);
     font-size: 0.95rem;
     margin: 0.3rem 0 0.75rem;
   }
@@ -947,7 +1017,7 @@ const strings = {
   }
   .name-words span + span {
     padding-left: 1.4em;
-    color: var(--gold);
+    color: var(--accent);
   }
   .name-story p:last-child {
     color: var(--muted);
@@ -1019,6 +1089,16 @@ const strings = {
       radial-gradient(40% 60% at 82% 100%, color-mix(in srgb, var(--glow-a, #e6a95a) 50%, transparent), transparent 70%),
       radial-gradient(50% 50% at 8% 0%, color-mix(in srgb, var(--glow-b, #5a3b1c) 40%, transparent), transparent 70%);
   }
+  .contact-mark {
+    position: absolute;
+    z-index: -1;
+    right: -4vw;
+    bottom: -2vw;
+    width: min(70vw, 60rem);
+    height: auto;
+    opacity: 0.07;
+    pointer-events: none;
+  }
   .contact h2 {
     font-size: clamp(3rem, 8vw, 7.5rem);
     letter-spacing: -0.035em;
@@ -1027,7 +1107,7 @@ const strings = {
   }
   .contact .lead {
     margin-top: 1.5rem;
-    color: rgb(236 228 214 / 0.78);
+    color: rgb(240 240 240 / 0.78);
   }
 
   .foot {
@@ -1035,6 +1115,7 @@ const strings = {
     flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
+    border-top: 1px solid var(--line);
     gap: 0.75rem 2rem;
     padding-block: 2.25rem;
     font-size: 0.875rem;
@@ -1054,6 +1135,8 @@ const strings = {
     h1,
     .hero-lead,
     .hero .hero-actions,
+    .hero-mark,
+    .hero-mark::after,
     .live-dot {
       animation: none;
     }
@@ -1145,7 +1228,7 @@ const strings = {
       align-items: center;
       padding: 0.4rem;
       border-radius: 1.5rem;
-      background: rgb(22 20 18 / 0.72);
+      background: rgb(19 19 19 / 0.72);
       border: 1px solid var(--line);
       backdrop-filter: blur(22px) saturate(1.3);
       box-shadow: 0 20px 40px -12px rgb(0 0 0 / 0.7);
@@ -1180,8 +1263,8 @@ const strings = {
       color: var(--ivory);
     }
     .tabbar .tab-book {
-      color: #17120a;
-      background: var(--gold);
+      color: #0a0a0a;
+      background: var(--accent);
       padding-block: 0.5rem;
     }
     .foot {

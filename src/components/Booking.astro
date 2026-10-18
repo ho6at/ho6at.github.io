@@ -104,6 +104,7 @@ const lights = ['dawn', 'day', 'golden', 'blue'] as const;
         <div class="pane" data-pane>
           <div class="ticket plate plate-golden" data-ticket>
             <div class="ticket-inner">
+              <img class="ticket-logo" src="/brand/luminoor-logo.png" alt="Luminoor Paris" width="556" height="166" />
               <p class="ticket-package" data-sum-package></p>
               <dl>
                 <div><dt>{s.dateLabel}</dt><dd data-sum-date></dd></div>
@@ -194,7 +195,7 @@ const lights = ['dawn', 'day', 'golden', 'blue'] as const;
     height: 2.4rem;
     border-radius: 50%;
     border: 1px solid var(--line);
-    background: rgb(236 228 214 / 0.05);
+    background: rgb(240 240 240 / 0.05);
     cursor: pointer;
     display: grid;
     place-items: center;
@@ -220,7 +221,7 @@ const lights = ['dawn', 'day', 'golden', 'blue'] as const;
     transition: background 0.5s var(--ease);
   }
   .progress span:global(.on) {
-    background: var(--gold);
+    background: var(--accent);
   }
 
   .viewport {
@@ -288,11 +289,11 @@ const lights = ['dawn', 'day', 'golden', 'blue'] as const;
       background 0.3s var(--ease);
   }
   .option:has(input:checked) {
-    border-color: var(--gold);
-    background: linear-gradient(90deg, rgb(201 169 107 / 0.14), rgb(201 169 107 / 0.03));
+    border-color: var(--accent);
+    background: linear-gradient(90deg, rgb(225 225 225 / 0.14), rgb(225 225 225 / 0.03));
   }
   .option:has(input:focus-visible) {
-    outline: 2px solid var(--gold);
+    outline: 2px solid var(--accent);
     outline-offset: 2px;
   }
   .thumb {
@@ -314,12 +315,12 @@ const lights = ['dawn', 'day', 'golden', 'blue'] as const;
   }
   .option-body {
     font-size: 0.875rem;
-    color: rgb(236 228 214 / 0.8);
+    color: rgb(240 240 240 / 0.8);
   }
   .option-price {
     font-family: var(--display);
     font-size: 1.4rem;
-    color: var(--gold-soft);
+    color: var(--accent-soft);
     padding-right: 0.4rem;
     white-space: nowrap;
   }
@@ -366,20 +367,20 @@ const lights = ['dawn', 'day', 'golden', 'blue'] as const;
   }
   .dates :global(label .gt) {
     font-size: 0.68rem;
-    color: var(--gold-soft);
+    color: var(--accent-soft);
     font-variant-numeric: tabular-nums;
   }
   .dates :global(label:has(input:checked)) {
     background: var(--ivory);
     border-color: var(--ivory);
-    color: #17120a;
+    color: #0a0a0a;
   }
   .dates :global(label:has(input:checked) .wd),
   .dates :global(label:has(input:checked) .gt) {
-    color: #5b4a2c;
+    color: #555555;
   }
   .dates :global(label:has(input:focus-visible)) {
-    outline: 2px solid var(--gold);
+    outline: 2px solid var(--accent);
     outline-offset: 2px;
   }
 
@@ -406,7 +407,7 @@ const lights = ['dawn', 'day', 'golden', 'blue'] as const;
     z-index: 2;
   }
   .light:has(input:checked) {
-    outline: 2px solid var(--gold);
+    outline: 2px solid var(--accent);
     outline-offset: -2px;
   }
   .light:has(input:focus-visible) {
@@ -418,7 +419,7 @@ const lights = ['dawn', 'day', 'golden', 'blue'] as const;
   }
   .light-time {
     font-size: 0.8rem;
-    color: rgb(236 228 214 / 0.82);
+    color: rgb(240 240 240 / 0.82);
     font-variant-numeric: tabular-nums;
   }
 
@@ -443,7 +444,7 @@ const lights = ['dawn', 'day', 'golden', 'blue'] as const;
   .field input:focus-visible,
   .field textarea:focus-visible {
     outline: none;
-    border-color: var(--gold);
+    border-color: var(--accent);
   }
   .stepper {
     display: inline-flex;
@@ -460,12 +461,12 @@ const lights = ['dawn', 'day', 'golden', 'blue'] as const;
     height: 2.6rem;
     border-radius: 50%;
     border: 0;
-    background: rgb(236 228 214 / 0.08);
+    background: rgb(240 240 240 / 0.08);
     font-size: 1.25rem;
     cursor: pointer;
   }
   .stepper button:hover {
-    background: rgb(236 228 214 / 0.16);
+    background: rgb(240 240 240 / 0.16);
   }
   .stepper output {
     min-width: 2.5rem;
@@ -487,7 +488,14 @@ const lights = ['dawn', 'day', 'golden', 'blue'] as const;
     position: relative;
     z-index: 2;
     padding: 1.5rem;
-    background: linear-gradient(180deg, rgb(13 12 11 / 0.15), rgb(13 12 11 / 0.72));
+    background: linear-gradient(180deg, rgb(10 10 10 / 0.15), rgb(10 10 10 / 0.72));
+  }
+  .ticket-logo {
+    display: block;
+    height: 2.1rem;
+    width: auto;
+    margin-bottom: 1.25rem;
+    opacity: 0.9;
   }
   .ticket-package {
     font-family: var(--display);
@@ -504,10 +512,10 @@ const lights = ['dawn', 'day', 'golden', 'blue'] as const;
     justify-content: space-between;
     gap: 1rem;
     padding-bottom: 0.6rem;
-    border-bottom: 1px solid rgb(236 228 214 / 0.15);
+    border-bottom: 1px solid rgb(240 240 240 / 0.15);
   }
   dt {
-    color: rgb(236 228 214 / 0.7);
+    color: rgb(240 240 240 / 0.7);
     font-size: 0.9rem;
   }
   dd {
@@ -520,11 +528,11 @@ const lights = ['dawn', 'day', 'golden', 'blue'] as const;
     font-size: 3rem;
     line-height: 1;
     margin-top: 1.25rem;
-    color: var(--gold-soft);
+    color: var(--accent-soft);
   }
   .ticket-note {
     font-size: 0.8rem;
-    color: rgb(236 228 214 / 0.7);
+    color: rgb(240 240 240 / 0.7);
     margin-top: 0.5rem;
   }
   .send {
