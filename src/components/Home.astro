@@ -3,6 +3,7 @@ import Logo from './Logo.astro';
 import Booking from './Booking.astro';
 import LanguageGate from './LanguageGate.astro';
 import Splash from './Splash.astro';
+import Eiffel from './Eiffel.astro';
 import { languages } from '../i18n/languages';
 import { site } from '../site';
 import type fr from '../i18n/fr';
@@ -63,6 +64,7 @@ const strings = {
   <!-- Hero: the Luminoor Paris logo under a soft studio light -->
   <section class="hero" data-hero>
     <div class="hero-light" aria-hidden="true"></div>
+    <div class="hero-eiffel" aria-hidden="true"><Eiffel /></div>
     <div class="wrap hero-inner">
       <div class="hero-halo" aria-hidden="true"></div>
       <div class="hero-mark" aria-hidden="true" data-hero-light="waiting">
@@ -424,6 +426,23 @@ const strings = {
       opacity: 0.55;
       transform: translate(-50%, -12%) scale(0.94);
     }
+  }
+  /* A faint line drawing of the Eiffel Tower behind the logo, dissolving towards the bottom */
+  .hero-eiffel {
+    position: absolute;
+    z-index: -1;
+    left: 50%;
+    bottom: 0;
+    height: 94%;
+    aspect-ratio: 1 / 2;
+    transform: translateX(-50%);
+    color: #e6d6bd;
+    opacity: 0.12;
+    filter: blur(0.4px);
+    -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 12%, #000 55%, transparent 100%);
+    mask-image: linear-gradient(180deg, transparent 0%, #000 12%, #000 55%, transparent 100%);
+    pointer-events: none;
+    animation: fade-in 2.4s var(--ease) 0.4s both;
   }
   .hero-inner {
     position: relative;
