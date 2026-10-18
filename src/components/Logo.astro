@@ -1,5 +1,5 @@
 ---
-// Wordmark: the first "o" of "oo" is a sun resting on the baseline — a Paris sunset.
+// Wordmark: LUMINOOR in tracked capitals, the first O drawn as a sun resting on the horizon.
 interface Props {
   href: string;
   rise?: boolean;
@@ -8,15 +8,15 @@ const { href, rise = false } = Astro.props;
 ---
 
 <a class:list={['logo', { rise }]} href={href} aria-label="Luminoor">
-  <span aria-hidden="true">Lumin<span class="sun"><span></span></span>or</span>
+  <span aria-hidden="true">LUMIN<span class="sun"><span></span></span>OR</span>
 </a>
 
 <style>
   .logo {
     font-family: var(--display);
-    font-size: 1.7rem;
-    font-weight: 500;
-    letter-spacing: 0.005em;
+    font-size: 1.15rem;
+    font-weight: 400;
+    letter-spacing: 0.34em;
     text-decoration: none;
     color: inherit;
     white-space: nowrap;
@@ -24,20 +24,20 @@ const { href, rise = false } = Astro.props;
   }
   .sun {
     display: inline-block;
-    width: 0.6em;
-    height: 0.54em;
-    margin-inline: 0.02em 0.03em;
+    width: 0.74em;
+    height: 0.7em;
+    margin-right: 0.34em;
     overflow: hidden;
     position: relative;
     vertical-align: -0.02em;
-    box-shadow: inset 0 -0.04em 0 currentColor;
+    box-shadow: inset 0 -0.06em 0 currentColor;
   }
   .sun > span {
     position: absolute;
-    left: 0.03em;
+    left: 0.02em;
     top: 0;
-    width: 0.54em;
-    height: 0.54em;
+    width: 0.7em;
+    height: 0.7em;
     border-radius: 50%;
     background: var(--gold);
     z-index: -1;

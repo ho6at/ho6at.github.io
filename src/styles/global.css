@@ -9,8 +9,8 @@
   --gold: #c9a96b;
   --gold-soft: #e4cf9f;
 
-  --display: 'Bodoni Moda', 'Didot', 'Times New Roman', serif;
-  --body: 'Instrument Sans', system-ui, sans-serif;
+  --display: 'Jost', 'Futura', 'Avenir Next', system-ui, sans-serif;
+  --body: 'Jost', 'Futura', 'Avenir Next', system-ui, sans-serif;
 
   --gutter: clamp(1.25rem, 4vw, 3.5rem);
   --max: 82rem;
@@ -51,9 +51,9 @@ h1,
 h2,
 h3 {
   font-family: var(--display);
-  font-weight: 400;
-  line-height: 1.04;
-  letter-spacing: -0.02em;
+  font-weight: 300;
+  line-height: 1.02;
+  letter-spacing: -0.03em;
   margin: 0;
 }
 h2 {
@@ -99,8 +99,9 @@ button {
   min-height: 3.1rem;
   padding: 0 1.5rem;
   border-radius: 999px;
-  font-weight: 600;
+  font-weight: 500;
   font-size: 0.975rem;
+  letter-spacing: 0.01em;
   text-decoration: none;
   cursor: pointer;
   border: 1px solid transparent;
