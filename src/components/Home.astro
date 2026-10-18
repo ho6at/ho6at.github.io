@@ -5,6 +5,7 @@ import LanguageGate from './LanguageGate.astro';
 import Splash from './Splash.astro';
 import Eiffel from './Eiffel.astro';
 import { languages } from '../i18n/languages';
+import { landings, landingIds, landingUi, landingHref } from '../i18n/landings';
 import { site } from '../site';
 import type fr from '../i18n/fr';
 
@@ -238,6 +239,19 @@ const strings = {
     </div>
   </section>
 </main>
+
+<nav class="wrap guides" aria-label={landingUi[t.lang].guides}>
+  <p>{landingUi[t.lang].guides}</p>
+  <ul>
+    {
+      landingIds.map((id) => (
+        <li>
+          <a href={landingHref(id, t.lang)}>{landings[id][t.lang].h1}</a>
+        </li>
+      ))
+    }
+  </ul>
+</nav>
 
 <footer class="wrap foot">
   <Logo href={home} size="footer" />
@@ -946,6 +960,28 @@ const strings = {
     color: rgb(240 240 240 / 0.78);
   }
 
+  .guides {
+    padding-block: 2.5rem 0.5rem;
+    border-top: 1px solid var(--line);
+    font-size: 0.9rem;
+  }
+  .guides p {
+    margin-bottom: 0.75rem;
+  }
+  .guides ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
+  }
+  .guides a {
+    color: var(--muted);
+  }
+  .guides a:hover {
+    color: var(--ivory);
+  }
   .foot {
     display: flex;
     flex-wrap: wrap;

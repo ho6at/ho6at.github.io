@@ -336,3 +336,15 @@ sheet.addEventListener('click', (e) => {
 });
 if (reduceMotion) track.style.transition = 'none';
 go(0);
+
+/* ---------- Arriving from a guide page with ?book=<package>: open the booking form ---------- */
+{
+  const params = new URLSearchParams(location.search);
+  if (params.has('book')) {
+    const pkg = params.get('book') || undefined;
+    check('package', pkg);
+    go(pkg ? 1 : 0);
+    sheet.showModal();
+    history.replaceState(null, '', location.pathname + location.hash);
+  }
+}

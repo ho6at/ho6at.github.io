@@ -1,0 +1,11 @@
+---
+import Landing from '../components/Landing.astro';
+import { landings, landingIds } from '../i18n/landings';
+
+export function getStaticPaths() {
+  return landingIds.map((id) => ({ params: { landing: landings[id].fr.slug }, props: { id } }));
+}
+const { id } = Astro.props;
+---
+
+<Landing id={id} lang="fr" />

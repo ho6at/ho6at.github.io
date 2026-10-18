@@ -1,0 +1,515 @@
+---
+// A page for one main search (see i18n/landings.ts), in the site's look. Its "book" buttons open the
+// booking form on the home page with the chosen package (home.ts reads `?book=`).
+import Base from '../layouts/Base.astro';
+import Logo from './Logo.astro';
+import Eiffel from './Eiffel.astro';
+import { site } from '../site';
+import { languages } from '../i18n/languages';
+import { landings, landingIds, landingUi, landingHref, type LandingId } from '../i18n/landings';
+import fr from '../i18n/fr';
+import en from '../i18n/en';
+import fa from '../i18n/fa';
+
+interface Props {
+  id: LandingId;
+  lang: 'fr' | 'en' | 'fa';
+}
+const { id, lang } = Astro.props;
+const t = { fr, en, fa }[lang];
+const page = landings[id][lang];
+const ui = landingUi[lang];
+const home = languages.find((l) => l.code === lang)!.href;
+const num = (n: number) => new Intl.NumberFormat(t.locale).format(n);
+const packages = page.packages.map((pid) => t.sessions.packages.find((p) => p.id === pid)!).filter(Boolean);
+const alternates = languages.map((l) => ({ code: l.code, href: landingHref(id, l.code) }));
+const bookHref = (pkg?: string) => `${home}${pkg ? `?book=${pkg}` : '?book'}`;
+
+const pageUrl = new URL(landingHref(id, lang), Astro.site).href;
+const siteUrl = Astro.site!.href;
+const schema = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Service',
+      name: page.h1,
+      description: page.description,
+      url: pageUrl,
+      serviceType: page.h1,
+      areaServed: { '@type': 'City', name: 'Paris' },
+      provider: {
+        '@type': ['ProfessionalService', 'LocalBusiness'],
+        '@id': `${siteUrl}#business`,
+        name: 'Luminoor Paris',
+        url: new URL(home, siteUrl).href,
+        image: `${siteUrl}og.jpg`,
+        email: site.email,
+        sameAs: [site.instagram],
+        priceRange: '€€',
+        address: { '@type': 'PostalAddress', addressLocality: 'Paris', addressCountry: 'FR' },
+      },
+      offers: packages.map((p) => ({
+        '@type': 'Offer',
+        name: `${p.name} — ${p.duration}`,
+        price: p.price,
+        priceCurrency: 'EUR',
+        availability: 'https://schema.org/InStock',
+      })),
+    },
+    {
+      '@type': 'FAQPage',
+      mainEntity: page.faq.map((i) => ({ '@type': 'Question', name: i.q, acceptedAnswer: { '@type': 'Answer', text: i.a } })),
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Luminoor Paris', item: new URL(home, siteUrl).href },
+        { '@type': 'ListItem', position: 2, name: page.h1, item: pageUrl },
+      ],
+    },
+  ],
+};
+const others = landingIds.filter((x) => x !== id);
+---
+
+<Base lang={lang} title={page.title} description={page.description} ogLocale={t.meta.ogLocale} schema={schema} alternates={alternates}>
+  <script is:inline>
+    // Arrived on a page in their language: going on to the home page needs no language picker or splash.
+    try {
+      sessionStorage.setItem('luminoor-lang-chosen', '1');
+      sessionStorage.setItem('luminoor-splash', '1');
+    } catch {}
+  </script>
+
+  <header class="top">
+    <div class="wrap bar">
+      <Logo href={home} />
+      <div class="bar-end">
+        <nav class="langs" aria-label="Language">
+          {
+            languages.map((l) => (
+              <a href={landingHref(id, l.code)} hreflang={l.code} lang={l.code} aria-label={l.name} aria-current={l.code === lang ? 'page' : undefined}>
+                {l.short}
+              </a>
+            ))
+          }
+        </nav>
+        <a class="button bar-book" href={bookHref()}>{ui.bookShort}</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="intro">
+      <div class="intro-eiffel" aria-hidden="true"><Eiffel /></div>
+      <div class="wrap intro-inner">
+        <nav class="crumbs" aria-label="Breadcrumb">
+          <a href={home}>{ui.home}</a>
+          <span aria-hidden="true">/</span>
+          <span aria-current="page">{page.h1}</span>
+        </nav>
+        <h1>{page.h1}</h1>
+        <p class="lead">{page.lead}</p>
+        <div class="actions">
+          <a class="button" href={bookHref(packages[0]?.id)}>{ui.book}</a>
+          <a class="button ghost" href="#packages">{ui.allPackages}</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="wrap block">
+      <ul class="points">
+        {
+          page.points.map((p) => (
+            <li>
+              <h2>{p.t}</h2>
+              <p>{p.d}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <section class="wrap block">
+      <h2 class="title">{page.spotsTitle}</h2>
+      <ul class="spots">
+        {
+          page.spots.map((s) => (
+            <li>
+              <h3>{s.name}</h3>
+              <p class="when">{s.when}</p>
+              <p>{s.note}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <section class="wrap block" id="packages">
+      <h2 class="title">{ui.packagesTitle}</h2>
+      <ul class="packages">
+        {
+          packages.map((p) => (
+            <li class:list={{ featured: p.featured }}>
+              <div class="pkg-top">
+                <h3>{p.name}</h3>
+                <p class="price">{num(p.price)} €</p>
+              </div>
+              <p class="meta">
+                {p.duration} · {p.places}
+              </p>
+              <p>{p.photos}</p>
+              {p.bonus && <p class="bonus">{p.bonus}</p>}
+              <p class="best">
+                <b>{t.sessions.bestForLabel}</b> {p.bestFor}
+              </p>
+              <a class="button ghost" href={bookHref(p.id)}>{ui.choose}</a>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <section class="wrap block faq">
+      <h2 class="title">{ui.faqTitle}</h2>
+      <div class="faq-list">
+        {
+          page.faq.map((i) => (
+            <details>
+              <summary>{i.q}</summary>
+              <p>{i.a}</p>
+            </details>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="cta">
+      <div class="wrap">
+        <h2>{page.ctaTitle}</h2>
+        <p class="lead">{page.ctaText}</p>
+        <div class="actions">
+          <a class="button" href={bookHref(packages[0]?.id)}>{ui.book}</a>
+          <a class="button ghost" href={site.instagram} rel="noopener">{t.contact.instagram}</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="wrap foot">
+    <nav class="guides" aria-label={ui.guides}>
+      <p>{ui.guides}</p>
+      <ul>
+        {
+          others.map((x) => (
+            <li>
+              <a href={landingHref(x, lang)}>{landings[x][lang].h1}</a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+    <div class="foot-end">
+      <Logo href={home} size="footer" />
+      <p>© {new Date().getFullYear()} Luminoor, {site.city}. {t.footer.rights}</p>
+      <a href={t.footer.legalHref}>{t.footer.legal}</a>
+    </div>
+  </footer>
+</Base>
+
+<style>
+  .top {
+    position: absolute;
+    inset: 0 0 auto;
+    z-index: 5;
+  }
+  .bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-block: 0.9rem;
+  }
+  .bar-end {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .langs {
+    display: flex;
+    padding: 0.2rem;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+  }
+  .langs a {
+    min-width: 2.2rem;
+    padding: 0.3rem 0.55rem;
+    border-radius: 999px;
+    text-align: center;
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-decoration: none;
+    color: var(--muted);
+  }
+  .langs a[lang='fa'] {
+    font-family: 'Vazirmatn', var(--body);
+  }
+  .langs a[aria-current] {
+    color: #0a0a0a;
+    background: var(--metal);
+  }
+  .bar-book {
+    min-height: 2.5rem;
+    padding: 0 1.15rem;
+  }
+
+  .intro {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    padding-block: 9rem 5rem;
+    background:
+      radial-gradient(45% 55% at 50% 40%, rgb(220 200 170 / 0.1), transparent 70%),
+      var(--bg);
+  }
+  .intro-eiffel {
+    position: absolute;
+    z-index: -1;
+    inset-inline-end: 8%;
+    bottom: 0;
+    height: 85%;
+    aspect-ratio: 1 / 2;
+    color: #e6d6bd;
+    opacity: 0.1;
+    filter: blur(6px);
+    -webkit-mask-image: linear-gradient(180deg, #000 50%, transparent 98%);
+    mask-image: linear-gradient(180deg, #000 50%, transparent 98%);
+  }
+  .crumbs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-bottom: 1.75rem;
+  }
+  .crumbs a {
+    color: var(--muted);
+  }
+  .intro h1 {
+    font-size: clamp(2.4rem, 6vw, 4.6rem);
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    max-width: 14em;
+    background: var(--champagne-foil);
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    padding-block: 0.06em;
+  }
+  :global(:root[lang='fa']) .intro h1 {
+    line-height: 1.4;
+  }
+  .intro .lead {
+    margin-top: 1.5rem;
+    color: rgb(240 240 240 / 0.8);
+    max-width: 34em;
+  }
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 2rem;
+  }
+
+  .block {
+    padding-top: clamp(4rem, 9vw, 7rem);
+  }
+  .title {
+    font-size: clamp(1.9rem, 4vw, 3rem);
+    margin-bottom: 2rem;
+  }
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .points {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1rem;
+  }
+  .points li {
+    padding: 1.5rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--line);
+    background: var(--surface);
+  }
+  .points h2 {
+    font-size: 1.3rem;
+    margin-bottom: 0.6rem;
+  }
+  .points p,
+  .spots p,
+  .packages p {
+    color: var(--muted);
+  }
+
+  .spots {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1rem;
+    border-top: 1px solid var(--line);
+  }
+  .spots li {
+    padding-top: 1.25rem;
+  }
+  .spots h3 {
+    font-size: 1.5rem;
+  }
+  .spots .when {
+    color: #dcc9ab;
+    font-size: 0.9rem;
+    margin: 0.3rem 0 0.5rem;
+  }
+
+  .packages {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    gap: 1rem;
+  }
+  .packages li {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    padding: 1.6rem;
+    border-radius: calc(var(--radius) + 4px);
+    border: 1px solid var(--line);
+    background: var(--surface);
+  }
+  .packages li.featured {
+    border-color: rgb(220 200 170 / 0.55);
+  }
+  .pkg-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+  }
+  .packages h3 {
+    font-size: 1.8rem;
+  }
+  .price {
+    font-size: 1.6rem;
+    font-weight: 300;
+    color: #efe3cf !important;
+    white-space: nowrap;
+  }
+  .meta {
+    font-size: 0.9rem;
+  }
+  .bonus {
+    color: #dcc9ab !important;
+  }
+  .best {
+    flex: 1;
+    font-size: 0.9rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--line);
+  }
+  .best b {
+    display: block;
+    font-weight: 500;
+    color: var(--ivory);
+  }
+  .packages .button {
+    margin-top: 0.5rem;
+  }
+
+  .faq-list {
+    border-top: 1px solid var(--line);
+    max-width: 50rem;
+  }
+  details {
+    border-bottom: 1px solid var(--line);
+    padding-block: 1.2rem;
+  }
+  summary {
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 1.1rem;
+  }
+  details p {
+    margin-top: 0.7rem;
+    color: var(--muted);
+  }
+
+  .cta {
+    margin-top: clamp(5rem, 10vw, 8rem);
+    padding-block: clamp(4.5rem, 9vw, 7rem);
+    border-top: 1px solid var(--line);
+    background: radial-gradient(45% 60% at 80% 100%, rgb(220 200 170 / 0.08), transparent 70%);
+  }
+  .cta h2 {
+    font-size: clamp(2.2rem, 5vw, 3.8rem);
+    max-width: 14em;
+  }
+  .cta .lead {
+    margin-top: 1rem;
+  }
+
+  .foot {
+    display: grid;
+    gap: 2rem;
+    padding-block: 2.5rem;
+    border-top: 1px solid var(--line);
+    font-size: 0.9rem;
+    color: var(--muted);
+  }
+  .guides p {
+    color: var(--ivory);
+    margin-bottom: 0.75rem;
+  }
+  .guides ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
+  }
+  .guides a {
+    color: var(--muted);
+  }
+  .guides a:hover {
+    color: var(--ivory);
+  }
+  .foot-end {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem 2rem;
+  }
+
+  @media (max-width: 960px) {
+    .points,
+    .spots {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  @media (max-width: 560px) {
+    .bar-book {
+      display: none; /* the hero has its own book button; the header has no room for it on phones */
+    }
+    .points,
+    .spots {
+      grid-template-columns: 1fr;
+    }
+    .intro {
+      padding-top: 7rem;
+    }
+    .intro-eiffel {
+      inset-inline-end: -10%;
+    }
+  }
+</style>

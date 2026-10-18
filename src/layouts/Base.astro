@@ -13,8 +13,11 @@ interface Props {
   ogLocale?: string;
   /** schema.org JSON-LD for this page */
   schema?: object;
+  /** The same page in each language (hreflang); defaults to the home pages when `home` is set */
+  alternates?: { code: string; href: string }[];
 }
 const { lang, title, description, home = false, ogLocale, schema } = Astro.props;
+const alternates = Astro.props.alternates ?? (home ? languages.map((l) => ({ code: l.code, href: l.href })) : []);
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const dir = languages.find((l) => l.code === lang)?.dir ?? 'ltr';
 // Vazirmatn covers Persian text (the language picker uses it on every page; Google Fonts only downloads
@@ -35,6 +38,11 @@ const fonts =
           // The opening splash (Splash) also plays once per visit, before the language picker.
           try {
             const root = document.documentElement;
+            // Coming to book (?book from a guide page): straight to the booking form.
+            if (new URLSearchParams(location.search).has('book')) {
+              sessionStorage.setItem('luminoor-lang-chosen', '1');
+              sessionStorage.setItem('luminoor-splash', '1');
+            }
             if (!sessionStorage.getItem('luminoor-lang-chosen')) root.classList.add('ask-lang');
             const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
             if (!still && !sessionStorage.getItem('luminoor-splash')) {
@@ -51,8 +59,12 @@ const fonts =
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
     {!site.indexable && <meta name="robots" content="noindex" />}
-    {home && languages.map((l) => <link rel="alternate" hreflang={l.code} href={new URL(l.href, Astro.site)} />)}
-    {home && <link rel="alternate" hreflang="x-default" href={new URL('/', Astro.site)} />}
+    {alternates.map((l) => <link rel="alternate" hreflang={l.code} href={new URL(l.href, Astro.site)} />)}
+    {
+      alternates.length > 0 && (
+        <link rel="alternate" hreflang="x-default" href={new URL(alternates.find((l) => l.code === 'fr')!.href, Astro.site)} />
+      )
+    }
     <meta property="og:site_name" content="Luminoor Paris" />
     <meta property="og:url" content={canonical} />
     {ogLocale && <meta property="og:locale" content={ogLocale} />}
