@@ -73,8 +73,17 @@ const strings = {
           <source srcset="/brand/luminoor-logo.webp" type="image/webp" />
           <img src="/brand/luminoor-logo.png" alt="" width="556" height="166" fetchpriority="high" />
         </picture>
-        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) => <span class="ray" style={`--i: ${i}`} />)}
-        <span class="lit" />
+        <span class="shade" />
+        {
+          [1, 2, 3, 4].map((i) => (
+            <span class="ray" style={`--i: ${i}`}>
+              <span class="glow" />
+            </span>
+          ))
+        }
+        <span class="lit">
+          <span class="glow" />
+        </span>
       </div>
       <h1><span class="sr-only">{t.meta.h1Prefix}</span>{t.hero.title}</h1>
       <p class="hero-lead">{t.hero.lead}</p>
@@ -422,8 +431,7 @@ const strings = {
     width: min(56rem, 120vw);
     aspect-ratio: 2 / 1;
     transform: translate(-50%, -12%);
-    background: radial-gradient(closest-side, rgb(220 200 170 / 0.22), rgb(220 200 170 / 0.07) 55%, transparent 75%);
-    filter: blur(8px);
+    background: radial-gradient(closest-side, rgb(220 200 170 / 0.2), rgb(220 200 170 / 0.07) 50%, transparent 80%);
     pointer-events: none;
     z-index: -1;
     animation:
@@ -468,59 +476,80 @@ const strings = {
   }
   /* The logo, lit once by a passing light (same effect as the splash; driven by scripts/home.ts):
      it waits in shadow, the light crosses it, then it settles at full brightness */
+  /* The logo, lit once by a passing light (driven by scripts/home.ts). Kept light for Safari: the logo
+     image never changes; a dark layer over it fades out (--base), and the light is a glow that only moves
+     (transform) inside layers cut to the logo's shape. */
   .hero-mark {
-    --lx: -12%;
-    --ly: 78%;
+    --gx: 0px;
+    --gy: 0px;
     --power: 0;
+    --base: 0.35;
     position: relative;
-    width: clamp(17rem, 46vw, 40rem);
-    filter: drop-shadow(0 18px 40px rgb(0 0 0 / 0.55));
+    width: clamp(13rem, 30vw, 24rem);
   }
   .hero-mark img {
     display: block;
     width: 100%;
     height: auto;
+    filter: drop-shadow(0 18px 40px rgb(0 0 0 / 0.55));
   }
-  /* While waiting and during the pass, the logo's own brightness is driven by the script (--base),
-     rising to full silver while the light is still on it, so there is no dim moment after the light */
-  .hero-mark[data-hero-light='waiting'] img {
-    filter: brightness(0.35);
-  }
-  .hero-mark[data-hero-light='passing'] img {
-    filter: brightness(var(--base, 0.35));
-  }
-  /* if the script never runs, do not leave the logo in shadow */
-  .hero-mark[data-hero-light='waiting'] img {
-    animation: unlit-fallback 0s 8s forwards;
-  }
-  @keyframes unlit-fallback {
-    to {
-      filter: none;
-    }
-  }
+  .hero-mark .shade,
   .hero-mark .lit,
   .hero-mark .ray {
     position: absolute;
     inset: 0;
-    background: radial-gradient(
-      circle at var(--lx) var(--ly),
-      #fffaf0 0%,
-      #f6ead6 9%,
-      rgb(225 205 175 / 0.85) 20%,
-      rgb(190 170 140 / 0.35) 36%,
-      transparent 58%
-    );
+    overflow: hidden;
     -webkit-mask: url('/brand/luminoor-logo.png') center / 100% 100% no-repeat;
     mask: url('/brand/luminoor-logo.png') center / 100% 100% no-repeat;
-    opacity: var(--power);
     pointer-events: none;
   }
+  /* shadow over the logo until the light has passed */
+  .hero-mark .shade {
+    background: #0a0a0a;
+    opacity: calc(1 - var(--base));
+  }
+  .hero-mark[data-hero-light='done'] .shade {
+    opacity: 0;
+  }
+  /* if the script never runs, do not leave the logo in shadow */
+  .hero-mark[data-hero-light='waiting'] .shade {
+    animation: unlit-fallback 0.6s 8s forwards;
+  }
+  @keyframes unlit-fallback {
+    to {
+      opacity: 0;
+    }
+  }
+  .hero-mark .lit,
   .hero-mark .ray {
-    transform-origin: var(--lx) var(--ly);
-    transform: scale(calc(1 + var(--i) * 0.026));
-    opacity: calc(var(--power) * (0.3 - var(--i) * 0.026));
-    mix-blend-mode: screen;
-    filter: blur(calc(var(--i) * 1.1px));
+    opacity: var(--power);
+    will-change: opacity, transform;
+  }
+  /* the light itself: a soft champagne glow centred on the light's position */
+  .hero-mark .glow {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 130%;
+    aspect-ratio: 1;
+    margin: -65% 0 0 -65%;
+    background: radial-gradient(
+      closest-side,
+      #fffaf0 0%,
+      #f6ead6 14%,
+      rgb(225 205 175 / 0.85) 32%,
+      rgb(190 170 140 / 0.35) 60%,
+      transparent 100%
+    );
+    transform: translate3d(var(--gx), var(--gy), 0);
+    will-change: transform;
+  }
+  /* rays: lit copies of the logo, each a little larger, scaled out from the light's position */
+  .hero-mark .ray {
+    --s: calc(1 + var(--i) * 0.035);
+    transform-origin: 0 0;
+    transform: translate(calc(var(--gx) * (1 - var(--s))), calc(var(--gy) * (1 - var(--s)))) scale(var(--s));
+    opacity: calc(var(--power) * (0.28 - var(--i) * 0.05));
   }
   h1 {
     margin-top: clamp(2rem, 5vh, 3rem);
@@ -537,7 +566,7 @@ const strings = {
     -webkit-text-fill-color: transparent;
     animation:
       enter 1.4s var(--ease) 1.2s both,
-      foil 10s ease-in-out 2.6s infinite;
+      foil 7s ease-in-out 2.6s 1;
   }
   /* French and English: engraved Roman capitals (Persian keeps Reem Kufi) */
   :global(:root:not([lang='fa'])) h1 {
@@ -548,7 +577,7 @@ const strings = {
     letter-spacing: 0.04em;
     max-width: 22em;
   }
-  /* Light slowly travelling across the gold */
+  /* Light travelling once across the gold (an endless shimmer repaints the title every frame) */
   @keyframes foil {
     0%,
     100% {
