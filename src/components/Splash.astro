@@ -1,28 +1,21 @@
 ---
-// Opening splash, once per visit: an unseen light source travels in an arc over the logo. Only its effect
-// shows: the letters lit by their distance to it. The letters are lit by their distance to it, and light streams out of them
-// away from it (god rays, made from copies of the lit letters scaled out from the light's position).
-// It closes once the page has loaded and the light has crossed at least once. The <html> gets the
-// `splash` class from an inline script in Base.astro (skipped for reduced motion or a repeat in the same
-// visit; that script also clears it after a few seconds whatever happens).
-const rays = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+// Opening splash, once per visit: an unseen light passes over the logo (LightLogo + lib/lightPass.ts),
+// repeating until the page has loaded, then the splash fades away. The <html> gets the `splash` class from
+// an inline script in Base.astro (skipped for reduced motion or a repeat in the same visit; that script
+// also clears it after a few seconds whatever happens).
+import LightLogo from './LightLogo.astro';
 ---
 
 <div class="splash" data-splash aria-hidden="true">
-  <div class="stage" data-stage>
-    <img class="base" src="/brand/luminoor-logo.png" alt="" width="556" height="166" />
-    {rays.map((i) => <span class="ray" style={`--i: ${i}`} />)}
-    <span class="lit"></span>
-  </div>
+  <LightLogo class="splash-logo" base={0.22} />
 </div>
 
-<script is:inline>
-  (() => {
-    const root = document.documentElement;
-    const splash = document.querySelector('[data-splash]');
-    if (!root.classList.contains('splash') || !splash) return;
-    const stage = splash.querySelector('[data-stage]');
+<script>
+  import { lightPass } from '../lib/lightPass';
 
+  const root = document.documentElement;
+  const splash = document.querySelector<HTMLElement>('[data-splash]');
+  if (root.classList.contains('splash') && splash) {
     let done = false;
     const finish = () => {
       if (done) return;
@@ -36,7 +29,7 @@ const rays = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
         // The hero's entrance played under the splash; play it again unless the language picker is up
         // (the picker replays it when it closes).
         if (!root.classList.contains('ask-lang')) {
-          document.querySelectorAll('.hero h1, .hero-lead, .hero .hero-actions').forEach((el) => {
+          document.querySelectorAll<HTMLElement>('.hero h1, .hero-lead, .hero .hero-actions').forEach((el) => {
             el.style.animation = 'none';
             void el.offsetWidth;
             el.style.animation = '';
@@ -49,28 +42,12 @@ const rays = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
     let loaded = document.readyState === 'complete';
     if (!loaded) addEventListener('load', () => (loaded = true), { once: true });
-
-    // One pass of the light: an arc from the lower left, over the logo, to the lower right. Its power
-    // rises as it enters and falls as it leaves. Passes repeat until the page has loaded.
-    const pass = 2600;
-    const smooth = (x) => x * x * (3 - 2 * x);
-    const start = performance.now() + 200;
-    const frame = (now) => {
-      if (done) return;
-      const elapsed = Math.max(0, now - start);
-      const t = (elapsed % pass) / pass;
-      const p = smooth(t);
-      const x = -12 + 124 * p; // % of the logo's width
-      const y = 78 - 105 * Math.sin(Math.PI * p); // % of its height: rises above the logo mid-way
-      const power = Math.sin(Math.PI * Math.min(1, t * 1.1)) ** 0.6;
-      stage.style.setProperty('--lx', `${x}%`);
-      stage.style.setProperty('--ly', `${y}%`);
-      stage.style.setProperty('--power', power.toFixed(3));
-      if (elapsed >= pass && loaded) return finish();
-      requestAnimationFrame(frame);
-    };
-    requestAnimationFrame(frame);
-  })();
+    lightPass(splash.querySelector<HTMLElement>('.light-logo')!, {
+      until: () => loaded,
+      cancelled: () => done,
+      onDone: finish,
+    });
+  }
 </script>
 
 <style>
@@ -93,50 +70,7 @@ const rays = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
   .splash.leaving {
     opacity: 0;
   }
-
-  .stage {
-    --lx: -12%;
-    --ly: 78%;
-    --power: 0;
-    position: relative;
+  .splash :global(.splash-logo) {
     width: min(40vw, 16rem);
-    aspect-ratio: 556 / 166;
   }
-  .stage > * {
-    position: absolute;
-    inset: 0;
-  }
-
-  /* The logo in darkness: just enough to read its shape */
-  .base {
-    width: 100%;
-    height: 100%;
-    filter: brightness(0.22);
-  }
-
-  /* Light falling on the letters: brightest nearest the source, falling off with distance */
-  .lit,
-  .ray {
-    background: radial-gradient(
-      circle at var(--lx) var(--ly),
-      #fffaf0 0%,
-      #f6ead6 9%,
-      rgb(225 205 175 / 0.85) 20%,
-      rgb(190 170 140 / 0.35) 36%,
-      transparent 58%
-    );
-    -webkit-mask: url('/brand/luminoor-logo.png') center / 100% 100% no-repeat;
-    mask: url('/brand/luminoor-logo.png') center / 100% 100% no-repeat;
-    opacity: var(--power);
-  }
-
-  /* Rays: copies of the lit letters, each pushed further out from the light, blended as light */
-  .ray {
-    transform-origin: var(--lx) var(--ly);
-    transform: scale(calc(1 + var(--i) * 0.026));
-    opacity: calc(var(--power) * (0.3 - var(--i) * 0.026));
-    mix-blend-mode: screen;
-    filter: blur(calc(var(--i) * 1.1px));
-  }
-
 </style>

@@ -1,0 +1,101 @@
+---
+// The Luminoor logo with a light that can pass over it (driven by lib/lightPass.ts), used by the splash and
+// the hero. Built to stay smooth in Safari: the logo image never changes; a dark layer over it fades
+// (--base), and the light is a glow that only moves (transform) inside layers cut to the logo's shape.
+// States (data-light): waiting (in shadow), passing, done (full silver).
+interface Props {
+  class?: string;
+  /** start in shadow, waiting for a pass (the hero); otherwise just dimmed (the splash) */
+  waiting?: boolean;
+  /** how dark the logo is before the light, 0 = black, 1 = full silver */
+  base?: number;
+}
+const { class: className, waiting = false, base = 0.35 } = Astro.props;
+---
+
+<div class:list={['light-logo', className]} data-light={waiting ? 'waiting' : 'passing'} style={`--base: ${base}`} aria-hidden="true">
+  <img src="/brand/luminoor-logo.png" alt="" width="556" height="166" fetchpriority="high" />
+  <span class="shade"></span>
+  {
+    [1, 2, 3, 4].map((i) => (
+      <span class="ray" style={`--i: ${i}`}>
+        <span class="glow" />
+      </span>
+    ))
+  }
+  <span class="lit"><span class="glow"></span></span>
+</div>
+
+<style>
+  .light-logo {
+    --gx: 0px;
+    --gy: 0px;
+    --power: 0;
+    position: relative;
+  }
+  img {
+    display: block;
+    width: 100%;
+    height: auto;
+    filter: drop-shadow(0 16px 36px rgb(0 0 0 / 0.55));
+  }
+  .shade,
+  .lit,
+  .ray {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    -webkit-mask: url('/brand/luminoor-logo.png') center / 100% 100% no-repeat;
+    mask: url('/brand/luminoor-logo.png') center / 100% 100% no-repeat;
+    pointer-events: none;
+  }
+  /* shadow over the logo until the light has passed */
+  .shade {
+    background: #0a0a0a;
+    opacity: calc(1 - var(--base));
+    will-change: opacity;
+  }
+  [data-light='done'] .shade {
+    opacity: 0;
+  }
+  /* if the script never runs, do not leave the logo in shadow */
+  [data-light='waiting'] .shade {
+    animation: unlit-fallback 0.6s 8s forwards;
+  }
+  @keyframes unlit-fallback {
+    to {
+      opacity: 0;
+    }
+  }
+  .lit,
+  .ray {
+    opacity: var(--power);
+    will-change: opacity, transform;
+  }
+  /* the light: a soft champagne glow centred on the light's position */
+  .glow {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 130%;
+    aspect-ratio: 1;
+    margin: -65% 0 0 -65%;
+    background: radial-gradient(
+      closest-side,
+      #fffaf0 0%,
+      #f6ead6 14%,
+      rgb(225 205 175 / 0.85) 32%,
+      rgb(190 170 140 / 0.35) 60%,
+      transparent 100%
+    );
+    transform: translate3d(var(--gx), var(--gy), 0);
+    will-change: transform;
+  }
+  /* rays: lit copies of the logo, each a little larger, scaled out from the light's position */
+  .ray {
+    --s: calc(1 + var(--i) * 0.035);
+    transform-origin: 0 0;
+    transform: translate(calc(var(--gx) * (1 - var(--s))), calc(var(--gy) * (1 - var(--s)))) scale(var(--s));
+    opacity: calc(var(--power) * (0.28 - var(--i) * 0.05));
+  }
+</style>

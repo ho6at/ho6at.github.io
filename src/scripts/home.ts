@@ -1,4 +1,5 @@
 import { sunDay, type Phase } from '../lib/sun';
+import { lightPass } from '../lib/lightPass';
 
 type Strings = {
   names: Record<Phase, string>;
@@ -36,34 +37,14 @@ const windows = (day: ReturnType<typeof sunDay>): Record<Light, [Date, Date]> =>
 });
 
 /* ---------- Hero logo: one pass of light, once the splash and language picker are gone ---------- */
-const heroMark = $('[data-hero-light]');
+const heroMark = $('.hero .light-logo');
 const lightHero = () => {
-  if (heroMark.dataset.heroLight !== 'waiting') return;
+  if (heroMark.dataset.light !== 'waiting') return;
   if (reduceMotion) {
-    heroMark.dataset.heroLight = 'done';
+    heroMark.dataset.light = 'done';
     return;
   }
-  heroMark.dataset.heroLight = 'passing';
-  const box = heroMark.getBoundingClientRect();
-  const pass = 2600;
-  const smooth = (x: number) => x * x * (3 - 2 * x);
-  const start = performance.now() + 300;
-  const frame = (now: number) => {
-    const t = Math.min(1, Math.max(0, now - start) / pass);
-    const p = smooth(t);
-    // light position, in pixels within the logo: an arc from lower left, over the logo, to lower right
-    heroMark.style.setProperty('--gx', `${((-12 + 124 * p) / 100) * box.width}px`);
-    heroMark.style.setProperty('--gy', `${((78 - 105 * Math.sin(Math.PI * p)) / 100) * box.height}px`);
-    heroMark.style.setProperty('--power', (Math.sin(Math.PI * Math.min(1, t * 1.1)) ** 0.6).toFixed(3));
-    // the logo itself brightens through the second half of the pass, reaching full silver as the light leaves
-    heroMark.style.setProperty('--base', (0.35 + 0.65 * smooth(Math.min(1, Math.max(0, (t - 0.4) / 0.55)))).toFixed(3));
-    if (t < 1) requestAnimationFrame(frame);
-    else {
-      heroMark.style.setProperty('--power', '0');
-      heroMark.dataset.heroLight = 'done';
-    }
-  };
-  requestAnimationFrame(frame);
+  lightPass(heroMark, { reveal: true });
 };
 const heroVisible = () => !root.classList.contains('splash') && !root.classList.contains('ask-lang');
 if (heroVisible()) lightHero();
