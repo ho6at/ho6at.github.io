@@ -1,7 +1,7 @@
-// Contact details and links in one place. Replace the placeholders before launch.
+// Contact details and links in one place.
 export const site = {
   name: 'Luminoor',
-  email: 'hello@luminoor.fr', // TODO: confirm once the domain is chosen
+  email: 'bonjour@luminoor.studio',
   instagram: 'https://www.instagram.com/luminoor.galerie/',
   whatsapp: '', // e.g. 'https://wa.me/33600000000' — leave empty to hide
   city: 'Paris',
