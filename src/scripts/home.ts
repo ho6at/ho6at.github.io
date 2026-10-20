@@ -1,6 +1,8 @@
 import { sunDay, type Phase } from '../lib/sun';
 import { lightPass } from '../lib/lightPass';
 import { followLight } from '../lib/followLight';
+import { quote, PRESETS, DEFAULT_PEOPLE, type Choice, type Preset, type Shoot } from '../lib/pricing';
+import type fr from '../i18n/fr';
 
 type Strings = {
   names: Record<Phase, string>;
@@ -13,6 +15,9 @@ type Strings = {
   packages: { id: string; name: string; price: number; featured: boolean }[];
   stepOf: string;
   steps: string[];
+  custom: typeof fr.sessions.custom;
+  langNames: Record<string, string>;
+  peopleLabel: string;
 };
 type Light = 'dawn' | 'day' | 'golden' | 'blue';
 
@@ -200,7 +205,9 @@ function go(n: number) {
     if (i === step) p.scrollTop = 0;
   });
   progress.forEach((p, i) => p.classList.toggle('on', i <= step));
-  stepLabel.textContent = S.stepOf.replace('{n}', String(step + 1)).replace('{total}', String(panes.length));
+  stepLabel.textContent = S.stepOf
+    .replace('{n}', (step + 1).toLocaleString(S.locale))
+    .replace('{total}', panes.length.toLocaleString(S.locale));
   stepTitle.textContent = S.steps.at(step) ?? '';
   back.classList.toggle('hidden', step === 0);
   next.classList.toggle('hidden', step === panes.length - 1);
@@ -227,74 +234,198 @@ for (let i = 0; i < 21; i++) {
   dates.append(label);
 }
 
-// People stepper
-const peopleInput = $<HTMLInputElement>('input[name="people"]', form);
-const peopleOut = $('[data-people-value]', form);
-$$<HTMLButtonElement>('[data-people]', form).forEach((b) =>
+// Steppers: places, people, outfit changes
+const steppers = new Map<string, (n: number) => void>();
+$$('[data-stepper]', form).forEach((box) => {
+  const name = box.dataset.stepper!;
+  const input = $<HTMLInputElement>(`input[name="${name}"]`, form);
+  const out = $('output', box);
+  const min = Number(box.dataset.min);
+  const max = Number(box.dataset.max);
+  const set = (n: number) => {
+    n = Math.min(max, Math.max(min, n));
+    input.value = String(n);
+    out.textContent = n.toLocaleString(S.locale);
+    $$<HTMLButtonElement>('[data-step-by]', box).forEach((b) => {
+      b.disabled = Number(b.dataset.stepBy) < 0 ? n <= min : n >= max;
+    });
+  };
+  steppers.set(name, set);
+  set(Number(input.value));
+  $$<HTMLButtonElement>('[data-step-by]', box).forEach((b) =>
+    b.addEventListener('click', () => {
+      set(Number(input.value) + Number(b.dataset.stepBy));
+      update();
+    }),
+  );
+});
+
+// A kind of session sets the usual number of people (until the visitor sets it)
+let peopleTouched = false;
+$$('[data-stepper="people"] button', form).forEach((b) => b.addEventListener('click', () => (peopleTouched = true)));
+$$<HTMLInputElement>('input[name="shoot"]', form).forEach((r) =>
+  r.addEventListener('change', () => {
+    if (!peopleTouched) steppers.get('people')!(DEFAULT_PEOPLE[r.value as Shoot]);
+    update();
+  }),
+);
+
+// Packages are presets: they fill in places, photos, outfits and the film
+function applyPreset(id: string) {
+  const p = PRESETS[id as Preset];
+  if (!p) return;
+  steppers.get('locations')!(p.locations);
+  steppers.get('outfits')!(p.outfits);
+  check('photos', String(p.photos));
+  $<HTMLInputElement>('input[name="video"]', form).checked = p.video;
+}
+$$<HTMLButtonElement>('[data-preset]', form).forEach((b) =>
   b.addEventListener('click', () => {
-    const n = Math.min(10, Math.max(1, Number(peopleInput.value) + Number(b.dataset.people)));
-    peopleInput.value = String(n);
-    peopleOut.textContent = String(n);
+    applyPreset(b.dataset.preset!);
     update();
   }),
 );
 
 const sum = {
-  pkg: $('[data-sum-package]', form),
+  shoot: $('[data-sum-shoot]', form),
   date: $('[data-sum-date]', form),
   light: $('[data-sum-light]', form),
   people: $('[data-sum-people]', form),
+  duration: $('[data-sum-duration]', form),
+  lines: $('[data-sum-lines]', form),
   price: $('[data-sum-price]', form),
-  group: $('[data-group-note]', form),
   ticket: $('[data-ticket]', form),
+  liveTotal: $('[data-live-total]', form),
+  live: $('.live', form),
+  durationLive: $('[data-duration]', form),
+  proposal: $('[data-proposal-note]', form),
+  dawn: $('[data-dawn-note]', form),
 };
 const sendEmail = $<HTMLAnchorElement>('[data-send-email]', form);
 const sendWa = form.querySelector<HTMLAnchorElement>('[data-send-wa]');
+const C = S.custom;
+const eur = (n: number) =>
+  new Intl.NumberFormat(S.locale, { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(n);
+const hours = (minutes: number) => {
+  const h = Math.floor(minutes / 60).toLocaleString(S.locale);
+  return (minutes % 60 ? C.hourHalf : C.hour).replace('{h}', h);
+};
+
+// The live total rolls to its new value instead of jumping
+let shown = 0;
+let target = 0;
+let rolling = 0;
+function rollTo(total: number) {
+  target = total;
+  if (!shown || reduceMotion) {
+    shown = total;
+    sum.liveTotal.textContent = eur(total);
+    return;
+  }
+  cancelAnimationFrame(rolling);
+  const from = shown;
+  const start = performance.now();
+  const tick = (now: number) => {
+    const k = Math.min(1, (now - start) / 450);
+    shown = Math.round(from + (target - from) * (1 - (1 - k) ** 3));
+    sum.liveTotal.textContent = eur(shown);
+    if (k < 1) rolling = requestAnimationFrame(tick);
+  };
+  rolling = requestAnimationFrame(tick);
+}
 
 function update() {
   const data = new FormData(form);
-  const pkg = S.packages.find((p) => p.id === data.get('package')) ?? S.packages.find((p) => p.featured)!;
+  const shoot = String(data.get('shoot') || 'street') as Shoot;
+  const choice: Choice = {
+    shoot,
+    locations: Number(data.get('locations') || 1),
+    photos: Number(data.get('photos') || 20),
+    people: Number(data.get('people') || 1),
+    light: String(data.get('light') || 'golden'),
+    video: data.has('video'),
+    express: data.has('express'),
+    outfits: Number(data.get('outfits') || 0),
+  };
+  const q = quote(choice);
+  const flexible = data.has('flexible');
   const ymd = String(data.get('date') || parisDate(new Date(now.getTime() + DAY)));
-  const light = String(data.get('light') || 'golden') as Light;
-  const people = Number(data.get('people') || 2);
+  const light = choice.light as Light;
   const name = String(data.get('name') || '').trim();
+  const contact = String(data.get('contact') || '').trim();
+  const lang = String(data.get('lang') || '');
   const note = String(data.get('note') || '').trim();
 
   const w = windows(sunDay(noonOf(ymd)));
   for (const [key, [a, b]] of Object.entries(w)) {
     $(`[data-light-time="${key}"]`, form).textContent = `${time(a)}–${time(b)}`;
   }
-  const dateLabel = noonOf(ymd).toLocaleDateString(S.locale, {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-    timeZone: 'Europe/Paris',
-  });
-  const price = new Intl.NumberFormat(S.locale, { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(
-    pkg.price,
-  );
+  const dateLabel = flexible
+    ? C.flexibleValue
+    : noonOf(ymd).toLocaleDateString(S.locale, { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'Europe/Paris' });
   const [from, to] = w[light];
+  const comma = S.locale.startsWith('fa') ? '، ' : ', ';
+  const lightLabel = flexible ? S.names[light] : `${S.names[light]}${comma}${time(from)}–${time(to)}`;
 
-  sum.pkg.textContent = pkg.name;
+  // live parts
+  rollTo(q.total);
+  sum.live.classList.toggle('hidden', step === panes.length - 1);
+  sum.durationLive.textContent = hours(q.minutes);
+  sum.proposal.hidden = shoot !== 'proposal';
+  sum.dawn.hidden = light !== 'dawn';
+  dates.classList.toggle('off', flexible);
+  $$<HTMLButtonElement>('[data-preset]', form).forEach((b) => {
+    const p = PRESETS[b.dataset.preset as Preset];
+    b.classList.toggle(
+      'on',
+      p.locations === choice.locations && p.photos === choice.photos && p.outfits === choice.outfits && p.video === choice.video,
+    );
+  });
+
+  // summary
+  const lineLabel = (key: string) =>
+    (C.lines as Record<string, string>)[key].replace('{n}', choice.photos.toLocaleString(S.locale));
+  sum.shoot.textContent = C.shoots[shoot].name;
   sum.date.textContent = dateLabel.charAt(0).toUpperCase() + dateLabel.slice(1);
-  sum.light.textContent = `${S.names[light]}, ${time(from)}–${time(to)}`;
-  sum.people.textContent = String(people);
-  sum.price.textContent = price;
-  sum.group.hidden = people < 3;
+  sum.light.textContent = lightLabel;
+  sum.people.textContent = choice.people.toLocaleString(S.locale);
+  sum.duration.textContent = hours(q.minutes);
+  sum.lines.replaceChildren(
+    ...q.lines.map((l) => {
+      const li = document.createElement('li');
+      const a = document.createElement('span');
+      const b = document.createElement('span');
+      a.textContent = lineLabel(l.key);
+      b.textContent = eur(l.amount);
+      li.append(a, b);
+      return li;
+    }),
+  );
+  sum.price.textContent = eur(q.total);
   sum.ticket.className = `ticket plate plate-${light}`;
 
+  const summary = [
+    `${C.shootLabel}: ${C.shoots[shoot].name}`,
+    `${C.locationsSum}: ${choice.locations.toLocaleString(S.locale)}`,
+    `${lineLabel('photos')}`,
+    `${S.peopleLabel.replace(/[?؟]$/, '')}: ${choice.people.toLocaleString(S.locale)}`,
+    ...q.lines.filter((l) => ['video', 'express', 'outfits', 'dawn'].includes(l.key)).map((l) => `+ ${lineLabel(l.key)}`),
+    `${dateLabel} · ${lightLabel}`,
+    `${C.durationLabel}: ${hours(q.minutes)}`,
+    lang ? `${C.langLabel}: ${S.langNames[lang]}` : '',
+  ]
+    .filter(Boolean)
+    .map((line) => `• ${line}`)
+    .join('\n');
   const body = S.message
-    .replace('{package}', pkg.name)
-    .replace('{price}', price)
-    .replace('{date}', dateLabel)
-    .replace('{light}', S.names[light].toLowerCase())
-    .replace('{time}', `${S.around} ${time(from)}`)
-    .replace('{people}', String(people))
+    .replace('{summary}', summary)
+    .replace('{price}', eur(q.total))
     .replace('{note}', note)
     .replace('{name}', name)
+    .replace('{contact}', contact)
     .replace(/\n{3,}/g, '\n\n')
     .trim();
-  sendEmail.href = `mailto:${S.email}?subject=${encodeURIComponent(`${S.subject} — ${pkg.name}`)}&body=${encodeURIComponent(body)}`;
+  sendEmail.href = `mailto:${S.email}?subject=${encodeURIComponent(`${S.subject} — ${C.shoots[shoot].name}`)}&body=${encodeURIComponent(body)}`;
   if (sendWa && S.whatsapp) sendWa.href = `${S.whatsapp}?text=${encodeURIComponent(body)}`;
 }
 form.addEventListener('input', update);
@@ -309,9 +440,9 @@ function check(name: string, value?: string) {
 
 $$<HTMLElement>('[data-open-booking]').forEach((b) =>
   b.addEventListener('click', () => {
-    check('package', b.dataset.package);
+    applyPreset(b.dataset.package ?? '');
     check('light', b.dataset.light);
-    go(b.dataset.package ? 1 : 0);
+    go(0);
     // a soft flash, like a camera's shutter, then the form
     if (reduceMotion) return sheet.showModal();
     const flash = document.createElement('div');
@@ -332,9 +463,8 @@ go(0);
 {
   const params = new URLSearchParams(location.search);
   if (params.has('book')) {
-    const pkg = params.get('book') || undefined;
-    check('package', pkg);
-    go(pkg ? 1 : 0);
+    applyPreset(params.get('book') || '');
+    go(0);
     sheet.showModal();
     history.replaceState(null, '', location.pathname + location.hash);
   }

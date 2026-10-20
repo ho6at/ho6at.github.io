@@ -1,17 +1,25 @@
 ---
-// App-style booking sheet: package → date and light → details → summary.
+// App-style booking sheet where the visitor builds a custom session: kind of session → places, photos and
+// people → add-ons → date and light → contact → summary. The price is worked out live by lib/pricing.ts
+// (the same formula as the package prices shown elsewhere); scripts/home.ts drives the steps.
 import { site } from '../site';
+import { PRICES, PHOTO_TIERS, SHOOTS, PRESETS, MAX_LOCATIONS, MAX_OUTFITS, presetPrice, type Preset } from '../lib/pricing';
+import { languages } from '../i18n/languages';
 import type fr from '../i18n/fr';
-
 
 interface Props {
   t: typeof fr;
 }
 const { t } = Astro.props;
 const s = t.sessions;
+const c = s.custom;
 const num = (n: number) => new Intl.NumberFormat(t.locale).format(n);
-const packageLight = { minimal: 'day', classic: 'dawn', signature: 'golden', cinestyle: 'blue' } as Record<string, string>;
+const eur = (n: number) =>
+  new Intl.NumberFormat(t.locale, { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(n);
+const shootLight = { street: 'day', couple: 'golden', proposal: 'blue', friends: 'dawn', portrait: 'day' } as const;
 const lights = ['dawn', 'day', 'golden', 'blue'] as const;
+const presets = Object.keys(PRESETS) as Preset[];
+const presetName = (id: Preset) => s.packages.find((p) => p.id === id)?.name ?? id;
 ---
 
 <dialog class="sheet" data-sheet aria-labelledby="sheet-title">
@@ -32,40 +40,124 @@ const lights = ['dawn', 'day', 'golden', 'blue'] as const;
 
     <div class="viewport">
       <div class="track" data-track-steps>
-        <!-- 1. Package -->
+        <!-- 1. Kind of session -->
         <fieldset class="pane" data-pane>
-          <legend class="sr-only">{s.packageLabel}</legend>
+          <legend class="sr-only">{c.shootLabel}</legend>
           <div class="options">
             {
-              s.packages.map((p) => (
+              SHOOTS.map((id) => (
                 <label class="option">
-                  <input type="radio" name="package" value={p.id} checked={p.featured} />
-                  <span class={`thumb plate plate-${packageLight[p.id]}`} aria-hidden="true" />
+                  <input type="radio" name="shoot" value={id} checked={id === 'street'} />
+                  <span class={`thumb plate plate-${shootLight[id]}`} aria-hidden="true" />
                   <span class="option-text">
-                    <span class="option-name">{p.name}</span>
-                    <span class="option-meta">
-                      {p.duration} · {p.places}
-                    </span>
-                    <span class="option-body">{p.photos}</span>
-                    {p.bonus && <span class="option-bonus">{p.bonus}</span>}
-                    <span class="option-best">
-                      <b>{s.bestForLabel}</b>
-                      {p.bestFor}
-                    </span>
+                    <span class="option-name">{c.shoots[id].name}</span>
+                    <span class="option-body">{c.shoots[id].text}</span>
                   </span>
-                  {p.featured && <span class="option-flag">{s.featuredLabel}</span>}
-                  <span class="option-price">{num(p.price)} €</span>
+                  {id === 'proposal' && <span class="option-add" dir="ltr">+{eur(PRICES.proposal)}</span>}
                 </label>
               ))
             }
           </div>
+          <p class="hint" data-proposal-note hidden>{c.proposalNote}</p>
         </fieldset>
 
-        <!-- 2. Date and light -->
+        <!-- 2. Places, photos and people -->
+        <div class="pane" data-pane>
+          <div class="field">
+            <span class="field-label">{c.presetsLabel}</span>
+            <div class="presets">
+              {
+                presets.map((id) => (
+                  <button type="button" class="preset" data-preset={id}>
+                    <span class="preset-name">{presetName(id)}</span>
+                    <span class="preset-price">{eur(presetPrice(id))}</span>
+                  </button>
+                ))
+              }
+            </div>
+          </div>
+          <div class="row">
+            <div class="field">
+              <span class="field-label" id="locations-label">{c.locationsLabel}</span>
+              <div class="stepper" role="group" aria-labelledby="locations-label" data-stepper="locations" data-min="1" data-max={MAX_LOCATIONS}>
+                <button type="button" data-step-by="-1" aria-label="−">−</button>
+                <output>1</output>
+                <button type="button" data-step-by="1" aria-label="+">+</button>
+              </div>
+              <input type="hidden" name="locations" value="1" />
+            </div>
+            <div class="field">
+              <span class="field-label" id="people-label">{s.peopleLabel}</span>
+              <div class="stepper" role="group" aria-labelledby="people-label" data-stepper="people" data-min="1" data-max="10">
+                <button type="button" data-step-by="-1" aria-label="−">−</button>
+                <output>1</output>
+                <button type="button" data-step-by="1" aria-label="+">+</button>
+              </div>
+              <input type="hidden" name="people" value="1" />
+            </div>
+          </div>
+          <fieldset>
+            <legend class="field-label">{c.photosLabel}</legend>
+            <div class="segments">
+              {
+                PHOTO_TIERS.map((n) => (
+                  <label class="segment">
+                    <input type="radio" name="photos" value={n} checked={n === 20} />
+                    <span>{num(n)}</span>
+                  </label>
+                ))
+              }
+            </div>
+            <p class="hint">{c.photosNote}</p>
+          </fieldset>
+          <p class="estimate">{c.durationLabel} <b data-duration></b></p>
+        </div>
+
+        <!-- 3. Add-ons -->
+        <div class="pane" data-pane>
+          <label class="toggle">
+            <input type="checkbox" name="video" />
+            <span class="toggle-text">
+              <span class="toggle-name">{c.videoName}</span>
+              <span class="toggle-body">{c.videoText}</span>
+            </span>
+            <span class="toggle-price" dir="ltr">+{eur(PRICES.video)}</span>
+            <span class="switch" aria-hidden="true"></span>
+          </label>
+          <label class="toggle">
+            <input type="checkbox" name="express" />
+            <span class="toggle-text">
+              <span class="toggle-name">{c.expressName}</span>
+              <span class="toggle-body">{c.expressText}</span>
+            </span>
+            <span class="toggle-price" dir="ltr">+{eur(PRICES.express)}</span>
+            <span class="switch" aria-hidden="true"></span>
+          </label>
+          <div class="toggle">
+            <span class="toggle-text">
+              <span class="toggle-name" id="outfits-label">{c.outfitsName}</span>
+              <span class="toggle-body">{c.outfitsText}</span>
+              <span class="toggle-price"><bdi dir="ltr">+{eur(PRICES.outfit)}</bdi> {c.each}</span>
+            </span>
+            <div class="stepper small" role="group" aria-labelledby="outfits-label" data-stepper="outfits" data-min="0" data-max={MAX_OUTFITS}>
+              <button type="button" data-step-by="-1" aria-label="−">−</button>
+              <output>0</output>
+              <button type="button" data-step-by="1" aria-label="+">+</button>
+            </div>
+            <input type="hidden" name="outfits" value="0" />
+          </div>
+          <p class="hint">{s.extras}</p>
+        </div>
+
+        <!-- 4. Date and light -->
         <div class="pane" data-pane>
           <fieldset>
             <legend class="field-label">{s.dateLabel}</legend>
             <div class="dates" data-dates></div>
+            <label class="flexible">
+              <input type="checkbox" name="flexible" />
+              <span>{c.flexibleDate}</span>
+            </label>
           </fieldset>
           <fieldset>
             <legend class="field-label">{s.lightLabel}</legend>
@@ -80,43 +172,53 @@ const lights = ['dawn', 'day', 'golden', 'blue'] as const;
                 ))
               }
             </div>
+            <p class="hint" data-dawn-note hidden>{c.dawnNote.replace('{price}', `\u2066+${eur(PRICES.dawn)}\u2069`)}</p>
           </fieldset>
         </div>
 
-        <!-- 3. Details -->
+        <!-- 5. Contact -->
         <div class="pane" data-pane>
-          <div class="field">
-            <span class="field-label" id="people-label">{s.peopleLabel}</span>
-            <div class="stepper" role="group" aria-labelledby="people-label">
-              <button type="button" data-people="-1" aria-label="−">−</button>
-              <output data-people-value>2</output>
-              <button type="button" data-people="1" aria-label="+">+</button>
-            </div>
-            <input type="hidden" name="people" value="2" />
-            <p class="hint" data-group-note hidden>{s.groupNote}</p>
-          </div>
           <label class="field">
             <span class="field-label">{s.nameLabel}</span>
             <input type="text" name="name" autocomplete="given-name" placeholder={s.namePlaceholder} />
           </label>
+          <label class="field">
+            <span class="field-label">{c.contactLabel}</span>
+            <input type="text" name="contact" autocomplete="email" inputmode="email" dir="auto" placeholder={c.contactPlaceholder} />
+          </label>
+          <fieldset>
+            <legend class="field-label">{c.langLabel}</legend>
+            <div class="segments">
+              {
+                languages.map((l) => (
+                  <label class="segment">
+                    <input type="radio" name="lang" value={l.code} checked={l.code === t.lang} />
+                    <span lang={l.code}>{l.name}</span>
+                  </label>
+                ))
+              }
+            </div>
+          </fieldset>
           <label class="field">
             <span class="field-label">{s.noteLabel}</span>
             <textarea name="note" rows="3" placeholder={s.notePlaceholder}></textarea>
           </label>
         </div>
 
-        <!-- 4. Summary -->
+        <!-- 6. Summary -->
         <div class="pane" data-pane>
           <div class="ticket plate plate-golden" data-ticket>
             <div class="ticket-inner">
               <img class="ticket-logo" src="/brand/luminoor-logo.png" alt="Luminoor Paris" width="556" height="166" />
-              <p class="ticket-package" data-sum-package></p>
+              <p class="ticket-package" data-sum-shoot></p>
               <dl>
                 <div><dt>{s.dateLabel}</dt><dd data-sum-date></dd></div>
                 <div><dt>{s.lightLabel}</dt><dd data-sum-light></dd></div>
                 <div><dt>{s.peopleLabel}</dt><dd data-sum-people></dd></div>
+                <div><dt>{c.durationLabel}</dt><dd data-sum-duration></dd></div>
               </dl>
-              <p class="ticket-price" data-sum-price></p>
+              <ul class="lines" data-sum-lines></ul>
+              <p class="ticket-total"><span>{c.totalLabel}</span><b data-sum-price></b></p>
               <p class="ticket-note">{s.priceNote}</p>
             </div>
           </div>
@@ -130,8 +232,11 @@ const lights = ['dawn', 'day', 'golden', 'blue'] as const;
     </div>
 
     <footer class="sheet-foot">
-      <button type="button" class="button ghost" data-back>{s.back}</button>
-      <button type="button" class="button" data-next>{s.next}</button>
+      <p class="live" aria-live="polite"><span>{c.totalLabel}</span><b data-live-total></b></p>
+      <div class="foot-buttons">
+        <button type="button" class="button ghost" data-back>{s.back}</button>
+        <button type="button" class="button" data-next>{s.next}</button>
+      </div>
     </footer>
   </form>
 </dialog>
@@ -215,7 +320,7 @@ const lights = ['dawn', 'day', 'golden', 'blue'] as const;
   .progress {
     grid-column: 1 / -1;
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(6, 1fr);
     gap: 0.35rem;
     margin-top: 1rem;
   }
@@ -352,6 +457,201 @@ const lights = ['dawn', 'day', 'golden', 'blue'] as const;
     color: var(--accent-soft);
     padding-inline-end: 0.4rem;
     white-space: nowrap;
+  }
+
+  .option-add {
+    font-size: 0.9rem;
+    color: var(--accent-soft);
+    padding-inline-end: 0.4rem;
+    white-space: nowrap;
+  }
+
+  /* Your session: presets, steppers, photo count */
+  .presets {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.5rem;
+  }
+  .preset {
+    display: grid;
+    gap: 0.15rem;
+    padding: 0.7rem 0.4rem;
+    border-radius: 16px;
+    border: 1px solid var(--line);
+    background: var(--raised);
+    cursor: pointer;
+    text-align: center;
+    transition:
+      border-color 0.3s var(--ease),
+      background 0.3s var(--ease);
+  }
+  .preset:hover {
+    border-color: var(--line-strong);
+  }
+  .preset:global(.on) {
+    border-color: var(--accent);
+    background: linear-gradient(180deg, rgb(225 225 225 / 0.12), rgb(225 225 225 / 0.03));
+  }
+  .preset-name {
+    font-family: var(--display);
+    font-size: 1.05rem;
+  }
+  .preset-price {
+    font-size: 0.78rem;
+    color: var(--accent-soft);
+  }
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem 2.5rem;
+  }
+  .segments {
+    display: flex;
+    gap: 0.4rem;
+    padding: 0.3rem;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: var(--raised);
+  }
+  .segment {
+    position: relative;
+    flex: 1;
+    cursor: pointer;
+  }
+  .segment span {
+    display: block;
+    padding: 0.6rem 0.3rem;
+    border-radius: 999px;
+    text-align: center;
+    font-size: 0.95rem;
+    transition:
+      background 0.3s var(--ease),
+      color 0.3s var(--ease);
+  }
+  .segment:has(input:checked) span {
+    background: var(--ivory);
+    color: #0a0a0a;
+  }
+  .segment:has(input:focus-visible) span {
+    outline: 2px solid var(--accent);
+  }
+  .estimate {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.9rem 1rem;
+    border-radius: 16px;
+    background: rgb(240 240 240 / 0.04);
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+  .estimate b {
+    color: var(--ivory);
+    font-weight: 500;
+  }
+
+  /* Add-ons */
+  .toggle {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    border-radius: 20px;
+    border: 1px solid var(--line);
+    background: var(--raised);
+    cursor: pointer;
+    transition: border-color 0.3s var(--ease);
+  }
+  div.toggle {
+    cursor: default;
+  }
+  .toggle:has(input:checked) {
+    border-color: var(--accent);
+  }
+  .toggle input[type='checkbox'] {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .toggle-text {
+    flex: 1;
+    display: grid;
+    gap: 0.15rem;
+  }
+  .toggle-name {
+    font-family: var(--display);
+    font-size: 1.25rem;
+  }
+  .toggle-body {
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+  .toggle-price {
+    font-size: 0.85rem;
+    color: var(--accent-soft);
+    white-space: nowrap;
+  }
+  .switch {
+    flex: none;
+    width: 2.9rem;
+    height: 1.7rem;
+    border-radius: 999px;
+    background: rgb(240 240 240 / 0.14);
+    position: relative;
+    transition: background 0.3s var(--ease);
+  }
+  .switch::after {
+    content: '';
+    position: absolute;
+    top: 0.2rem;
+    inset-inline-start: 0.2rem;
+    width: 1.3rem;
+    height: 1.3rem;
+    border-radius: 50%;
+    background: var(--ivory);
+    transition: transform 0.3s var(--ease);
+  }
+  .toggle:has(input:checked) .switch {
+    background: var(--accent);
+  }
+  .toggle:has(input:checked) .switch::after {
+    transform: translateX(1.2rem);
+    background: #0a0a0a;
+  }
+  :global([dir='rtl']) .toggle:has(input:checked) .switch::after {
+    transform: translateX(-1.2rem);
+  }
+  .toggle:has(input:focus-visible) {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+  .stepper.small button {
+    width: 2.2rem;
+    height: 2.2rem;
+  }
+  .stepper.small output {
+    min-width: 1.8rem;
+    font-size: 1.25rem;
+  }
+  .flexible {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-top: 0.8rem;
+    font-size: 0.9rem;
+    color: var(--muted);
+    cursor: pointer;
+  }
+  .flexible input {
+    accent-color: var(--accent);
+    width: 1.05rem;
+    height: 1.05rem;
+  }
+  .dates:global(.off) {
+    opacity: 0.35;
+    pointer-events: none;
+    transition: opacity 0.3s var(--ease);
   }
 
   /* Date strip */
@@ -552,11 +852,42 @@ const lights = ['dawn', 'day', 'golden', 'blue'] as const;
     text-align: end;
     font-weight: 500;
   }
-  .ticket-price {
+  .lines {
+    list-style: none;
+    margin: 1.1rem 0 0;
+    padding: 0;
+    display: grid;
+    gap: 0.35rem;
+    font-size: 0.85rem;
+    color: rgb(240 240 240 / 0.75);
+  }
+  .lines :global(li) {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  .lines :global(li span:last-child) {
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+  .ticket-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+    margin-top: 1.1rem;
+    padding-top: 0.9rem;
+    border-top: 1px solid rgb(240 240 240 / 0.25);
+  }
+  .ticket-total span {
+    font-size: 0.9rem;
+    color: rgb(240 240 240 / 0.75);
+  }
+  .ticket-total b {
     font-family: var(--display);
-    font-size: 3rem;
+    font-size: 2.6rem;
+    font-weight: 400;
     line-height: 1;
-    margin-top: 1.25rem;
     color: var(--accent-soft);
   }
   .ticket-note {
@@ -570,16 +901,36 @@ const lights = ['dawn', 'day', 'golden', 'blue'] as const;
   }
 
   .sheet-foot {
+    display: grid;
+    gap: 0.75rem;
+    padding: 0.85rem 1.5rem 1.5rem;
+    border-top: 1px solid var(--line);
+  }
+  .foot-buttons {
     display: flex;
     justify-content: space-between;
     gap: 0.75rem;
-    padding: 1rem 1.5rem 1.5rem;
-    border-top: 1px solid var(--line);
   }
-  .sheet-foot .button {
+  .foot-buttons .button {
     flex: 1;
   }
-  .sheet-foot :global(.hidden) {
+  /* the price, live while the session is built */
+  .live {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+  .live b {
+    font-family: var(--display);
+    font-size: 1.6rem;
+    font-weight: 400;
+    color: var(--accent-soft);
+    font-variant-numeric: tabular-nums;
+  }
+  .sheet-foot :global(.hidden),
+  .live:global(.hidden) {
     visibility: hidden;
   }
 
@@ -626,6 +977,9 @@ const lights = ['dawn', 'day', 'golden', 'blue'] as const;
     }
     .option {
       grid-template-columns: 3.5rem minmax(0, 1fr) auto;
+    }
+    .presets {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
     .sheet-foot {
       padding-bottom: max(1.25rem, env(safe-area-inset-bottom));
