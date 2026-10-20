@@ -22,7 +22,7 @@ export default {
     title: 'Les rues de Paris, votre scène.',
     lead: 'Des photos prises sur le vif, comme une star surprise dans la rue. Vous marchez dans Paris, naturellement ; on vous suit de loin.',
     cta: 'Réserver une séance',
-    ctaSecondary: 'Comment ça marche',
+    ctaSecondary: 'Voir nos photos',
   },
   how: {
     title: 'Comment ça marche',

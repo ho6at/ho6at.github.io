@@ -24,7 +24,7 @@ const en: typeof fr = {
     title: 'The streets of Paris, your stage.',
     lead: 'Candid, unposed photos in Paris, the way stars are caught on the street. You walk the city as yourself; we follow from afar.',
     cta: 'Book a session',
-    ctaSecondary: 'How it works',
+    ctaSecondary: 'See our work',
   },
   how: {
     title: 'How it works',
