@@ -1,5 +1,6 @@
 import { sunDay, type Phase } from '../lib/sun';
 import { lightPass } from '../lib/lightPass';
+import { followLight } from '../lib/followLight';
 
 type Strings = {
   names: Record<Phase, string>;
@@ -44,7 +45,8 @@ const lightHero = () => {
     heroMark.dataset.light = 'done';
     return;
   }
-  lightPass(heroMark, { reveal: true });
+  // after the pass, the light stays and follows the visitor
+  lightPass(heroMark, { reveal: true, onDone: () => followLight($('[data-hero]'), heroMark, $('.hero-follow')) });
 };
 const heroVisible = () => !root.classList.contains('splash') && !root.classList.contains('ask-lang');
 if (heroVisible()) lightHero();
@@ -310,7 +312,13 @@ $$<HTMLElement>('[data-open-booking]').forEach((b) =>
     check('package', b.dataset.package);
     check('light', b.dataset.light);
     go(b.dataset.package ? 1 : 0);
-    sheet.showModal();
+    // a soft flash, like a camera's shutter, then the form
+    if (reduceMotion) return sheet.showModal();
+    const flash = document.createElement('div');
+    flash.className = 'shutter';
+    flash.addEventListener('animationend', () => flash.remove());
+    document.body.append(flash);
+    setTimeout(() => sheet.showModal(), 110);
   }),
 );
 $('[data-close]', form).addEventListener('click', () => sheet.close());

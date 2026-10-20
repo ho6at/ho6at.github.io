@@ -311,3 +311,22 @@ button {
   clip: rect(0 0 0 0);
   white-space: nowrap;
 }
+
+/* Opening the booking form: a soft flash, like a camera's shutter (scripts/home.ts) */
+.shutter {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  background: radial-gradient(circle at 50% 45%, #fffaf0, #f3e7d3 60%, #e6d6bd);
+  pointer-events: none;
+  opacity: 0;
+  animation: shutter 0.55s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+@keyframes shutter {
+  12% {
+    opacity: 0.32;
+  }
+  to {
+    opacity: 0;
+  }
+}

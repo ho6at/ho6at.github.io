@@ -67,6 +67,7 @@ const strings = {
   <section class="hero" data-hero>
     <div class="hero-light" aria-hidden="true"></div>
     <div class="hero-eiffel" aria-hidden="true"><Eiffel /></div>
+    <div class="hero-follow" aria-hidden="true"></div>
     <div class="wrap hero-inner">
       <div class="hero-halo" aria-hidden="true"></div>
       <LightLogo class="hero-mark" waiting />
@@ -434,6 +435,25 @@ const strings = {
       opacity: 0.55;
       transform: translate(-50%, -12%) scale(0.94);
     }
+  }
+  /* The light that follows the visitor after the opening pass (lib/followLight.ts) */
+  .hero-follow {
+    position: absolute;
+    z-index: -1;
+    left: 0;
+    top: 0;
+    width: min(46rem, 110vw);
+    aspect-ratio: 1;
+    margin: calc(min(46rem, 110vw) / -2) 0 0 calc(min(46rem, 110vw) / -2);
+    background: radial-gradient(
+      closest-side,
+      rgb(236 222 198 / 0.11),
+      rgb(225 205 175 / 0.05) 45%,
+      transparent 100%
+    );
+    opacity: 0;
+    pointer-events: none;
+    will-change: transform, opacity;
   }
   /* The Eiffel Tower behind the logo, out of focus like a distant background, dissolving towards the bottom */
   .hero-eiffel {
