@@ -29,7 +29,7 @@ import LightLogo from './LightLogo.astro';
         // The hero's entrance played under the splash; play it again unless the language picker is up
         // (the picker replays it when it closes).
         if (!root.classList.contains('ask-lang')) {
-          document.querySelectorAll<HTMLElement>('.hero h1, .hero-lead, .hero .hero-actions').forEach((el) => {
+          document.querySelectorAll<HTMLElement>('.hero-kicker, .hero h1, .hero-lead, .hero .hero-actions').forEach((el) => {
             el.style.animation = 'none';
             void el.offsetWidth;
             el.style.animation = '';

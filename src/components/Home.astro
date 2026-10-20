@@ -74,6 +74,7 @@ const strings = {
     <div class="wrap hero-inner">
       <div class="hero-halo" aria-hidden="true"></div>
       <LightLogo class="hero-mark" waiting />
+      <p class="hero-kicker" lang="fr" dir="ltr"><span>Le Flâneur</span></p>
       <h1><span class="sr-only">{t.meta.h1Prefix}</span>{t.hero.title}</h1>
       <p class="hero-lead">{t.hero.lead}</p>
       <div class="hero-actions">
@@ -506,6 +507,32 @@ const strings = {
   .hero :global(.hero-mark) {
     width: clamp(13rem, 30vw, 24rem);
   }
+  /* the name of the style, small under the logo */
+  .hero-kicker {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    font-family: 'Jost', system-ui, sans-serif;
+    font-size: 0.78rem;
+    font-weight: 400;
+    letter-spacing: 0.42em;
+    text-transform: uppercase;
+    color: #e6d6bd;
+    animation: enter 1.4s var(--ease) 1.2s both;
+  }
+  .hero-kicker span {
+    margin-inline-end: -0.42em;
+  }
+  .hero-kicker::before,
+  .hero-kicker::after {
+    content: '';
+    width: 2.2rem;
+    height: 1px;
+    background: currentColor;
+    opacity: 0.45;
+  }
   h1 {
     text-wrap: balance;
     margin-top: clamp(2rem, 5vh, 3rem);
@@ -544,6 +571,7 @@ const strings = {
     }
   }
   .hero-lead {
+    text-wrap: balance;
     margin-top: 1.5rem;
     font-size: 1.1rem;
     max-width: 30em;
@@ -1039,6 +1067,7 @@ const strings = {
     h1,
     .hero-lead,
     .hero .hero-actions,
+    .hero-kicker,
     .hero-halo {
       animation: none;
     }

@@ -22,7 +22,7 @@ const en: typeof fr = {
   },
   hero: {
     title: 'The streets of Paris, your stage.',
-    lead: 'A paparazzi photoshoot in Paris. You walk the city as yourself; we follow from a distance and catch you like a star.',
+    lead: 'Candid, unposed photos in Paris, the way stars are caught on the street. You walk the city as yourself; we follow from afar.',
     cta: 'Book a session',
     ctaSecondary: 'How it works',
   },
@@ -31,7 +31,7 @@ const en: typeof fr = {
     lead: 'No posing, no stiff smiles. Just you in Paris, and a lens that never lets you go.',
     steps: [
       { name: 'Your route', body: 'Tell us about your outfits and the Paris you love. We draw a walk through its streets, timed to the best light.' },
-      { name: 'You walk, we vanish', body: 'You stroll, cross a street, stop for a coffee. We follow at a distance with a long lens, like the paparazzi outside a fashion show.' },
+      { name: 'You walk, we vanish', body: 'You stroll, cross a street, stop for a coffee. We follow at a distance with a long lens, like the photographers outside a fashion show.' },
       { name: 'Your star moments', body: 'A few days later, a private gallery of candid photos, as if someone famous had been caught in Paris. That someone is you.' },
     ],
   },
@@ -89,7 +89,7 @@ const en: typeof fr = {
         placesNote: '',
         photos: '35 edited photos + all raw photos',
         bonus: '',
-        style: 'A full paparazzi story through Paris',
+        style: 'The whole story of your day in Paris',
         bestFor: 'The complete Luminoor experience',
         price: presetPrice('signature'),
         featured: true,
@@ -234,7 +234,7 @@ const en: typeof fr = {
       { q: 'What should I wear?', a: 'Whatever you’d wear to be seen in Paris. We help you choose before the session, and you can change outfits along the way.' },
       { q: 'What if it rains?', a: 'We move the session to another day of your trip for free, or suggest covered locations.' },
       { q: 'How does payment work?', a: 'A 30% deposit holds the date. The rest is paid on the day of the shoot.' },
-      { q: 'Can you help with a surprise proposal?', a: 'It’s what our style is made for. We hide in the crowd like paparazzi, catch the moment, then the two of you walk on together.' },
+      { q: 'Can you help with a surprise proposal?', a: 'It’s what our style is made for. We blend into the crowd, catch the moment, then the two of you walk on together.' },
     ],
   },
   contact: {

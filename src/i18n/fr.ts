@@ -20,7 +20,7 @@ export default {
   },
   hero: {
     title: 'Les rues de Paris, votre scène.',
-    lead: 'Un shooting façon paparazzi à Paris. Vous marchez dans la ville, naturellement ; on vous suit de loin et on vous photographie comme une star.',
+    lead: 'Des photos prises sur le vif, comme une star surprise dans la rue. Vous marchez dans Paris, naturellement ; on vous suit de loin.',
     cta: 'Réserver une séance',
     ctaSecondary: 'Comment ça marche',
   },
@@ -29,7 +29,7 @@ export default {
     lead: 'Pas de pose, pas de sourire figé. Juste vous dans Paris, et un objectif qui ne vous lâche pas.',
     steps: [
       { name: 'Votre parcours', body: 'Parlez-nous de vos tenues et du Paris que vous aimez. On dessine une promenade dans ses rues, calée sur la plus belle lumière.' },
-      { name: 'Vous marchez, on disparaît', body: 'Vous flânez, traversez une rue, vous arrêtez pour un café. On vous suit de loin au téléobjectif, comme les paparazzi devant un défilé.' },
+      { name: 'Vous marchez, on disparaît', body: 'Vous flânez, traversez une rue, vous arrêtez pour un café. On vous suit de loin au téléobjectif, comme les photographes devant un défilé.' },
       { name: 'Vos photos de star', body: 'Quelques jours plus tard, une galerie privée de photos prises sur le vif, comme si une célébrité avait été surprise dans Paris. Cette célébrité, c’est vous.' },
     ],
   },
@@ -87,7 +87,7 @@ export default {
         placesNote: '',
         photos: '35 photos retouchées + toutes les photos brutes',
         bonus: '',
-        style: 'Une histoire paparazzi complète à travers Paris',
+        style: 'Toute l’histoire de votre journée à Paris',
         bestFor: 'L’expérience Luminoor complète',
         price: presetPrice('signature'),
         featured: true,
@@ -232,7 +232,7 @@ export default {
       { q: 'Comment m’habiller ?', a: 'Comme pour être vu dans Paris. On vous aide à choisir avant la séance, et vous pouvez changer de tenue en chemin.' },
       { q: 'Que se passe-t-il s’il pleut ?', a: 'On déplace la séance gratuitement à une autre date de votre séjour, ou on vous propose des lieux couverts.' },
       { q: 'Comment se passe le paiement ?', a: 'Un acompte de 30 % réserve la date. Le reste est réglé le jour de la séance.' },
-      { q: 'Peut-on organiser une demande en mariage surprise ?', a: 'Notre style est fait pour ça. On se cache dans la foule comme des paparazzi, on capture le moment, puis vous repartez main dans la main.' },
+      { q: 'Peut-on organiser une demande en mariage surprise ?', a: 'Notre style est fait pour ça. On se fond dans la foule, on capture le moment, puis vous repartez main dans la main.' },
     ],
   },
   contact: {

@@ -48,7 +48,7 @@
   font-family: var(--body);
   font-weight: 300;
 }
-:root[lang='fa'] body * {
+:root[lang='fa'] body *:not(:lang(fr), :lang(en)) {
   letter-spacing: 0 !important;
 }
 :root[lang='fa'] :is(h1, h2, h3) {

@@ -357,10 +357,10 @@ export const landings: Record<LandingId, Record<Lang, Landing>> = {
       description:
         'Photographe pour votre demande en mariage à Paris : caché dans la foule comme un paparazzi, il capte le oui sans jamais trahir la surprise.',
       h1: 'Photographe pour votre demande en mariage à Paris',
-      lead: 'Vous posez la question, on reste dans l’ombre. Caché parmi les passants comme un paparazzi, le photographe saisit le moment exact où votre partenaire dit oui.',
+      lead: 'Vous posez la question, on reste dans l’ombre. Fondu parmi les passants, le photographe saisit le moment exact où votre partenaire dit oui.',
       points: [
         { t: 'Tout est préparé en secret', d: 'Avec l’option demande en mariage (+120 €), on choisit ensemble le lieu, l’heure et le signal. Le jour venu, rien n’est laissé au hasard.' },
-        { t: 'Invisibles, comme des paparazzi', d: 'Au téléobjectif, de loin, au milieu des passants. Votre partenaire ne remarque rien.' },
+        { t: 'Invisibles, au milieu des passants', d: 'Au téléobjectif, de loin, au milieu des passants. Votre partenaire ne remarque rien.' },
         { t: 'Le oui, puis la balade', d: 'On capture la surprise, puis on vous suit dans les rues autour pendant que vous savourez le moment.' },
         { t: 'Des photos et un film', d: 'Avec La Star, vous recevez aussi un film cinématographique d’une minute.' },
       ],
@@ -395,10 +395,10 @@ export const landings: Record<LandingId, Record<Lang, Landing>> = {
       description:
         'Proposal photographer in Paris: hidden in the crowd like a paparazzo, we catch the yes without ever giving the surprise away, then follow you both.',
       h1: 'Proposal photographer in Paris',
-      lead: 'You ask the question, we stay in the shadows. Hidden among passers-by like a paparazzo, the photographer catches the exact moment your partner says yes.',
+      lead: 'You ask the question, we stay in the shadows. Blending in among passers-by, the photographer catches the exact moment your partner says yes.',
       points: [
         { t: 'Planned in secret', d: 'With the proposal add-on (+€120), we choose the spot, the time and the signal together. On the day, nothing is left to chance.' },
-        { t: 'Invisible, like paparazzi', d: 'A long lens, from afar, among the passers-by. Your partner notices nothing.' },
+        { t: 'Invisible in the crowd', d: 'A long lens, from afar, among the passers-by. Your partner notices nothing.' },
         { t: 'The yes, then the walk', d: 'We capture the surprise, then follow you through the streets around while you take it all in.' },
         { t: 'Photos and a film', d: 'With La Star, you also receive a one-minute cinematic film.' },
       ],
@@ -433,10 +433,10 @@ export const landings: Record<LandingId, Record<Lang, Landing>> = {
       description:
         'عکاس خواستگاری در پاریس: مثل پاپاراتزی‌ها میان جمعیت پنهان می‌مانیم، لحظه‌ی «بله» را ثبت می‌کنیم و غافلگیری لو نمی‌رود؛ بعد هم دنبالتان می‌آییم.',
       h1: 'عکاس خواستگاری در پاریس',
-      lead: 'شما سؤال را بپرسید، ما در سایه می‌مانیم. عکاس مثل یک پاپاراتزی میان رهگذرها پنهان است و همان لحظه‌ای را ثبت می‌کند که «بله» را می‌شنوید.',
+      lead: 'شما سؤال را بپرسید، ما در سایه می‌مانیم. عکاس میان رهگذرها گم است و همان لحظه‌ای را ثبت می‌کند که «بله» را می‌شنوید.',
       points: [
         { t: 'همه‌چیز مخفیانه آماده می‌شود', d: 'با گزینه‌ی خواستگاری (۱۲۰+ یورو)، لوکیشن، ساعت و علامت را با هم مشخص می‌کنیم. روز موعود، هیچ‌چیز به شانس سپرده نمی‌شود.' },
-        { t: 'نامرئی، مثل پاپاراتزی‌ها', d: 'با لنز تله، از دور و میان رهگذرها. همسر آینده‌تان چیزی متوجه نمی‌شود.' },
+        { t: 'نامرئی، میان جمعیت', d: 'با لنز تله، از دور و میان رهگذرها. همسر آینده‌تان چیزی متوجه نمی‌شود.' },
         { t: 'اول «بله»، بعد قدم‌زدن', d: 'غافلگیری را ثبت می‌کنیم و بعد، وقتی در خیابان‌های اطراف حال آن لحظه را مزه می‌کنید، دنبالتان می‌آییم.' },
         { t: 'عکس و فیلم', d: 'با پکیج La Star، یک فیلم سینمایی یک‌دقیقه‌ای هم می‌گیرید.' },
       ],
