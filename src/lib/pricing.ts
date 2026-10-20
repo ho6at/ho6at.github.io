@@ -2,7 +2,7 @@
 // pages and the structured data, so every price on the site comes from one formula:
 // base + extra locations + edited photos + kind of session + extra people + dawn + add-ons, to the nearest 10 €.
 
-export const SHOOTS = ['street', 'couple', 'proposal', 'friends', 'portrait'] as const;
+export const SHOOTS = ['street', 'couple', 'proposal', 'friends'] as const;
 export type Shoot = (typeof SHOOTS)[number];
 export const PHOTO_TIERS = [10, 20, 35, 50, 80] as const;
 export const MAX_LOCATIONS = 4;
@@ -21,7 +21,7 @@ export const PRICES = {
 };
 
 /** how many people each kind of session usually is (the form starts there) */
-export const DEFAULT_PEOPLE: Record<Shoot, number> = { street: 1, couple: 2, proposal: 2, friends: 4, portrait: 1 };
+export const DEFAULT_PEOPLE: Record<Shoot, number> = { street: 1, couple: 2, proposal: 2, friends: 4 };
 
 export interface Choice {
   shoot: Shoot;

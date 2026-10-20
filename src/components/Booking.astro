@@ -16,7 +16,7 @@ const c = s.custom;
 const num = (n: number) => new Intl.NumberFormat(t.locale).format(n);
 const eur = (n: number) =>
   new Intl.NumberFormat(t.locale, { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(n);
-const shootLight = { street: 'day', couple: 'golden', proposal: 'blue', friends: 'dawn', portrait: 'day' } as const;
+const shootLight = { street: 'day', couple: 'golden', proposal: 'blue', friends: 'dawn' } as const;
 const lights = ['dawn', 'day', 'golden', 'blue'] as const;
 const presets = Object.keys(PRESETS) as Preset[];
 const presetName = (id: Preset) => s.packages.find((p) => p.id === id)?.name ?? id;

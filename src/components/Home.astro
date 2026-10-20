@@ -78,10 +78,29 @@ const strings = {
       <p class="hero-lead">{t.hero.lead}</p>
       <div class="hero-actions">
         <button class="button" type="button" data-open-booking>{t.hero.cta}</button>
-        <a class="button ghost" href="#places">{t.hero.ctaSecondary}</a>
+        <a class="button ghost" href="#how">{t.hero.ctaSecondary}</a>
       </div>
     </div>
 
+  </section>
+
+  <!-- How it works: the paparazzi idea in three steps -->
+  <section class="section" id="how">
+    <div class="wrap head">
+      <h2>{t.how.title}</h2>
+      <p class="lead">{t.how.lead}</p>
+    </div>
+    <ol class="wrap how">
+      {
+        t.how.steps.map((s, i) => (
+          <li>
+            <span class="how-n" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+            <h3>{s.name}</h3>
+            <p>{s.body}</p>
+          </li>
+        ))
+      }
+    </ol>
   </section>
 
   <!-- Sessions -->
@@ -563,6 +582,55 @@ const strings = {
     align-items: end;
     margin-bottom: clamp(2.25rem, 5vw, 4rem);
   }
+  /* How it works: three frames, each in a viewfinder's corner marks */
+  .how {
+    list-style: none;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+  }
+  .how li {
+    --c: rgb(230 214 189 / 0.55);
+    position: relative;
+    padding: 2rem 1.75rem 2.1rem;
+    border-radius: 6px;
+    background:
+      linear-gradient(var(--c), var(--c)) top left / 1.4rem 1px no-repeat,
+      linear-gradient(var(--c), var(--c)) top left / 1px 1.4rem no-repeat,
+      linear-gradient(var(--c), var(--c)) top right / 1.4rem 1px no-repeat,
+      linear-gradient(var(--c), var(--c)) top right / 1px 1.4rem no-repeat,
+      linear-gradient(var(--c), var(--c)) bottom left / 1.4rem 1px no-repeat,
+      linear-gradient(var(--c), var(--c)) bottom left / 1px 1.4rem no-repeat,
+      linear-gradient(var(--c), var(--c)) bottom right / 1.4rem 1px no-repeat,
+      linear-gradient(var(--c), var(--c)) bottom right / 1px 1.4rem no-repeat,
+      rgb(240 240 240 / 0.025);
+  }
+  .how-n {
+    display: block;
+    font-family: var(--display);
+    font-size: 2.6rem;
+    line-height: 1;
+    background: var(--champagne-foil);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    margin-bottom: 1.4rem;
+  }
+  .how h3 {
+    font-size: 1.45rem;
+    margin-bottom: 0.6rem;
+  }
+  .how p {
+    color: var(--muted);
+    line-height: 1.65;
+  }
+  @media (max-width: 860px) {
+    .how {
+      grid-template-columns: 1fr;
+    }
+  }
+
   .note {
     margin-top: 1.75rem;
     font-size: 0.95rem;
