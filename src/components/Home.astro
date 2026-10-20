@@ -86,25 +86,6 @@ const strings = {
 
   </section>
 
-  <!-- How it works: the paparazzi idea in three steps -->
-  <section class="section" id="how">
-    <div class="wrap head">
-      <h2>{t.how.title}</h2>
-      <p class="lead">{t.how.lead}</p>
-    </div>
-    <ol class="wrap how">
-      {
-        t.how.steps.map((s, i) => (
-          <li>
-            <span class="how-n" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
-            <h3>{s.name}</h3>
-            <p>{s.body}</p>
-          </li>
-        ))
-      }
-    </ol>
-  </section>
-
   <!-- Gallery: real sessions, in a film strip on phones and an editorial grid on wider screens -->
   <section class="section" id="gallery">
     <div class="wrap head">
@@ -144,6 +125,25 @@ const strings = {
         <svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"></path></svg>
       </button>
     </div>
+  </section>
+
+  <!-- How it works: the paparazzi idea in three steps -->
+  <section class="section" id="how">
+    <div class="wrap head">
+      <h2>{t.how.title}</h2>
+      <p class="lead">{t.how.lead}</p>
+    </div>
+    <ol class="wrap how">
+      {
+        t.how.steps.map((s, i) => (
+          <li>
+            <span class="how-n" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+            <h3>{s.name}</h3>
+            <p>{s.body}</p>
+          </li>
+        ))
+      }
+    </ol>
   </section>
 
   <!-- Sessions -->
