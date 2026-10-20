@@ -18,7 +18,7 @@ export default {
     contact: 'Contact',
   },
   hero: {
-    title: 'Paris, sous votre plus belle lumière.',
+    title: 'Les rues de Paris, votre scène.',
     lead: 'Séances photo street style pour celles et ceux qui visitent Paris : couples, demandes en mariage, voyages en solo ou entre amis.',
     cta: 'Réserver une séance',
     ctaSecondary: 'Nos lieux',

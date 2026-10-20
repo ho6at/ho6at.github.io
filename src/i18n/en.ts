@@ -20,7 +20,7 @@ const en: typeof fr = {
     contact: 'Contact',
   },
   hero: {
-    title: 'Paris, in your best light.',
+    title: 'The streets of Paris, your stage.',
     lead: 'Street style photoshoots for people visiting Paris: couples, proposals, solo trips and friends.',
     cta: 'Book a session',
     ctaSecondary: 'Our places',
