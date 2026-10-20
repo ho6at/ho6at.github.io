@@ -16,13 +16,6 @@ const { class: className, waiting = false, base = 0.35 } = Astro.props;
 <div class:list={['light-logo', className]} data-light={waiting ? 'waiting' : 'passing'} style={`--base: ${base}`} aria-hidden="true">
   <img src="/brand/luminoor-logo.png" alt="" width="556" height="166" fetchpriority="high" />
   <span class="shade"></span>
-  {
-    [1, 2, 3, 4].map((i) => (
-      <span class="ray" style={`--i: ${i}`}>
-        <span class="glow" />
-      </span>
-    ))
-  }
   <span class="lit"><span class="glow"></span></span>
 </div>
 
@@ -40,8 +33,7 @@ const { class: className, waiting = false, base = 0.35 } = Astro.props;
     filter: drop-shadow(0 16px 36px rgb(0 0 0 / 0.55));
   }
   .shade,
-  .lit,
-  .ray {
+  .lit {
     position: absolute;
     inset: 0;
     overflow: hidden;
@@ -67,8 +59,7 @@ const { class: className, waiting = false, base = 0.35 } = Astro.props;
       opacity: 0;
     }
   }
-  .lit,
-  .ray {
+  .lit {
     opacity: var(--power);
     will-change: opacity, transform;
   }
@@ -90,12 +81,5 @@ const { class: className, waiting = false, base = 0.35 } = Astro.props;
     );
     transform: translate3d(var(--gx), var(--gy), 0);
     will-change: transform;
-  }
-  /* rays: lit copies of the logo, each a little larger, scaled out from the light's position */
-  .ray {
-    --s: calc(1 + var(--i) * 0.035);
-    transform-origin: 0 0;
-    transform: translate(calc(var(--gx) * (1 - var(--s))), calc(var(--gy) * (1 - var(--s)))) scale(var(--s));
-    opacity: calc(var(--power) * (0.28 - var(--i) * 0.05));
   }
 </style>
