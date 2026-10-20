@@ -5,6 +5,7 @@
 import { site } from '../site';
 import { PRICES, PHOTO_TIERS, SHOOTS, PRESETS, MAX_LOCATIONS, MAX_OUTFITS, presetPrice, type Preset } from '../lib/pricing';
 import { languages } from '../i18n/languages';
+import { src as photoSrc, type PhotoId } from '../lib/photos';
 import type fr from '../i18n/fr';
 
 interface Props {
@@ -17,6 +18,7 @@ const num = (n: number) => new Intl.NumberFormat(t.locale).format(n);
 const eur = (n: number) =>
   new Intl.NumberFormat(t.locale, { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(n);
 const shootLight = { street: 'day', couple: 'golden', proposal: 'blue', friends: 'dawn' } as const;
+const shootPhoto: Partial<Record<string, PhotoId>> = { street: 'cafe-portrait', couple: 'couple-night-run', proposal: 'eiffel-night', friends: 'cafe-motion' };
 const lights = ['dawn', 'day', 'golden', 'blue'] as const;
 const presets = Object.keys(PRESETS) as Preset[];
 const presetName = (id: Preset) => s.packages.find((p) => p.id === id)?.name ?? id;
@@ -48,7 +50,11 @@ const presetName = (id: Preset) => s.packages.find((p) => p.id === id)?.name ?? 
               SHOOTS.map((id) => (
                 <label class="option">
                   <input type="radio" name="shoot" value={id} checked={id === 'street'} />
-                  <span class={`thumb plate plate-${shootLight[id]}`} aria-hidden="true" />
+                  {shootPhoto[id] ? (
+                    <img class="thumb photo" src={photoSrc(shootPhoto[id]!).replace(/-\d+\.webp$/, '-480.webp')} alt="" width="480" height="720" loading="lazy" decoding="async" />
+                  ) : (
+                    <span class={`thumb plate plate-${shootLight[id]}`} aria-hidden="true" />
+                  )}
                   <span class="option-text">
                     <span class="option-name">{c.shoots[id].name}</span>
                     <span class="option-body">{c.shoots[id].text}</span>
@@ -409,6 +415,12 @@ const presetName = (id: Preset) => s.packages.find((p) => p.id === id)?.name ?? 
   .thumb {
     aspect-ratio: 1;
     border-radius: 14px;
+  }
+  img.thumb {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    object-position: 50% 35%;
   }
   .option-text {
     display: grid;

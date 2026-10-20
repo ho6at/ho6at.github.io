@@ -35,6 +35,19 @@ const en: typeof fr = {
       { name: 'Your star moments', body: 'A few days later, a private gallery of candid photos, as if someone famous had been caught in Paris. That someone is you.' },
     ],
   },
+  gallery: {
+    title: 'Le Flâneur, in pictures',
+    lead: 'Real sessions in Paris. No one is posing: they walk, run, wait, and we are somewhere across the street.',
+    items: {
+      'couple-night-run': { alt: 'A couple running hand in hand across a Paris street at night, in black and white', place: 'A Haussmann street' },
+      'cafe-motion': { alt: 'A woman standing still at a café terrace while passers-by blur past her', place: 'A café terrace' },
+      'regrattier': { alt: 'A couple embracing on Rue Le Regrattier as a passer-by walks through the foreground, in black and white', place: 'Rue Le Regrattier, Île Saint-Louis' },
+      'eiffel-night': { alt: 'A couple dressed in white in a Paris street, the lit Eiffel Tower behind them', place: 'The Eiffel Tower' },
+      'cafe-portrait': { alt: 'A woman in a white dress sitting in a Parisian café, looking away', place: 'A Parisian café' },
+      'louvre-window': { alt: 'A silhouette by a tall window looking out at the Louvre pyramid', place: 'The Louvre' },
+      'night-hat': { alt: 'A man in a hat under the warm light of a street lamp, phone in hand', place: 'Under a street lamp' },
+    },
+  },
   light: {
     names: {
       night: 'Night',

@@ -33,6 +33,19 @@ export default {
       { name: 'Vos photos de star', body: 'Quelques jours plus tard, une galerie privée de photos prises sur le vif, comme si une célébrité avait été surprise dans Paris. Cette célébrité, c’est vous.' },
     ],
   },
+  gallery: {
+    title: 'Le Flâneur, en images',
+    lead: 'De vraies séances à Paris. Personne ne pose : ils marchent, courent, attendent, et nous sommes quelque part de l’autre côté de la rue.',
+    items: {
+      'couple-night-run': { alt: 'Un couple traverse une rue de Paris en courant main dans la main, la nuit, en noir et blanc', place: 'Une rue haussmannienne' },
+      'cafe-motion': { alt: 'Une femme immobile devant une terrasse de café, les passants flous autour d’elle', place: 'Une terrasse de café' },
+      'regrattier': { alt: 'Un couple enlacé rue Le Regrattier, un passant au premier plan, en noir et blanc', place: 'Rue Le Regrattier, île Saint-Louis' },
+      'eiffel-night': { alt: 'Un couple vêtu de blanc dans une rue de Paris, la tour Eiffel illuminée derrière eux', place: 'La tour Eiffel' },
+      'cafe-portrait': { alt: 'Une femme en robe blanche assise dans un café parisien, le regard ailleurs', place: 'Un café parisien' },
+      'louvre-window': { alt: 'Une silhouette devant une grande fenêtre donnant sur la pyramide du Louvre', place: 'Le Louvre' },
+      'night-hat': { alt: 'Un homme au chapeau sous la lumière chaude d’un réverbère, téléphone à la main', place: 'Sous un réverbère' },
+    },
+  },
   light: {
     names: {
       night: 'Nuit',

@@ -64,6 +64,21 @@ else {
   watch.observe(root, { attributes: true, attributeFilter: ['class'] });
 }
 
+/* ---------- Gallery strip: previous / next for mouse users ---------- */
+{
+  const strip = document.querySelector<HTMLElement>('.gallery');
+  $$<HTMLButtonElement>('[data-strip]').forEach((b) =>
+    b.addEventListener('click', () => {
+      if (!strip) return;
+      const card = strip.querySelector<HTMLElement>('.shot');
+      const step = (card?.offsetWidth ?? 300) + 16;
+      // in Persian the strip runs right to left, so "next" scrolls the other way
+      const dir = Number(b.dataset.strip) * (document.dir === 'rtl' ? -1 : 1);
+      strip.scrollBy({ left: dir * step, behavior: reduceMotion ? 'auto' : 'smooth' });
+    }),
+  );
+}
+
 /* ---------- Gliding between sections ---------- */
 // Where each section settles: its heading just under the fixed header (from its scroll-margin).
 const snapPoint = (el: HTMLElement) =>
