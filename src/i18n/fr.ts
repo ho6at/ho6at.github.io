@@ -38,7 +38,8 @@ export default {
     lead: 'De vraies séances à Paris. Personne ne pose : ils marchent, courent, attendent, et nous sommes quelque part de l’autre côté de la rue.',
     items: {
       'couple-night-run': { alt: 'Un couple traverse une rue de Paris en courant main dans la main, la nuit, en noir et blanc', place: 'Une rue haussmannienne' },
-      'cafe-motion': { alt: 'Une femme immobile devant une terrasse de café, les passants flous autour d’elle', place: 'Une terrasse de café' },
+      'mist': { alt: 'Une femme en blanc debout dans un nuage de brume, sous une rotonde parisienne', place: 'Dans la brume' },
+      'cafe-motion': { alt: 'Une femme passe devant une terrasse de café, les passants flous autour d’elle', place: 'Une terrasse de café' },
       'regrattier': { alt: 'Un couple enlacé rue Le Regrattier, un passant au premier plan, en noir et blanc', place: 'Rue Le Regrattier, île Saint-Louis' },
       'eiffel-night': { alt: 'Un couple vêtu de blanc dans une rue de Paris, la tour Eiffel illuminée derrière eux', place: 'La tour Eiffel' },
       'cafe-portrait': { alt: 'Une femme en robe blanche assise dans un café parisien, le regard ailleurs', place: 'Un café parisien' },
