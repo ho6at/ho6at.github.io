@@ -39,6 +39,7 @@ export default {
     items: {
       'couple-night-run': { alt: 'Un couple traverse une rue de Paris en courant main dans la main, la nuit, en noir et blanc', place: 'Une rue haussmannienne' },
       'mist': { alt: 'Une femme en blanc debout dans un nuage de brume, sous une rotonde parisienne', place: 'Dans la brume' },
+      'window-diner': { alt: 'Un homme dîne seul derrière une vitrine de restaurant marquée « Plats à emporter », en noir et blanc', place: 'Une vitrine de restaurant' },
       'procope': { alt: 'Un couple en lunettes de soleil, immobile devant le Procope, les passants flous derrière eux, en noir et blanc', place: 'Le Procope, Saint-Germain' },
       'cafe-motion': { alt: 'Une femme passe devant une terrasse de café, les passants flous autour d’elle', place: 'Une terrasse de café' },
       'regrattier': { alt: 'Un couple enlacé rue Le Regrattier, un passant au premier plan, en noir et blanc', place: 'Rue Le Regrattier, île Saint-Louis' },
