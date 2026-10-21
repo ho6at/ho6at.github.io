@@ -2,8 +2,8 @@
 // `light` is the light the photo was taken in; captions and alt text live in i18n (gallery.items).
 export const photos = [
   { id: 'couple-night-run', w: 4032, h: 6048, light: 'night', sizes: [480, 960, 1600] },
-  { id: 'procope', w: 6048, h: 4032, light: 'day', sizes: [720, 1440, 2400] },
   { id: 'regrattier', w: 2160, h: 3240, light: 'day', sizes: [480, 960, 1600] },
+  { id: 'procope', w: 6048, h: 4032, light: 'day', sizes: [720, 1440, 2400] },
   { id: 'mist', w: 4032, h: 6048, light: 'day', sizes: [480, 960, 1600] },
   { id: 'eiffel-night', w: 941, h: 1672, light: 'night', sizes: [480, 941] },
   { id: 'cafe-portrait', w: 1536, h: 2304, light: 'day', sizes: [480, 960, 1536] },
