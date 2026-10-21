@@ -5,7 +5,7 @@ import LanguageGate from './LanguageGate.astro';
 import Splash from './Splash.astro';
 import Eiffel from './Eiffel.astro';
 import LightLogo from './LightLogo.astro';
-import { photos, srcset, src } from '../lib/photos';
+import { galleryPhotos, srcset, src } from '../lib/photos';
 import { languages } from '../i18n/languages';
 import { landings, landingIds, landingUi, landingHref } from '../i18n/landings';
 import { site } from '../site';
@@ -94,14 +94,14 @@ const strings = {
     </div>
     <div class="wrap gallery">
       {
-        photos.map((ph) => {
+        galleryPhotos.map((ph) => {
           const item = t.gallery.items[ph.id];
           return (
             <figure class="shot">
               <img
                 src={src(ph.id)}
                 srcset={srcset(ph.id)}
-                sizes="(max-width: 700px) 78vw, (max-width: 1100px) 45vw, 33vw"
+                sizes={ph.w > ph.h ? "(max-width: 700px) 176vw, 96vh" : "(max-width: 700px) 78vw, 43vh"}
                 width={ph.w}
                 height={ph.h}
                 alt={item.alt}

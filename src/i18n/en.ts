@@ -41,6 +41,7 @@ const en: typeof fr = {
     items: {
       'couple-night-run': { alt: 'A couple running hand in hand across a Paris street at night, in black and white', place: 'A Haussmann street' },
       'mist': { alt: 'A woman in white standing in a cloud of mist beneath a Parisian rotunda', place: 'In the mist' },
+      'procope': { alt: 'A couple in sunglasses standing still in front of Le Procope while passers-by blur behind them, in black and white', place: 'Le Procope, Saint-Germain' },
       'cafe-motion': { alt: 'A woman walking past a café terrace while passers-by blur around her', place: 'A café terrace' },
       'regrattier': { alt: 'A couple embracing on Rue Le Regrattier as a passer-by walks through the foreground, in black and white', place: 'Rue Le Regrattier, Île Saint-Louis' },
       'eiffel-night': { alt: 'A couple dressed in white in a Paris street, the lit Eiffel Tower behind them', place: 'The Eiffel Tower' },
