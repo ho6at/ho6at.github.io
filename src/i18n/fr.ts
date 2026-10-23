@@ -36,6 +36,7 @@ export default {
   gallery: {
     title: 'Le Flâneur, en images',
     lead: 'De vraies séances à Paris. Personne ne pose : ils marchent, courent, attendent, et nous sommes quelque part de l’autre côté de la rue.',
+    filters: { all: 'Tout', couple: 'Couples', solo: 'Solo', bw: 'Noir & blanc' },
     items: {
       'couple-night-run': { alt: 'Un couple traverse une rue de Paris en courant main dans la main, la nuit, en noir et blanc', place: 'Une rue haussmannienne' },
       'mist': { alt: 'Une femme en blanc debout dans un nuage de brume, sous une rotonde parisienne', place: 'Dans la brume' },

@@ -92,12 +92,21 @@ const strings = {
       <h2>{t.gallery.title}</h2>
       <p class="lead">{t.gallery.lead}</p>
     </div>
-    <div class="wrap gallery">
+    <div class="wrap filters" role="group" aria-label={t.gallery.title}>
+      {
+        (['all', 'couple', 'solo', 'bw'] as const).map((f) => (
+          <button type="button" class="filter" data-filter={f} aria-pressed={f === 'all' ? 'true' : 'false'}>
+            {t.gallery.filters[f]}
+          </button>
+        ))
+      }
+    </div>
+    <div class="wrap gallery" data-gallery>
       {
         galleryPhotos.map((ph) => {
           const item = t.gallery.items[ph.id];
           return (
-            <figure class="shot">
+            <figure class="shot" data-kind={ph.kind} data-bw={'bw' in ph ? '1' : undefined}>
               <img
                 src={src(ph.id)}
                 srcset={srcset(ph.id)}
@@ -117,7 +126,8 @@ const strings = {
         })
       }
     </div>
-    <div class="wrap strip-nav" aria-hidden="true">
+    <div class="wrap strip-nav">
+      <p class="counter" aria-hidden="true"><b data-count-now></b> / <span data-count-total></span></p>
       <button type="button" class="strip-btn" data-strip="-1" tabindex="-1">
         <svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"></path></svg>
       </button>
@@ -770,13 +780,69 @@ const strings = {
     text-transform: uppercase;
     color: #e6d6bd;
   }
-  .strip-nav {
+  /* filters: couples, solo, black and white */
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .filter {
+    padding: 0.55rem 1.1rem;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: transparent;
+    color: var(--muted);
+    font: inherit;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition:
+      background 0.3s var(--ease),
+      color 0.3s var(--ease),
+      border-color 0.3s var(--ease);
+  }
+  .filter:hover {
+    color: var(--ivory);
+    border-color: var(--line-strong);
+  }
+  .filter[aria-pressed='true'] {
+    background: var(--ivory);
+    border-color: var(--ivory);
+    color: #0a0a0a;
+  }
+  .gallery {
+    transition:
+      opacity 0.25s var(--ease),
+      transform 0.25s var(--ease);
+  }
+  .gallery:global(.switching) {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  .shot[hidden] {
     display: none;
+  }
+  /* a film counter: which frame you are on */
+  .counter {
+    margin-inline-end: auto;
+    font-size: 0.85rem;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .counter b {
+    font-weight: 400;
+    color: #e6d6bd;
+  }
+  .strip-nav {
+    display: flex;
+    align-items: center;
     justify-content: flex-end;
     gap: 0.6rem;
     margin-top: 1.25rem;
   }
   .strip-btn {
+    display: none;
     width: 2.9rem;
     height: 2.9rem;
     border-radius: 50%;
@@ -814,8 +880,8 @@ const strings = {
       opacity: 1;
       transform: none;
     }
-    .strip-nav {
-      display: flex;
+    .strip-btn {
+      display: grid;
     }
   }
   /* phones: each photo takes most of the width, the next one peeking in */

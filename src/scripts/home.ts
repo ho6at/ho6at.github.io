@@ -64,13 +64,67 @@ else {
   watch.observe(root, { attributes: true, attributeFilter: ['class'] });
 }
 
-/* ---------- Gallery strip: previous / next for mouse users ---------- */
+/* ---------- Gallery strip: filters, frame counter, previous / next for mouse users ---------- */
 {
-  const strip = document.querySelector<HTMLElement>('.gallery');
+  const strip = document.querySelector<HTMLElement>('[data-gallery]');
+  const shots = strip ? $$<HTMLElement>('.shot', strip) : [];
+  const now = document.querySelector<HTMLElement>('[data-count-now]');
+  const total = document.querySelector<HTMLElement>('[data-count-total]');
+  const pad = (n: number) => n.toString().padStart(2, '0').replace(/\d/g, (d) => Number(d).toLocaleString(S.locale));
+  const visible = () => shots.filter((s) => !s.hidden);
+  // the frame nearest the strip's start edge
+  const count = () => {
+    if (!strip || !now || !total) return;
+    const shown = visible();
+    const edge = document.dir === 'rtl' ? strip.getBoundingClientRect().right : strip.getBoundingClientRect().left;
+    let best = 0;
+    let dist = Infinity;
+    shown.forEach((s, i) => {
+      const r = s.getBoundingClientRect();
+      const d = Math.abs((document.dir === 'rtl' ? r.right : r.left) - edge);
+      if (d < dist) [dist, best] = [d, i];
+    });
+    now.textContent = pad(best + 1);
+    total.textContent = pad(shown.length);
+  };
+  let ticking = false;
+  strip?.addEventListener(
+    'scroll',
+    () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        ticking = false;
+        count();
+      });
+    },
+    { passive: true },
+  );
+  count();
+
+  $$<HTMLButtonElement>('[data-filter]').forEach((b) =>
+    b.addEventListener('click', () => {
+      if (!strip || b.getAttribute('aria-pressed') === 'true') return;
+      $$('[data-filter]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+      const f = b.dataset.filter;
+      const apply = () => {
+        shots.forEach((s) => {
+          s.hidden = !(f === 'all' || (f === 'bw' ? s.dataset.bw === '1' : s.dataset.kind === f));
+        });
+        strip.scrollLeft = 0;
+        count();
+        strip.classList.remove('switching');
+      };
+      if (reduceMotion) return apply();
+      strip.classList.add('switching');
+      setTimeout(apply, 250);
+    }),
+  );
+
   $$<HTMLButtonElement>('[data-strip]').forEach((b) =>
     b.addEventListener('click', () => {
       if (!strip) return;
-      const card = strip.querySelector<HTMLElement>('.shot');
+      const card = strip.querySelector<HTMLElement>('.shot:not([hidden])');
       const step = (card?.offsetWidth ?? 300) + 16;
       // in Persian the strip runs right to left, so "next" scrolls the other way
       const dir = Number(b.dataset.strip) * (document.dir === 'rtl' ? -1 : 1);
