@@ -18,6 +18,7 @@ export const PRICES = {
   video: 150, // one-minute cinematic film
   express: 60, // photos within 48 hours
   outfit: 30, // each change of outfit
+  extraPhoto: 9, // each edited photo chosen beyond the package (La Chambre Noire)
 };
 
 /** how many people each kind of session usually is (the form starts there) */

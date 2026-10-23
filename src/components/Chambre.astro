@@ -1,0 +1,527 @@
+---
+// La Chambre Noire: a client's private page after their session. They keep their favourite photos (the package
+// sets how many are included, more are extra) and choose each one's style, previewed live on their own photo.
+// A style is the photographer's Lightroom look; here its colour is approximated with CSS filters on a second
+// copy of the photo laid over the original, so changing the strength only changes that copy's opacity.
+// Choices are kept in this browser (localStorage) and sent by email for now.
+import { site } from '../site';
+import { PRICES } from '../lib/pricing';
+import { chambre, lookText, looks } from '../i18n/chambre';
+
+interface Props {
+  lang: 'fr' | 'en' | 'fa';
+  locale: string;
+  session: { id: string; name: string; date: string; quota: number; photos: { id: string; file: string; w: number; h: number }[] };
+  home: string;
+  demo?: boolean;
+}
+const { lang, locale, session, home, demo = false } = Astro.props;
+const c = chambre[lang];
+const L = lookText[lang];
+const base = `/chambre/${session.id}/`;
+const date = new Date(`${session.date}T12:00:00Z`).toLocaleDateString(locale, { day: 'numeric', month: 'long', timeZone: 'Europe/Paris' });
+const strings = {
+  ...c,
+  looks: L,
+  locale,
+  email: site.email,
+  name: session.name,
+  session: session.id,
+  quotaText: c.quota,
+  extraText: c.extra,
+  quota: session.quota,
+  extraPrice: PRICES.extraPhoto,
+};
+---
+
+<main class="chambre" data-chambre={JSON.stringify(strings)}>
+  <header class="wrap ch-head">
+    <a class="ch-logo" href={home} aria-label="Luminoor">
+      <img src="/brand/luminoor-logo.png" alt="Luminoor Paris" width="556" height="166" />
+    </a>
+    <p class="ch-kicker">{c.kicker}</p>
+    <h1 lang="fr" dir="ltr">La Chambre Noire</h1>
+    <p class="ch-hello">{c.hello.replace('{name}', session.name).replace('{date}', date)}</p>
+    <p class="ch-intro">{c.intro}</p>
+    {demo && <p class="ch-demo">{c.demo}</p>}
+  </header>
+
+  <ul class="wrap ch-grid">
+    {
+      session.photos.map((p, i) => (
+        <li class="tile" data-photo={p.id} data-file={p.file} data-look="naturel">
+          <button type="button" class="tile-open" data-open={i} aria-label={`${p.file}`}>
+            <img class="base" src={`${base}${p.id}-480.webp`} alt="" width={p.w} height={p.h} loading="lazy" decoding="async" />
+            <img class="top" src={`${base}${p.id}-480.webp`} alt="" width={p.w} height={p.h} loading="lazy" decoding="async" />
+          </button>
+          <span class="tile-look" aria-hidden="true" />
+          <span class="tile-kept" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>
+          </span>
+        </li>
+      ))
+    }
+  </ul>
+  <p class="wrap ch-tap">{c.tap}</p>
+  <p class="wrap ch-honest">{c.honest}</p>
+
+  <!-- The bar that follows: how many photos are kept, what is extra, and sending -->
+  <div class="ch-bar">
+    <div class="ch-bar-inner">
+      <p class="ch-count">
+        <span data-quota></span>
+        <span class="ch-extra" data-extra hidden></span>
+      </p>
+      <div class="ch-actions">
+        <a class="button ghost small" data-let-us href={`mailto:${site.email}`}>{c.letUs}</a>
+        <a class="button small" data-send href={`mailto:${site.email}`} aria-disabled="true">{c.send}</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Full-screen viewer -->
+  <dialog class="viewer" data-viewer aria-label="La Chambre Noire">
+    <div class="v-top">
+      <button type="button" class="v-icon" data-close aria-label={c.close}>
+        <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" /></svg>
+      </button>
+      <p class="v-index" data-index dir="ltr"></p>
+      <span class="v-space"></span>
+    </div>
+    <div class="v-stage" data-stage>
+      <img class="base" data-v-base alt="" />
+      <img class="top" data-v-top alt="" />
+      <button type="button" class="v-nav prev" data-step="-1" aria-label={c.prev}>
+        <svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" /></svg>
+      </button>
+      <button type="button" class="v-nav next" data-step="1" aria-label={c.next}>
+        <svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" /></svg>
+      </button>
+    </div>
+    <div class="v-panel">
+      <div class="v-looks" role="radiogroup">
+        {
+          looks.map((l) => (
+            <button type="button" class="v-look" role="radio" data-look={l} aria-checked={l === 'naturel' ? 'true' : 'false'}>
+              <span class="v-look-name" lang="fr">{L[l].name}</span>
+              <span class="v-look-text">{L[l].text}</span>
+            </button>
+          ))
+        }
+      </div>
+      <label class="v-strength">
+        <span>{c.intensity}</span>
+        <input type="range" min="0" max="100" value="100" data-strength />
+      </label>
+      <input class="v-note" type="text" data-note placeholder={c.note} />
+      <div class="v-foot">
+        <p class="v-hold">{c.hold}</p>
+        <button type="button" class="button small v-keep" data-keep aria-pressed="false">
+          <span data-keep-label>{c.keep}</span>
+        </button>
+      </div>
+    </div>
+  </dialog>
+</main>
+
+<script>
+  import { initChambre } from '../scripts/chambre';
+  initChambre();
+</script>
+
+<style>
+  .chambre {
+    padding-bottom: 9rem;
+  }
+  .ch-head {
+    padding-top: clamp(2rem, 6vw, 4rem);
+    padding-bottom: 2rem;
+    text-align: center;
+  }
+  .ch-logo img {
+    height: 2.4rem;
+    width: auto;
+    opacity: 0.9;
+  }
+  .ch-kicker {
+    margin-top: 2rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: #e6d6bd;
+  }
+  :global(:root[lang='fa']) .ch-kicker {
+    letter-spacing: 0;
+  }
+  .ch-head h1 {
+    margin-top: 0.6rem;
+    font-family: 'Cinzel', 'Jost', serif;
+    font-size: clamp(2.2rem, 7vw, 3.6rem);
+    font-weight: 400;
+    letter-spacing: 0.02em;
+    background: var(--champagne-foil);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .ch-hello {
+    margin-top: 1.2rem;
+    font-size: 1.1rem;
+  }
+  .ch-intro {
+    max-width: 34rem;
+    margin: 0.6rem auto 0;
+    color: var(--muted);
+    line-height: 1.7;
+    text-wrap: balance;
+  }
+  .ch-demo {
+    display: inline-block;
+    margin-top: 1.2rem;
+    padding: 0.35rem 0.9rem;
+    border-radius: 999px;
+    border: 1px dashed var(--line-strong);
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+
+  /* Grid of proofs */
+  .ch-grid {
+    list-style: none;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(46%, 15rem), 1fr));
+    gap: 0.75rem;
+  }
+  .tile {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--raised);
+    outline: 1px solid transparent;
+    outline-offset: -1px;
+    transition: outline-color 0.3s var(--ease);
+  }
+  .tile:global(.is-kept) {
+    outline: 2px solid #e6d6bd;
+    outline-offset: -2px;
+  }
+  .tile-open {
+    display: block;
+    position: relative;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: zoom-in;
+    aspect-ratio: 2 / 3;
+  }
+  .tile img,
+  .v-stage img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .v-stage img {
+    object-fit: contain;
+  }
+  /* the styles: a filtered copy over the original; its opacity is the strength */
+  .top {
+    transition: opacity 0.35s var(--ease);
+  }
+  :global([data-look='naturel']) > .top,
+  :global([data-look='naturel']) .top {
+    filter: contrast(1.04) saturate(1.06);
+  }
+  :global([data-look='noir']) > .top,
+  :global([data-look='noir']) .top {
+    filter: grayscale(1) contrast(1.3) brightness(0.95);
+  }
+  :global([data-look='pellicule']) > .top,
+  :global([data-look='pellicule']) .top {
+    filter: sepia(0.24) saturate(0.82) contrast(0.88) brightness(1.06) hue-rotate(-8deg);
+  }
+  .tile-look {
+    position: absolute;
+    inset: auto auto 0.6rem 0.6rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    background: rgb(10 10 10 / 0.6);
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    color: #e6d6bd;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s var(--ease);
+  }
+  .tile:global(.is-kept) .tile-look {
+    opacity: 1;
+  }
+  .tile-kept {
+    position: absolute;
+    top: 0.6rem;
+    inset-inline-end: 0.6rem;
+    width: 1.8rem;
+    height: 1.8rem;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: #e6d6bd;
+    color: #0a0a0a;
+    opacity: 0;
+    transform: scale(0.6);
+    transition:
+      opacity 0.3s var(--ease),
+      transform 0.3s var(--ease);
+    pointer-events: none;
+  }
+  .tile:global(.is-kept) .tile-kept {
+    opacity: 1;
+    transform: none;
+  }
+  .tile-kept svg,
+  .v-icon svg,
+  .v-nav svg {
+    width: 1rem;
+    height: 1rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .ch-tap,
+  .ch-honest {
+    margin-top: 1rem;
+    font-size: 0.85rem;
+    color: var(--muted);
+    text-align: center;
+  }
+  .ch-honest {
+    margin-top: 0.4rem;
+    font-size: 0.8rem;
+    opacity: 0.8;
+  }
+
+  /* the bar */
+  .ch-bar {
+    position: fixed;
+    inset: auto 0 0;
+    z-index: 20;
+    padding: 0.75rem var(--gutter) max(0.9rem, env(safe-area-inset-bottom));
+    background: linear-gradient(transparent, rgb(8 8 8 / 0.92) 30%);
+  }
+  .ch-bar-inner {
+    max-width: 52rem;
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6rem 1rem;
+    padding: 0.8rem 1rem;
+    border-radius: 22px;
+    border: 1px solid var(--line);
+    background: rgb(22 22 22 / 0.85);
+    backdrop-filter: blur(14px);
+  }
+  .ch-count {
+    display: grid;
+    font-size: 0.9rem;
+  }
+  .ch-extra {
+    font-size: 0.8rem;
+    color: #e6d6bd;
+  }
+  .ch-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+  .button.small {
+    padding: 0.65rem 1.1rem;
+    font-size: 0.9rem;
+  }
+  .button[aria-disabled='true'] {
+    opacity: 0.4;
+    pointer-events: none;
+  }
+
+  /* the viewer */
+  .viewer {
+    width: 100vw;
+    max-width: none;
+    height: 100dvh;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: #050505;
+    color: var(--ivory);
+    display: none;
+    flex-direction: column;
+  }
+  .viewer[open] {
+    display: flex;
+    animation: v-in 0.35s var(--ease);
+  }
+  @keyframes v-in {
+    from {
+      opacity: 0;
+    }
+  }
+  .viewer::backdrop {
+    background: #050505;
+  }
+  .v-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.8rem var(--gutter);
+  }
+  .v-icon,
+  .v-nav {
+    width: 2.6rem;
+    height: 2.6rem;
+    border-radius: 50%;
+    border: 1px solid var(--line);
+    background: rgb(240 240 240 / 0.06);
+    color: var(--ivory);
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+  }
+  .v-space {
+    width: 2.6rem;
+  }
+  .v-index {
+    font-size: 0.85rem;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .v-stage {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    touch-action: pan-y;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+  }
+  .v-stage img {
+    pointer-events: none;
+  }
+  .v-nav {
+    position: absolute;
+    top: 50%;
+    margin-top: -1.3rem;
+    display: none;
+  }
+  .v-nav.prev {
+    inset-inline-start: 1rem;
+  }
+  .v-nav.next {
+    inset-inline-end: 1rem;
+  }
+  :global([dir='rtl']) .v-nav svg {
+    transform: scaleX(-1);
+  }
+  @media (hover: hover) {
+    .v-nav {
+      display: grid;
+    }
+  }
+  .v-panel {
+    display: grid;
+    gap: 0.8rem;
+    padding: 0.9rem var(--gutter) max(1rem, env(safe-area-inset-bottom));
+    max-width: 44rem;
+    width: 100%;
+    margin: 0 auto;
+  }
+  .v-looks {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.5rem;
+  }
+  .v-look {
+    display: grid;
+    gap: 0.1rem;
+    padding: 0.6rem 0.5rem;
+    border-radius: 14px;
+    border: 1px solid var(--line);
+    background: transparent;
+    color: var(--ivory);
+    cursor: pointer;
+    text-align: center;
+    transition:
+      background 0.3s var(--ease),
+      border-color 0.3s var(--ease),
+      color 0.3s var(--ease);
+  }
+  .v-look[aria-checked='true'] {
+    background: var(--ivory);
+    border-color: var(--ivory);
+    color: #0a0a0a;
+  }
+  .v-look-name {
+    font-family: 'Cinzel', 'Jost', serif;
+    font-size: 1rem;
+  }
+  .v-look-text {
+    font-size: 0.7rem;
+    opacity: 0.7;
+  }
+  .v-strength {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+  .v-strength input {
+    flex: 1;
+    accent-color: #e6d6bd;
+  }
+  .v-note {
+    font: inherit;
+    font-size: 0.9rem;
+    color: var(--ivory);
+    background: var(--raised);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 0.7rem 0.9rem;
+  }
+  .v-note:focus-visible {
+    outline: none;
+    border-color: #e6d6bd;
+  }
+  .v-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  .v-hold {
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+  .v-keep {
+    white-space: nowrap;
+    flex: none;
+  }
+  .v-keep[aria-pressed='true'] {
+    background: #e6d6bd;
+    color: #0a0a0a;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .top,
+    .viewer[open] {
+      transition: none;
+      animation: none;
+    }
+  }
+</style>

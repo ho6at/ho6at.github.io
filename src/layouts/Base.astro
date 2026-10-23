@@ -15,8 +15,10 @@ interface Props {
   schema?: object;
   /** The same page in each language (hreflang); defaults to the home pages when `home` is set */
   alternates?: { code: string; href: string }[];
+  /** Private pages (a client's darkroom): never indexed */
+  noindex?: boolean;
 }
-const { lang, title, description, home = false, ogLocale, schema } = Astro.props;
+const { lang, title, description, home = false, ogLocale, schema, noindex = false } = Astro.props;
 const alternates = Astro.props.alternates ?? (home ? languages.map((l) => ({ code: l.code, href: l.href })) : []);
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const dir = languages.find((l) => l.code === lang)?.dir ?? 'ltr';
@@ -58,7 +60,7 @@ const fonts =
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
-    {!site.indexable && <meta name="robots" content="noindex" />}
+    {(!site.indexable || noindex) && <meta name="robots" content="noindex, nofollow" />}
     {alternates.map((l) => <link rel="alternate" hreflang={l.code} href={new URL(l.href, Astro.site)} />)}
     {
       alternates.length > 0 && (
