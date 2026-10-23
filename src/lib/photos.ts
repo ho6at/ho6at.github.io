@@ -5,6 +5,7 @@ export const photos = [
   { id: 'regrattier', w: 2160, h: 3240, light: 'day', sizes: [480, 960, 1600] },
   { id: 'window-diner', w: 1024, h: 1536, light: 'night', sizes: [480, 960, 1024] },
   { id: 'procope', w: 6048, h: 4032, light: 'day', sizes: [720, 1440, 2400] },
+  { id: 'saint-germain', w: 4032, h: 6048, light: 'day', sizes: [480, 960, 1600] },
   { id: 'louvre-arch', w: 1024, h: 1536, light: 'golden', sizes: [480, 960, 1024] },
   { id: 'louvre-arcades', w: 1024, h: 1536, light: 'day', sizes: [480, 960, 1024] },
   { id: 'mist', w: 4032, h: 6048, light: 'day', sizes: [480, 960, 1600] },
