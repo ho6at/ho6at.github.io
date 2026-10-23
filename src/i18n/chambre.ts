@@ -41,6 +41,7 @@ export const chambre: Record<Lang, Record<string, string>> = {
     revealTitle: '{name}, vos photos sont prêtes.',
     revealText: 'Développées une par une, à la main.',
     signed: 'Retouchée à la main par Hojjat',
+    toDossier: 'Ouvrir le dossier de filature',
     back: 'Retour aux épreuves',
   },
   en: {
@@ -73,6 +74,7 @@ export const chambre: Record<Lang, Record<string, string>> = {
     revealTitle: '{name}, your photos are ready.',
     revealText: 'Developed one by one, by hand.',
     signed: 'Edited by hand by Hojjat',
+    toDossier: 'Open the tailing file',
     back: 'Back to the proofs',
   },
   fa: {
@@ -105,6 +107,7 @@ export const chambre: Record<Lang, Record<string, string>> = {
     revealTitle: '{name}، عکس‌هایتان آماده‌اند.',
     revealText: 'یکی‌یکی، با دست، ظاهر شده‌اند.',
     signed: 'ادیت دستیِ حجت',
+    toDossier: 'باز کردن پرونده‌ی تعقیب',
     back: 'بازگشت به نسخه‌های آزمایشی',
   },
 };

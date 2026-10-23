@@ -1,0 +1,351 @@
+---
+// Le Dossier: the delivery told as a paparazzi's tailing file (data in i18n/dossier.ts). A manila cover, then a
+// dark map of Paris (MapLibre with OpenFreeMap tiles, loaded on this page only) that draws the route as the
+// sightings scroll by, each with its time, place, light, photo and the agent's note.
+import { dossierText, type Sighting } from '../i18n/dossier';
+import { photo, srcset, src, type PhotoId } from '../lib/photos';
+
+interface Props {
+  lang: 'fr' | 'en' | 'fa';
+  locale: string;
+  lightNames: Record<string, string>;
+  dossier: {
+    number: string;
+    name: string;
+    date: string;
+    sightings: Sighting[];
+    legs: { path: [number, number][]; metro?: boolean }[];
+  };
+  reveal: string;
+  demo?: boolean;
+}
+const { lang, locale, lightNames, dossier, reveal, demo = false } = Astro.props;
+const d = dossierText[lang];
+const S = dossier.sightings;
+
+// walking distance, from the stops and the streets between them
+const rad = (x: number) => (x * Math.PI) / 180;
+const meters = ([a, b]: [number, number], [c, e]: [number, number]) => {
+  const dLat = rad(e - b);
+  const dLng = rad(c - a);
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(rad(b)) * Math.cos(rad(e)) * Math.sin(dLng / 2) ** 2;
+  return 2 * 6371000 * Math.asin(Math.sqrt(h));
+};
+const segments = dossier.legs.map((leg, i) => ({ metro: !!leg.metro, coords: [S[i].at, ...leg.path, S[i + 1].at] }));
+const walked = segments
+  .filter((s) => !s.metro)
+  .reduce((sum, s) => sum + s.coords.slice(1).reduce((m, c, i) => m + meters(s.coords[i], c), 0), 0);
+const km = new Intl.NumberFormat(locale, { maximumFractionDigits: 1 }).format(walked / 1000);
+const fmtTime = (t: string) => {
+  const [h, m] = t.split(':').map(Number);
+  return new Date(Date.UTC(2026, 0, 1, h, m)).toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' });
+};
+const date = new Date(`${dossier.date}T12:00:00Z`).toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Europe/Paris' });
+const stats = d.stats
+  .replace('{n}', S.length.toLocaleString(locale))
+  .replace('{km}', km)
+  .replace('{from}', fmtTime(S[0].time))
+  .replace('{to}', fmtTime(S[S.length - 1].time));
+const data = { stops: S.map((s) => s.at), segments };
+---
+
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Courier+Prime&display=swap" />
+
+<main class="dossier" data-dossier={JSON.stringify(data)}>
+  <!-- The cover: a manila case file -->
+  <header class="wrap cover">
+    <div class="folder">
+      <p class="stamp">{d.stamp}</p>
+      <p class="file">{d.file.replace('{n}', dossier.number)}</p>
+      <h1>{d.subject.split('{name}')[0]}<bdi>{dossier.name}</bdi>{d.subject.split('{name}')[1]}</h1>
+      <p class="type">{d.date.replace('{date}', date)}</p>
+      <p class="type">{d.agent}</p>
+      <p class="intro">{d.intro}</p>
+      <p class="stats">{stats}</p>
+    </div>
+    {demo && <p class="d-demo">{d.demo}</p>}
+  </header>
+
+  <div class="d-body">
+    <div class="d-map" dir="ltr" data-map role="img" aria-label={d.mapLabel}></div>
+    <ol class="d-list">
+      {
+        S.map((s, i) => {
+          const ph = photo(s.photo as PhotoId);
+          return (
+            <li class="sighting" data-i={i}>
+              <p class="s-head">
+                <span class="s-n">
+                  {d.sighting} {String(i + 1).padStart(2, '0')}
+                </span>
+                <time dir="ltr">{fmtTime(s.time)}</time>
+              </p>
+              <h2>{s.text[lang].place}</h2>
+              <p class="s-light">{lightNames[s.light]}</p>
+              <figure class="s-photo">
+                <img
+                  src={src(ph.id)}
+                  srcset={srcset(ph.id)}
+                  sizes="(max-width: 900px) 92vw, 40vw"
+                  width={ph.w}
+                  height={ph.h}
+                  alt=""
+                  loading="lazy"
+                  decoding="async"
+                />
+              </figure>
+              <p class="s-note">{s.text[lang].note}</p>
+              {dossier.legs[i]?.metro && <p class="s-metro">· · · {d.metro} · · ·</p>}
+            </li>
+          );
+        })
+      }
+    </ol>
+  </div>
+
+  <footer class="wrap d-end">
+    <p class="closing">{d.closing}</p>
+    <a class="button" href={reveal}>{d.toReveal}</a>
+  </footer>
+</main>
+
+<script>
+  import { initDossier } from '../scripts/dossier';
+  initDossier();
+</script>
+
+<style>
+  .dossier {
+    --paper: #d9c8a4;
+    --ink: #2a2218;
+    --type: 'Courier Prime', 'Courier New', ui-monospace, monospace;
+    padding-bottom: 5rem;
+  }
+  /* Persian has no typewriter face here: the regular Persian font, so letters stay joined */
+  :global(:root[lang='fa']) .dossier {
+    --type: 'Courier Prime', 'Vazirmatn', sans-serif;
+  }
+
+  /* the manila cover */
+  .cover {
+    padding-top: clamp(2rem, 6vw, 4rem);
+    padding-bottom: 2.5rem;
+  }
+  .folder {
+    position: relative;
+    max-width: 34rem;
+    margin: 0 auto;
+    padding: 2.2rem 1.6rem 1.8rem;
+    border-radius: 4px 14px 4px 4px;
+    background:
+      radial-gradient(120% 90% at 20% 10%, rgb(255 255 255 / 0.18), transparent 60%),
+      linear-gradient(180deg, #ddcca8, #cfbb93);
+    color: var(--ink);
+    font-family: var(--type);
+    box-shadow:
+      0 30px 60px -30px rgb(0 0 0 / 0.8),
+      inset 0 0 0 1px rgb(0 0 0 / 0.08);
+    transform: rotate(-0.6deg);
+  }
+  /* the folder's tab */
+  .folder::before {
+    content: '';
+    position: absolute;
+    top: -0.9rem;
+    inset-inline-start: 1.4rem;
+    width: 8rem;
+    height: 1rem;
+    border-radius: 6px 6px 0 0;
+    background: #ddcca8;
+  }
+  .stamp {
+    position: absolute;
+    top: 1.4rem;
+    inset-inline-end: 1.2rem;
+    padding: 0.25rem 0.7rem;
+    border: 2px solid #b3261e;
+    border-radius: 3px;
+    color: #b3261e;
+    font-size: 0.85rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    transform: rotate(-9deg);
+    opacity: 0.85;
+  }
+  :global(:root[lang='fa']) .stamp {
+    letter-spacing: 0;
+  }
+  .file {
+    font-size: 0.8rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    opacity: 0.7;
+  }
+  .folder h1 {
+    margin: 0.7rem 0 1rem;
+    font-family: var(--type);
+    font-size: clamp(1.6rem, 6vw, 2.2rem);
+    font-weight: 400;
+    color: var(--ink);
+    letter-spacing: 0;
+  }
+  .type {
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+  .intro {
+    margin-top: 1.2rem;
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+  .stats {
+    margin-top: 1rem;
+    padding-top: 0.8rem;
+    border-top: 1px dashed rgb(42 34 24 / 0.4);
+    font-size: 0.8rem;
+  }
+  .d-demo {
+    margin-top: 1.2rem;
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+
+  /* the map and the sightings: the map stays in view while the sightings scroll */
+  .d-body {
+    position: relative;
+  }
+  .d-map {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    height: 46svh;
+    background: #0e0f12;
+    box-shadow: 0 18px 30px -18px rgb(0 0 0 / 0.9);
+  }
+  .d-list {
+    list-style: none;
+    margin: 0;
+    padding: 1.5rem var(--gutter) 0;
+    display: grid;
+    gap: 4.5rem;
+  }
+  .sighting {
+    max-width: 34rem;
+    margin: 0 auto;
+    width: 100%;
+    opacity: 0.45;
+    transition: opacity 0.6s var(--ease);
+  }
+  .sighting:global(.on) {
+    opacity: 1;
+  }
+  .s-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-family: var(--type);
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #e6d6bd;
+  }
+  .s-head time {
+    font-size: 1.6rem;
+    letter-spacing: 0;
+    color: var(--ivory);
+  }
+  .sighting h2 {
+    margin-top: 0.4rem;
+    font-size: 1.4rem;
+  }
+  .s-light {
+    margin-top: 0.2rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .s-photo {
+    margin: 1rem 0 0;
+    border-radius: 4px;
+    overflow: hidden;
+    background: var(--raised);
+  }
+  .s-photo img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .s-note {
+    margin-top: 1rem;
+    font-family: var(--type);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: rgb(240 240 240 / 0.85);
+  }
+  .s-metro {
+    margin-top: 3rem;
+    text-align: center;
+    font-family: var(--type);
+    font-size: 0.8rem;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+  }
+  .d-end {
+    margin-top: 4rem;
+    text-align: center;
+  }
+  .closing {
+    max-width: 30rem;
+    margin: 0 auto 1.5rem;
+    font-family: var(--type);
+    line-height: 1.6;
+  }
+
+  /* map pins */
+  .d-map :global(.pin) {
+    display: grid;
+    place-items: center;
+    width: 1.7rem;
+    height: 1.7rem;
+    border-radius: 50%;
+    background: #0e0f12;
+    border: 1.5px solid #e6d6bd;
+    color: #e6d6bd;
+    font: 600 0.7rem/1 'Jost', sans-serif;
+    transition:
+      transform 0.4s var(--ease),
+      background 0.4s var(--ease),
+      color 0.4s var(--ease);
+  }
+  .d-map :global(.pin.on) {
+    background: #e6d6bd;
+    color: #0e0f12;
+    transform: scale(1.25);
+  }
+  .d-map :global(.maplibregl-ctrl-attrib) {
+    font-size: 0.6rem;
+    background: rgb(14 15 18 / 0.7);
+    color: #888;
+  }
+  .d-map :global(.maplibregl-ctrl-attrib a) {
+    color: #aaa;
+  }
+
+  /* wide screens: the map on one side, the sightings on the other */
+  @media (min-width: 900px) {
+    .d-body {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+    .d-map {
+      height: 100svh;
+    }
+    .d-list {
+      padding-block: 30vh;
+    }
+  }
+</style>

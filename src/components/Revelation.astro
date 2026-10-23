@@ -9,8 +9,9 @@ interface Props {
   session: { id: string; name: string; photos: { id: string; file: string; w: number; h: number }[] };
   home: string;
   proofs: string;
+  dossier?: string;
 }
-const { lang, session, home, proofs } = Astro.props;
+const { lang, session, home, proofs, dossier } = Astro.props;
 const c = chambre[lang];
 const base = `/chambre/${session.id}/`;
 ---
@@ -52,6 +53,13 @@ const base = `/chambre/${session.id}/`;
     }
   </ol>
 
+  {
+    dossier && (
+      <p class="wrap rv-dossier">
+        <a class="button" href={dossier}>{c.toDossier}</a>
+      </p>
+    )
+  }
   <p class="wrap rv-back"><a class="textlink" href={proofs}>{c.back}</a></p>
 </main>
 
@@ -188,8 +196,12 @@ const base = `/chambre/${session.id}/`;
     font-style: italic;
     color: #e6d6bd;
   }
-  .rv-back {
+  .rv-dossier {
     margin-top: 4rem;
+    text-align: center;
+  }
+  .rv-back {
+    margin-top: 2rem;
     text-align: center;
   }
 </style>

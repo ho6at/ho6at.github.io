@@ -1,0 +1,11 @@
+---
+// Le Dossier, demo: the delivery told as a paparazzi's tailing file, with the route on a map (not indexed).
+import Base from '../../../layouts/Base.astro';
+import Dossier from '../../../components/Dossier.astro';
+import t from '../../../i18n/fr';
+import { demoDossier } from '../../../i18n/dossier';
+---
+
+<Base lang="fr" title="Le Dossier — Luminoor" description="Le Dossier" noindex>
+  <Dossier lang="fr" locale={t.locale} lightNames={t.light.names} dossier={demoDossier} reveal="/chambre/demo/revelation/" demo />
+</Base>
