@@ -1,28 +1,29 @@
 ---
-// La Chambre Noire: a client's private page after their session. They keep their favourite photos (the package
-// sets how many are included, more are extra) and choose each one's style, previewed live on their own photo.
-// A style is the photographer's Lightroom look; here its colour is approximated with CSS filters on a second
-// copy of the photo laid over the original, so changing the strength only changes that copy's opacity.
+// La Chambre Noire, the contact sheet: the client's unfinished proofs, laid out like a film contact sheet. They
+// circle their favourites with a red grease pencil (the package sets how many are included, more are extra) and
+// pick a direction for each: Couleur, Noir or Libre (the photographer's choice). Nothing is edited on the page;
+// the proofs are shown flat and marked "Épreuve", and the editing stays handwork in Lightroom.
 // Choices are kept in this browser (localStorage) and sent by email for now.
 import { site } from '../site';
 import { PRICES } from '../lib/pricing';
-import { chambre, lookText, looks } from '../i18n/chambre';
+import { chambre, directionText, directions, directionExample } from '../i18n/chambre';
 
 interface Props {
   lang: 'fr' | 'en' | 'fa';
   locale: string;
   session: { id: string; name: string; date: string; quota: number; photos: { id: string; file: string; w: number; h: number }[] };
   home: string;
+  reveal: string;
   demo?: boolean;
 }
-const { lang, locale, session, home, demo = false } = Astro.props;
+const { lang, locale, session, home, reveal, demo = false } = Astro.props;
 const c = chambre[lang];
-const L = lookText[lang];
+const D = directionText[lang];
 const base = `/chambre/${session.id}/`;
 const date = new Date(`${session.date}T12:00:00Z`).toLocaleDateString(locale, { day: 'numeric', month: 'long', timeZone: 'Europe/Paris' });
 const strings = {
   ...c,
-  looks: L,
+  directions: D,
   locale,
   email: site.email,
   name: session.name,
@@ -32,6 +33,8 @@ const strings = {
   quota: session.quota,
   extraPrice: PRICES.extraPhoto,
 };
+// a hand-drawn loop, like a grease pencil on a contact sheet (drawn in a 100 × 100 box, stretched to the frame)
+const loop = 'M52 6 C78 5 95 22 94 50 C93 79 74 95 47 94 C20 93 5 76 6 49 C7 23 25 8 49 7 C58 6.5 66 9 72 13';
 ---
 
 <main class="chambre" data-chambre={JSON.stringify(strings)}>
@@ -43,29 +46,55 @@ const strings = {
     <h1 lang="fr" dir="ltr">La Chambre Noire</h1>
     <p class="ch-hello">{c.hello.replace('{name}', session.name).replace('{date}', date)}</p>
     <p class="ch-intro">{c.intro}</p>
+    <p class="ch-craft">{c.craft}</p>
     {demo && <p class="ch-demo">{c.demo}</p>}
   </header>
 
-  <ul class="wrap ch-grid">
-    {
-      session.photos.map((p, i) => (
-        <li class="tile" data-photo={p.id} data-file={p.file} data-look="naturel">
-          <button type="button" class="tile-open" data-open={i} aria-label={`${p.file}`}>
-            <img class="base" src={`${base}${p.id}-480.webp`} alt="" width={p.w} height={p.h} loading="lazy" decoding="async" />
-            <img class="top" src={`${base}${p.id}-480.webp`} alt="" width={p.w} height={p.h} loading="lazy" decoding="async" />
-          </button>
-          <span class="tile-look" aria-hidden="true" />
-          <span class="tile-kept" aria-hidden="true">
-            <svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>
-          </span>
-        </li>
-      ))
-    }
-  </ul>
-  <p class="wrap ch-tap">{c.tap}</p>
-  <p class="wrap ch-honest">{c.honest}</p>
+  <!-- The directions, each shown with a finished photo from the portfolio -->
+  <section class="wrap ch-dirs" aria-labelledby="dirs-title">
+    <h2 id="dirs-title">{c.directionsTitle}</h2>
+    <ul>
+      {
+        directions.map((d) => (
+          <li>
+            <img src={directionExample[d]} alt="" width="480" height="720" loading="lazy" decoding="async" />
+            <p>
+              <b lang="fr">{D[d].name}</b>
+              <span>{D[d].text}</span>
+            </p>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
 
-  <!-- The bar that follows: how many photos are kept, what is extra, and sending -->
+  <!-- The contact sheet -->
+  <section class="sheet-film">
+    <ul class="wrap ch-grid">
+      {
+        session.photos.map((p, i) => (
+          <li class="tile" data-photo={p.id} data-file={p.file}>
+            <button type="button" class="tile-open" data-open={i} aria-label={`${c.frame} ${i + 1}`}>
+              <img src={`${base}${p.id}-480.webp`} alt="" width={p.w} height={p.h} loading="lazy" decoding="async" />
+              <span class="proof-mark" aria-hidden="true">{c.proof}</span>
+              <svg class="loop" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+                <path d={loop} />
+              </svg>
+            </button>
+            <p class="tile-edge" dir="ltr" aria-hidden="true">
+              <span>{String(i + 12).padStart(2, '0')}</span>
+              <span>▸ {String(i + 12).padStart(2, '0')}A</span>
+            </p>
+            <span class="tile-dir" aria-hidden="true" />
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+  <p class="wrap ch-tap">{c.tap}</p>
+  <p class="wrap ch-reveal"><a class="textlink" href={reveal}>{c.revealLink}</a></p>
+
+  <!-- The bar that follows: how many photos are circled, what is extra, and sending -->
   <div class="ch-bar">
     <div class="ch-bar-inner">
       <p class="ch-count">
@@ -79,7 +108,7 @@ const strings = {
     </div>
   </div>
 
-  <!-- Full-screen viewer -->
+  <!-- The loupe -->
   <dialog class="viewer" data-viewer aria-label="La Chambre Noire">
     <div class="v-top">
       <button type="button" class="v-icon" data-close aria-label={c.close}>
@@ -89,8 +118,13 @@ const strings = {
       <span class="v-space"></span>
     </div>
     <div class="v-stage" data-stage>
-      <img class="base" data-v-base alt="" />
-      <img class="top" data-v-top alt="" />
+      <div class="v-frame" data-v-frame>
+        <img data-v-img alt="" />
+        <span class="proof-mark" aria-hidden="true">{c.proof}</span>
+        <svg class="loop" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+          <path d={loop} />
+        </svg>
+      </div>
       <button type="button" class="v-nav prev" data-step="-1" aria-label={c.prev}>
         <svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" /></svg>
       </button>
@@ -99,27 +133,21 @@ const strings = {
       </button>
     </div>
     <div class="v-panel">
-      <div class="v-looks" role="radiogroup">
+      <button type="button" class="v-mark" data-mark aria-pressed="false">
+        <svg viewBox="0 0 100 100" aria-hidden="true"><path d={loop} /></svg>
+        <span data-mark-label>{c.mark}</span>
+      </button>
+      <div class="v-dirs" role="radiogroup" data-dirs hidden>
         {
-          looks.map((l) => (
-            <button type="button" class="v-look" role="radio" data-look={l} aria-checked={l === 'naturel' ? 'true' : 'false'}>
-              <span class="v-look-name" lang="fr">{L[l].name}</span>
-              <span class="v-look-text">{L[l].text}</span>
+          directions.map((d) => (
+            <button type="button" class="v-dir" role="radio" data-dir={d} aria-checked={d === 'libre' ? 'true' : 'false'}>
+              <span class="v-dir-name" lang="fr">{D[d].name}</span>
+              <span class="v-dir-text">{D[d].text}</span>
             </button>
           ))
         }
       </div>
-      <label class="v-strength">
-        <span>{c.intensity}</span>
-        <input type="range" min="0" max="100" value="100" data-strength />
-      </label>
-      <input class="v-note" type="text" data-note placeholder={c.note} />
-      <div class="v-foot">
-        <p class="v-hold">{c.hold}</p>
-        <button type="button" class="button small v-keep" data-keep aria-pressed="false">
-          <span data-keep-label>{c.keep}</span>
-        </button>
-      </div>
+      <input class="v-note" type="text" data-note placeholder={c.note} hidden />
     </div>
   </dialog>
 </main>
@@ -150,9 +178,6 @@ const strings = {
     text-transform: uppercase;
     color: #e6d6bd;
   }
-  :global(:root[lang='fa']) .ch-kicker {
-    letter-spacing: 0;
-  }
   .ch-head h1 {
     margin-top: 0.6rem;
     font-family: 'Cinzel', 'Jost', serif;
@@ -168,12 +193,18 @@ const strings = {
     margin-top: 1.2rem;
     font-size: 1.1rem;
   }
-  .ch-intro {
+  .ch-intro,
+  .ch-craft {
     max-width: 34rem;
-    margin: 0.6rem auto 0;
+    margin: 0.7rem auto 0;
     color: var(--muted);
     line-height: 1.7;
     text-wrap: balance;
+  }
+  .ch-craft {
+    font-size: 0.9rem;
+    color: #e6d6bd;
+    opacity: 0.85;
   }
   .ch-demo {
     display: inline-block;
@@ -185,26 +216,65 @@ const strings = {
     color: var(--muted);
   }
 
-  /* Grid of proofs */
+  /* the directions */
+  .ch-dirs {
+    margin-bottom: 2.5rem;
+  }
+  .ch-dirs h2 {
+    font-size: 0.8rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+  .ch-dirs ul {
+    list-style: none;
+    margin: 0 auto;
+    padding: 0;
+    max-width: 40rem;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+  .ch-dirs img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    border-radius: 6px;
+  }
+  .ch-dirs p {
+    display: grid;
+    gap: 0.15rem;
+    margin-top: 0.5rem;
+    text-align: center;
+  }
+  .ch-dirs b {
+    font-family: 'Cinzel', 'Jost', serif;
+    font-weight: 400;
+  }
+  .ch-dirs span {
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+
+  /* the contact sheet: dark film, frame numbers along the edge */
+  .sheet-film {
+    background: #0c0b0a;
+    border-block: 1px solid rgb(240 240 240 / 0.06);
+    padding-block: 1.5rem;
+  }
   .ch-grid {
     list-style: none;
     margin: 0 auto;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(46%, 15rem), 1fr));
-    gap: 0.75rem;
+    grid-template-columns: repeat(auto-fill, minmax(min(30%, 11rem), 1fr));
+    gap: 1rem 0.6rem;
   }
   .tile {
     position: relative;
-    border-radius: 8px;
-    overflow: hidden;
-    background: var(--raised);
-    outline: 1px solid transparent;
-    outline-offset: -1px;
-    transition: outline-color 0.3s var(--ease);
-  }
-  .tile:global(.is-kept) {
-    outline: 2px solid #e6d6bd;
-    outline-offset: -2px;
   }
   .tile-open {
     display: block;
@@ -212,97 +282,95 @@ const strings = {
     width: 100%;
     padding: 0;
     border: 0;
-    background: none;
+    background: #000;
     cursor: zoom-in;
     aspect-ratio: 2 / 3;
   }
-  .tile img,
-  .v-stage img {
+  .tile-open img,
+  .v-frame img {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
+    /* proofs look unfinished on purpose: flat and a little pale, as they come out of the camera */
+    filter: saturate(0.55) contrast(0.82) brightness(1.05);
   }
-  .v-stage img {
+  .v-frame img {
     object-fit: contain;
   }
-  /* the styles: a filtered copy over the original; its opacity is the strength */
-  .top {
-    transition: opacity 0.35s var(--ease);
-  }
-  :global([data-look='naturel']) > .top,
-  :global([data-look='naturel']) .top {
-    filter: contrast(1.04) saturate(1.06);
-  }
-  :global([data-look='noir']) > .top,
-  :global([data-look='noir']) .top {
-    filter: grayscale(1) contrast(1.3) brightness(0.95);
-  }
-  :global([data-look='pellicule']) > .top,
-  :global([data-look='pellicule']) .top {
-    filter: sepia(0.24) saturate(0.82) contrast(0.88) brightness(1.06) hue-rotate(-8deg);
-  }
-  .tile-look {
+  .proof-mark {
     position: absolute;
-    inset: auto auto 0.6rem 0.6rem;
-    padding: 0.2rem 0.6rem;
-    border-radius: 999px;
-    background: rgb(10 10 10 / 0.6);
-    font-size: 0.7rem;
-    letter-spacing: 0.08em;
-    color: #e6d6bd;
+    left: 0.5rem;
+    bottom: 0.45rem;
+    font-size: 0.55rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: rgb(255 255 255 / 0.55);
     pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.3s var(--ease);
   }
-  .tile:global(.is-kept) .tile-look {
-    opacity: 1;
-  }
-  .tile-kept {
+  .loop {
     position: absolute;
-    top: 0.6rem;
-    inset-inline-end: 0.6rem;
-    width: 1.8rem;
-    height: 1.8rem;
-    border-radius: 50%;
-    display: grid;
-    place-items: center;
-    background: #e6d6bd;
-    color: #0a0a0a;
+    inset: -4%;
+    width: 108%;
+    height: 108%;
+    overflow: visible;
+    pointer-events: none;
+  }
+  .loop {
     opacity: 0;
-    transform: scale(0.6);
+    transform: scale(0.9) rotate(-5deg);
     transition:
-      opacity 0.3s var(--ease),
-      transform 0.3s var(--ease);
-    pointer-events: none;
+      opacity 0.35s var(--ease),
+      transform 0.5s cubic-bezier(0.3, 1.4, 0.5, 1);
   }
-  .tile:global(.is-kept) .tile-kept {
+  .loop path {
+    fill: none;
+    stroke: #d23a2c;
+    stroke-width: 2.6;
+    stroke-linecap: round;
+    vector-effect: non-scaling-stroke;
+  }
+  :global(.is-marked) .loop {
     opacity: 1;
     transform: none;
   }
-  .tile-kept svg,
-  .v-icon svg,
-  .v-nav svg {
-    width: 1rem;
-    height: 1rem;
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 2;
-    stroke-linecap: round;
-    stroke-linejoin: round;
+  .tile-edge {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.3rem;
+    font-size: 0.6rem;
+    letter-spacing: 0.12em;
+    color: rgb(214 168 82 / 0.75);
+    font-variant-numeric: tabular-nums;
   }
-  .ch-tap,
-  .ch-honest {
+  .tile-dir {
+    position: absolute;
+    top: 0.4rem;
+    inset-inline-end: 0.4rem;
+    padding: 0.15rem 0.5rem;
+    border-radius: 999px;
+    background: rgb(10 10 10 / 0.7);
+    font-size: 0.62rem;
+    letter-spacing: 0.06em;
+    color: #e6d6bd;
+    opacity: 0;
+    transition: opacity 0.3s var(--ease);
+    pointer-events: none;
+  }
+  .tile:global(.is-marked) .tile-dir {
+    opacity: 1;
+  }
+  .ch-tap {
     margin-top: 1rem;
     font-size: 0.85rem;
     color: var(--muted);
     text-align: center;
   }
-  .ch-honest {
-    margin-top: 0.4rem;
-    font-size: 0.8rem;
-    opacity: 0.8;
+  .ch-reveal {
+    margin-top: 1.2rem;
+    text-align: center;
+    font-size: 0.9rem;
   }
 
   /* the bar */
@@ -349,7 +417,7 @@ const strings = {
     pointer-events: none;
   }
 
-  /* the viewer */
+  /* the loupe */
   .viewer {
     width: 100vw;
     max-width: none;
@@ -393,6 +461,16 @@ const strings = {
     place-items: center;
     cursor: pointer;
   }
+  .v-icon svg,
+  .v-nav svg {
+    width: 1rem;
+    height: 1rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
   .v-space {
     width: 2.6rem;
   }
@@ -406,13 +484,18 @@ const strings = {
     position: relative;
     flex: 1;
     min-height: 0;
+    display: grid;
+    place-items: center;
+    padding: 0.75rem 1.5rem;
     touch-action: pan-y;
     user-select: none;
     -webkit-user-select: none;
-    -webkit-touch-callout: none;
   }
-  .v-stage img {
-    pointer-events: none;
+  .v-frame {
+    position: relative;
+    height: 100%;
+    max-width: 100%;
+    aspect-ratio: 2 / 3;
   }
   .v-nav {
     position: absolute;
@@ -436,21 +519,52 @@ const strings = {
   }
   .v-panel {
     display: grid;
-    gap: 0.8rem;
+    gap: 0.75rem;
     padding: 0.9rem var(--gutter) max(1rem, env(safe-area-inset-bottom));
-    max-width: 44rem;
+    max-width: 40rem;
     width: 100%;
     margin: 0 auto;
   }
-  .v-looks {
+  .v-mark {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    padding: 0.85rem 1rem;
+    border-radius: 999px;
+    border: 1px solid rgb(210 58 44 / 0.6);
+    background: transparent;
+    color: var(--ivory);
+    font: inherit;
+    cursor: pointer;
+    transition: background 0.3s var(--ease);
+  }
+  .v-mark svg {
+    width: 1.3rem;
+    height: 1.3rem;
+  }
+  .v-mark path {
+    fill: none;
+    stroke: #d23a2c;
+    stroke-width: 7;
+    stroke-linecap: round;
+  }
+  .v-mark[aria-pressed='true'] {
+    background: rgb(210 58 44 / 0.16);
+  }
+  .v-dirs {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 0.5rem;
   }
-  .v-look {
+  .v-dirs[hidden],
+  .v-note[hidden] {
+    display: none;
+  }
+  .v-dir {
     display: grid;
     gap: 0.1rem;
-    padding: 0.6rem 0.5rem;
+    padding: 0.6rem 0.4rem;
     border-radius: 14px;
     border: 1px solid var(--line);
     background: transparent;
@@ -462,29 +576,18 @@ const strings = {
       border-color 0.3s var(--ease),
       color 0.3s var(--ease);
   }
-  .v-look[aria-checked='true'] {
+  .v-dir[aria-checked='true'] {
     background: var(--ivory);
     border-color: var(--ivory);
     color: #0a0a0a;
   }
-  .v-look-name {
+  .v-dir-name {
     font-family: 'Cinzel', 'Jost', serif;
-    font-size: 1rem;
+    font-size: 0.95rem;
   }
-  .v-look-text {
-    font-size: 0.7rem;
+  .v-dir-text {
+    font-size: 0.68rem;
     opacity: 0.7;
-  }
-  .v-strength {
-    display: flex;
-    align-items: center;
-    gap: 0.8rem;
-    font-size: 0.8rem;
-    color: var(--muted);
-  }
-  .v-strength input {
-    flex: 1;
-    accent-color: #e6d6bd;
   }
   .v-note {
     font: inherit;
@@ -499,26 +602,8 @@ const strings = {
     outline: none;
     border-color: #e6d6bd;
   }
-  .v-foot {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-  }
-  .v-hold {
-    font-size: 0.75rem;
-    color: var(--muted);
-  }
-  .v-keep {
-    white-space: nowrap;
-    flex: none;
-  }
-  .v-keep[aria-pressed='true'] {
-    background: #e6d6bd;
-    color: #0a0a0a;
-  }
   @media (prefers-reduced-motion: reduce) {
-    .top,
+    .loop,
     .viewer[open] {
       transition: none;
       animation: none;

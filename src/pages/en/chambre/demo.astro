@@ -1,5 +1,5 @@
 ---
-// La Chambre Noire, demo session (not indexed, not in the sitemap).
+// La Chambre Noire, demo session: the contact sheet (not indexed, not in the sitemap).
 import Base from '../../../layouts/Base.astro';
 import Chambre from '../../../components/Chambre.astro';
 import t from '../../../i18n/en';
@@ -7,5 +7,5 @@ import { demoSession } from '../../../i18n/chambre';
 ---
 
 <Base lang="en" title="La Chambre Noire — Luminoor" description="La Chambre Noire" noindex>
-  <Chambre lang="en" locale={t.locale} session={demoSession} home="/en/" demo />
+  <Chambre lang="en" locale={t.locale} session={demoSession} home="/en/" reveal="/en/chambre/demo/revelation/" demo />
 </Base>

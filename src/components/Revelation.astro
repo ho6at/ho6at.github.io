@@ -1,0 +1,162 @@
+---
+// La Chambre Noire, the delivery ("révélation"): the finished photos, one under the other, each surfacing like a
+// print in the developer as it scrolls into view (a pale veil fades away; opacity and transform only), signed by
+// the photographer.
+import { chambre } from '../i18n/chambre';
+
+interface Props {
+  lang: 'fr' | 'en' | 'fa';
+  session: { id: string; name: string; photos: { id: string; file: string; w: number; h: number }[] };
+  home: string;
+  proofs: string;
+}
+const { lang, session, home, proofs } = Astro.props;
+const c = chambre[lang];
+const base = `/chambre/${session.id}/`;
+---
+
+<main class="reveal-page">
+  <header class="wrap rv-head">
+    <a class="rv-logo" href={home} aria-label="Luminoor">
+      <img src="/brand/luminoor-logo.png" alt="Luminoor Paris" width="556" height="166" />
+    </a>
+    <p class="rv-kicker" lang="fr">{c.revealKicker}</p>
+    <h1>{c.revealTitle.replace('{name}', session.name)}</h1>
+    <p class="rv-text">{c.revealText}</p>
+  </header>
+
+  <ol class="rv-list">
+    {
+      session.photos.map((p, i) => (
+        <li class="print" data-print>
+          <div class="print-frame">
+            <img
+              src={`${base}${p.id}-1280.webp`}
+              srcset={`${base}${p.id}-480.webp 480w, ${base}${p.id}-1280.webp 1280w`}
+              sizes="(max-width: 700px) 92vw, 34rem"
+              alt=""
+              width={p.w}
+              height={p.h}
+              loading={i < 2 ? 'eager' : 'lazy'}
+              decoding="async"
+            />
+            <span class="veil" aria-hidden="true" />
+          </div>
+          <p class="print-sign">
+            <span dir="ltr">N° {String(i + 1).padStart(2, '0')}</span>
+            <span class="sig">{c.signed}</span>
+          </p>
+        </li>
+      ))
+    }
+  </ol>
+
+  <p class="wrap rv-back"><a class="textlink" href={proofs}>{c.back}</a></p>
+</main>
+
+<script>
+  // Each print develops once, when it scrolls into view
+  const prints = [...document.querySelectorAll<HTMLElement>('[data-print]')];
+  const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (still || !('IntersectionObserver' in window)) prints.forEach((p) => p.classList.add('developed'));
+  else {
+    const io = new IntersectionObserver(
+      (entries) =>
+        entries.forEach((e) => {
+          if (!e.isIntersecting) return;
+          e.target.classList.add('developed');
+          io.unobserve(e.target);
+        }),
+      { threshold: 0.35 },
+    );
+    prints.forEach((p) => io.observe(p));
+  }
+</script>
+
+<style>
+  .reveal-page {
+    padding-bottom: 6rem;
+  }
+  .rv-head {
+    padding-top: clamp(2rem, 6vw, 4rem);
+    padding-bottom: 2.5rem;
+    text-align: center;
+  }
+  .rv-logo img {
+    height: 2.4rem;
+    width: auto;
+    opacity: 0.9;
+  }
+  .rv-kicker {
+    margin-top: 2rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: #e6d6bd;
+  }
+  .rv-head h1 {
+    margin-top: 0.8rem;
+    font-size: clamp(1.8rem, 6vw, 3rem);
+    text-wrap: balance;
+  }
+  .rv-text {
+    margin-top: 0.7rem;
+    color: var(--muted);
+  }
+  .rv-list {
+    list-style: none;
+    margin: 0 auto;
+    padding: 0 var(--gutter);
+    max-width: 36rem;
+    display: grid;
+    gap: clamp(3rem, 10vw, 5rem);
+  }
+  .print-frame {
+    position: relative;
+    overflow: hidden;
+    border-radius: 3px;
+    background: #f2ede4;
+  }
+  .print-frame img {
+    display: block;
+    width: 100%;
+    height: auto;
+    opacity: 0;
+    transform: scale(1.02);
+    transition:
+      opacity 2.4s cubic-bezier(0.25, 0.1, 0.25, 1),
+      transform 2.8s cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+  /* the developer's pale veil that lifts off the print */
+  .veil {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, #f6f1e8, #e9e2d6);
+    opacity: 1;
+    transition: opacity 2.6s cubic-bezier(0.25, 0.1, 0.25, 1) 0.3s;
+    pointer-events: none;
+  }
+  .print:global(.developed) img {
+    opacity: 1;
+    transform: none;
+  }
+  .print:global(.developed) .veil {
+    opacity: 0;
+  }
+  .print-sign {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-top: 0.8rem;
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+  .sig {
+    font-style: italic;
+    color: #e6d6bd;
+  }
+  .rv-back {
+    margin-top: 4rem;
+    text-align: center;
+  }
+</style>

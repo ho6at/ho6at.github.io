@@ -1,103 +1,134 @@
-// La Chambre Noire: a client's private page after their session, where they keep their favourite photos and
-// choose each one's style (a live preview of the photographer's own Lightroom looks). The style names stay in
-// French in every language, like the package names.
+// La Chambre Noire: a client's private pages after their session.
+// 1. The contact sheet: unfinished proofs, the client circles favourites like on a film contact sheet and picks a
+//    direction for each (colour, black and white, or the photographer's choice). Nothing is edited on the page:
+//    the editing stays the photographer's handwork, in Lightroom.
+// 2. The révélation: the finished photos, appearing like a print in the developer, signed.
+// Direction names stay in French in every language, like the package names.
 
 type Lang = 'fr' | 'en' | 'fa';
 
-export const looks = ['naturel', 'noir', 'pellicule'] as const;
-export type Look = (typeof looks)[number];
+export const directions = ['couleur', 'noir', 'libre'] as const;
+export type Direction = (typeof directions)[number];
 
 export const chambre: Record<Lang, Record<string, string>> = {
   fr: {
     kicker: 'Votre chambre noire',
     hello: 'Bonjour {name}. Voici votre séance du {date}.',
-    intro: 'Gardez vos photos préférées et choisissez le style de chacune. Nous les retouchons ensuite à la main, dans Lightroom.',
+    intro: 'Voici vos épreuves, telles qu’elles sortent de l’appareil. Entourez vos préférées et dites-nous dans quelle direction les emmener. Le reste se fait à la main.',
+    craft: 'Chaque photo choisie, c’est environ vingt minutes de retouche à la main dans Lightroom : la lumière, la peau, les passants, la couleur.',
     demo: 'Démonstration : une séance d’exemple.',
+    directionsTitle: 'Les directions',
+    proof: 'Épreuve',
+    frame: 'Vue',
+    tap: 'Touchez une épreuve pour la voir en grand.',
+    mark: 'Entourer',
+    marked: 'Entourée',
+    note: 'Une remarque sur cette photo (facultatif)',
     quota: '{n} / {total} photos incluses',
     extra: '+{n} en supplément · {price}',
-    intensity: 'Intensité',
-    keep: 'Garder',
-    kept: 'Gardée',
-    hold: 'Maintenez la photo pour voir l’original',
-    note: 'Une remarque sur cette photo (facultatif)',
-    honest: 'L’aperçu montre la couleur et l’ambiance. Les finitions (peau, détails, passants) sont faites à la main.',
-    tap: 'Touchez une photo pour la voir en grand.',
     send: 'Envoyer à la chambre noire',
     letUs: 'Laisser le photographe choisir',
     subject: 'La Chambre Noire — sélection de {name}',
     mailIntro: 'Bonjour Luminoor,\n\nVoici ma sélection :',
-    mailLetUs: 'Bonjour Luminoor,\n\nJe vous laisse choisir les photos et leur style.',
+    mailLetUs: 'Bonjour Luminoor,\n\nJe vous laisse choisir les photos et leur direction.',
     close: 'Fermer',
     prev: 'Photo précédente',
     next: 'Photo suivante',
+    revealLink: 'Voir à quoi ressemble la livraison',
+    revealKicker: 'Révélation',
+    revealTitle: '{name}, vos photos sont prêtes.',
+    revealText: 'Développées une par une, à la main.',
+    signed: 'Retouchée à la main par Hojjat',
+    back: 'Retour aux épreuves',
   },
   en: {
     kicker: 'Your darkroom',
     hello: 'Hello {name}. Here is your session from {date}.',
-    intro: 'Keep your favourite photos and choose a style for each one. We then edit them by hand, in Lightroom.',
+    intro: 'These are your proofs, just as they came out of the camera. Circle your favourites and tell us which direction to take them in. The rest is done by hand.',
+    craft: 'Each photo you choose is about twenty minutes of hand editing in Lightroom: the light, the skin, the passers-by, the colour.',
     demo: 'Demo: a sample session.',
+    directionsTitle: 'The directions',
+    proof: 'Proof',
+    frame: 'Frame',
+    tap: 'Tap a proof to see it large.',
+    mark: 'Circle it',
+    marked: 'Circled',
+    note: 'A note on this photo (optional)',
     quota: '{n} of {total} photos included',
     extra: '+{n} extra · {price}',
-    intensity: 'Strength',
-    keep: 'Keep',
-    kept: 'Kept',
-    hold: 'Press and hold the photo to see the original',
-    note: 'A note on this photo (optional)',
-    honest: 'The preview shows colour and mood. Finishing touches (skin, details, passers-by) are done by hand.',
-    tap: 'Tap a photo to see it full screen.',
     send: 'Send to the darkroom',
     letUs: 'Let the photographer choose',
     subject: 'La Chambre Noire — {name}’s selection',
     mailIntro: 'Hello Luminoor,\n\nHere is my selection:',
-    mailLetUs: 'Hello Luminoor,\n\nI’ll let you choose the photos and their style.',
+    mailLetUs: 'Hello Luminoor,\n\nI’ll let you choose the photos and their direction.',
     close: 'Close',
     prev: 'Previous photo',
     next: 'Next photo',
+    revealLink: 'See what the delivery looks like',
+    revealKicker: 'Révélation',
+    revealTitle: '{name}, your photos are ready.',
+    revealText: 'Developed one by one, by hand.',
+    signed: 'Edited by hand by Hojjat',
+    back: 'Back to the proofs',
   },
   fa: {
     kicker: 'تاریکخانه‌ی شما',
     hello: 'سلام {name}. این عکس‌های جلسه‌ی {date} شماست.',
-    intro: 'عکس‌های محبوبتان را نگه دارید و برای هر کدام سبکی انتخاب کنید. بعد ما آن‌ها را با دست، در لایت‌روم، ادیت می‌کنیم.',
+    intro: 'این‌ها نسخه‌های آزمایشی عکس‌های شماست، همان‌طور که از دوربین بیرون آمده‌اند. دور عکس‌های محبوبتان خط بکشید و بگویید هر کدام را به چه سمتی ببریم. بقیه‌اش کار دست ماست.',
+    craft: 'هر عکسی که انتخاب می‌کنید، حدود بیست دقیقه ادیت دستی در لایت‌روم است: نور، پوست، رهگذرها، رنگ.',
     demo: 'نسخه‌ی نمایشی: یک جلسه‌ی نمونه.',
+    directionsTitle: 'جهت‌ها',
+    proof: 'Épreuve',
+    frame: 'فریم',
+    tap: 'برای دیدن عکس در اندازه‌ی بزرگ، رویش بزنید.',
+    mark: 'خط دور عکس',
+    marked: 'انتخاب شد',
+    note: 'یادداشتی برای این عکس (اختیاری)',
     quota: '{n} از {total} عکسِ پکیج',
     extra: '{n} عکس اضافه · {price}',
-    intensity: 'شدت',
-    keep: 'نگه‌داشتن',
-    kept: 'انتخاب شد',
-    hold: 'برای دیدن نسخه‌ی اصلی، انگشتتان را روی عکس نگه دارید',
-    note: 'یادداشتی برای این عکس (اختیاری)',
-    honest: 'پیش‌نمایش رنگ و حال‌وهوا را نشان می‌دهد. جزئیات نهایی (پوست، ریزه‌کاری‌ها، رهگذرها) با دست انجام می‌شود.',
-    tap: 'برای دیدن عکس در اندازه‌ی کامل، رویش بزنید.',
     send: 'ارسال به تاریکخانه',
     letUs: 'انتخاب با عکاس',
     subject: 'La Chambre Noire — انتخاب‌های {name}',
     mailIntro: 'سلام،\n\nانتخاب‌های من:',
-    mailLetUs: 'سلام،\n\nانتخاب عکس‌ها و سبکشان را به خودتان می‌سپارم.',
+    mailLetUs: 'سلام،\n\nانتخاب عکس‌ها و جهتشان را به خودتان می‌سپارم.',
     close: 'بستن',
     prev: 'عکس قبلی',
     next: 'عکس بعدی',
+    revealLink: 'ببینید تحویل نهایی چه شکلی است',
+    revealKicker: 'Révélation',
+    revealTitle: '{name}، عکس‌هایتان آماده‌اند.',
+    revealText: 'یکی‌یکی، با دست، ظاهر شده‌اند.',
+    signed: 'ادیت دستیِ حجت',
+    back: 'بازگشت به نسخه‌های آزمایشی',
   },
 };
 
-export const lookText: Record<Lang, Record<Look, { name: string; text: string }>> = {
+export const directionText: Record<Lang, Record<Direction, { name: string; text: string }>> = {
   fr: {
-    naturel: { name: 'Naturel', text: 'Fidèle à la lumière du jour' },
-    noir: { name: 'Noir', text: 'Notre noir et blanc' },
-    pellicule: { name: 'Pellicule', text: 'La douceur d’un film' },
+    couleur: { name: 'Couleur', text: 'Nos couleurs de Paris, chaudes et douces' },
+    noir: { name: 'Noir', text: 'Notre noir et blanc, contrasté' },
+    libre: { name: 'Libre', text: 'Le photographe choisit' },
   },
   en: {
-    naturel: { name: 'Naturel', text: 'True to the light of the day' },
-    noir: { name: 'Noir', text: 'Our black and white' },
-    pellicule: { name: 'Pellicule', text: 'The softness of film' },
+    couleur: { name: 'Couleur', text: 'Our Paris colours, warm and soft' },
+    noir: { name: 'Noir', text: 'Our black and white, with contrast' },
+    libre: { name: 'Libre', text: 'The photographer decides' },
   },
   fa: {
-    naturel: { name: 'Naturel', text: 'وفادار به نور روز' },
-    noir: { name: 'Noir', text: 'سیاه‌وسفیدِ امضای ما' },
-    pellicule: { name: 'Pellicule', text: 'لطافت فیلم آنالوگ' },
+    couleur: { name: 'Couleur', text: 'رنگ‌های پاریسیِ ما، گرم و نرم' },
+    noir: { name: 'Noir', text: 'سیاه‌وسفیدِ ما، پرکنتراست' },
+    libre: { name: 'Libre', text: 'انتخاب با عکاس' },
   },
 };
 
-/** A sample session for the demo page; real sessions will come from the photographer's uploads. */
+/** A finished example of each direction, from the portfolio (photos in public/photos) */
+export const directionExample: Record<Direction, string> = {
+  couleur: '/photos/night-hat-480.webp',
+  noir: '/photos/couple-night-run-480.webp',
+  libre: '/photos/regrattier-480.webp',
+};
+
+/** A sample session for the demo pages; real sessions will come from the photographer's uploads. */
 export const demoSession = {
   id: 'demo',
   name: 'Sara',

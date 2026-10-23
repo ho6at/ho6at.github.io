@@ -1,0 +1,10 @@
+---
+// La Chambre Noire, demo session: the delivery (not indexed, not in the sitemap).
+import Base from '../../../../layouts/Base.astro';
+import Revelation from '../../../../components/Revelation.astro';
+import { demoSession } from '../../../../i18n/chambre';
+---
+
+<Base lang="fa" title="Révélation — Luminoor" description="La Chambre Noire" noindex>
+  <Revelation lang="fa" session={demoSession} home="/fa/" proofs="/fa/chambre/demo/" />
+</Base>

@@ -1,14 +1,12 @@
-// La Chambre Noire (components/Chambre.astro): keep photos, choose a style and its strength for each, compare
-// with the original by holding the photo, then send the selection by email. Choices stay in this browser.
+// La Chambre Noire contact sheet (components/Chambre.astro): circle favourite proofs, pick a direction for each,
+// add a note, then send the selection by email. Choices stay in this browser.
 
-type Look = 'naturel' | 'noir' | 'pellicule';
-type Pick = { kept: boolean; look: Look; amount: number; note: string };
+type Direction = 'couleur' | 'noir' | 'libre';
+type Pick = { marked: boolean; dir: Direction; note: string };
 type Strings = Record<string, string> & {
-  looks: Record<Look, { name: string; text: string }>;
+  directions: Record<Direction, { name: string; text: string }>;
   quota: number;
   extraPrice: number;
-  quotaText: string;
-  extraText: string;
 };
 
 export function initChambre() {
@@ -19,14 +17,14 @@ export function initChambre() {
   const $$ = <T extends Element = HTMLElement>(sel: string, scope: ParentNode = document) => [...scope.querySelectorAll<T>(sel)];
   const rtl = document.dir === 'rtl';
   const tiles = $$('.tile', main);
-  const key = `chambre-${S.session}`;
+  const key = `chambre-sheet-${S.session}`;
 
   const picks = new Map<string, Pick>();
   let saved: Record<string, Pick> = {};
   try {
     saved = JSON.parse(localStorage.getItem(key) || '{}');
   } catch {}
-  tiles.forEach((t) => picks.set(t.dataset.photo!, { kept: false, look: 'naturel', amount: 100, note: '', ...saved[t.dataset.photo!] }));
+  tiles.forEach((t) => picks.set(t.dataset.photo!, { marked: false, dir: 'libre', note: '', ...saved[t.dataset.photo!] }));
   const save = () => {
     try {
       localStorage.setItem(key, JSON.stringify(Object.fromEntries(picks)));
@@ -37,7 +35,7 @@ export function initChambre() {
   const eur = (n: number) =>
     new Intl.NumberFormat(S.locale, { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(n);
 
-  /* ---------- the grid and the bar ---------- */
+  /* ---------- the contact sheet and the bar ---------- */
   const quota = $('[data-quota]');
   const extra = $('[data-extra]');
   const send = $<HTMLAnchorElement>('[data-send]');
@@ -45,23 +43,21 @@ export function initChambre() {
 
   function paintTile(t: HTMLElement) {
     const p = picks.get(t.dataset.photo!)!;
-    t.dataset.look = p.look;
-    t.classList.toggle('is-kept', p.kept);
-    $<HTMLImageElement>('.top', t).style.opacity = String(p.amount / 100);
-    $('.tile-look', t).textContent = S.looks[p.look].name;
+    t.classList.toggle('is-marked', p.marked);
+    $('.tile-dir', t).textContent = S.directions[p.dir].name;
   }
 
   function paintBar() {
-    const kept = tiles.filter((t) => picks.get(t.dataset.photo!)!.kept);
-    const over = Math.max(0, kept.length - S.quota);
-    quota.textContent = S.quotaText.replace('{n}', num(Math.min(kept.length, S.quota))).replace('{total}', num(S.quota));
+    const marked = tiles.filter((t) => picks.get(t.dataset.photo!)!.marked);
+    const over = Math.max(0, marked.length - S.quota);
+    quota.textContent = S.quotaText.replace('{n}', num(Math.min(marked.length, S.quota))).replace('{total}', num(S.quota));
     extra.hidden = over === 0;
     extra.textContent = S.extraText.replace('{n}', num(over)).replace('{price}', eur(over * S.extraPrice));
-    send.setAttribute('aria-disabled', String(kept.length === 0));
+    send.setAttribute('aria-disabled', String(marked.length === 0));
 
-    const lines = kept.map((t) => {
+    const lines = marked.map((t) => {
       const p = picks.get(t.dataset.photo!)!;
-      return `• ${t.dataset.file} — ${S.looks[p.look].name} ${p.amount}%${p.note ? ` — ${p.note}` : ''}`;
+      return `• ${t.dataset.file} — ${S.directions[p.dir].name}${p.note ? ` — ${p.note}` : ''}`;
     });
     const subject = S.subject.replace('{name}', S.name);
     const body = `${S.mailIntro}\n${lines.join('\n')}${over ? `\n\n${extra.textContent}` : ''}`;
@@ -72,40 +68,38 @@ export function initChambre() {
   tiles.forEach(paintTile);
   paintBar();
 
-  /* ---------- the viewer ---------- */
+  /* ---------- the loupe ---------- */
   const viewer = $<HTMLDialogElement>('[data-viewer]');
   const stage = $('[data-stage]', viewer);
-  const vBase = $<HTMLImageElement>('[data-v-base]', viewer);
-  const vTop = $<HTMLImageElement>('[data-v-top]', viewer);
+  const frame = $('[data-v-frame]', viewer);
+  const img = $<HTMLImageElement>('[data-v-img]', viewer);
   const index = $('[data-index]', viewer);
-  const strength = $<HTMLInputElement>('[data-strength]', viewer);
+  const mark = $<HTMLButtonElement>('[data-mark]', viewer);
+  const markLabel = $('[data-mark-label]', viewer);
+  const dirs = $('[data-dirs]', viewer);
+  const dirButtons = $$<HTMLButtonElement>('[data-dir]', viewer);
   const note = $<HTMLInputElement>('[data-note]', viewer);
-  const keep = $<HTMLButtonElement>('[data-keep]', viewer);
-  const keepLabel = $('[data-keep-label]', viewer);
-  const lookButtons = $$<HTMLButtonElement>('[data-look]', viewer).filter((b) => b.classList.contains('v-look'));
   let current = 0;
 
   const pick = () => picks.get(tiles[current].dataset.photo!)!;
 
   function show(i: number) {
     current = (i + tiles.length) % tiles.length;
-    const t = tiles[current];
-    const src = $<HTMLImageElement>('.base', t).getAttribute('src')!.replace('-480.webp', '-1280.webp');
-    vBase.src = src;
-    vTop.src = src;
+    const src = $<HTMLImageElement>('img', tiles[current]).getAttribute('src')!.replace('-480.webp', '-1280.webp');
+    img.src = src;
     index.textContent = `${num(current + 1)} / ${num(tiles.length)}`;
     paintViewer();
   }
 
   function paintViewer() {
     const p = pick();
-    stage.dataset.look = p.look;
-    vTop.style.opacity = String(p.amount / 100);
-    strength.value = String(p.amount);
+    frame.classList.toggle('is-marked', p.marked);
+    mark.setAttribute('aria-pressed', String(p.marked));
+    markLabel.textContent = p.marked ? S.marked : S.mark;
+    dirs.hidden = !p.marked;
+    note.hidden = !p.marked;
+    dirButtons.forEach((b) => b.setAttribute('aria-checked', String(b.dataset.dir === p.dir)));
     note.value = p.note;
-    lookButtons.forEach((b) => b.setAttribute('aria-checked', String(b.dataset.look === p.look)));
-    keep.setAttribute('aria-pressed', String(p.kept));
-    keepLabel.textContent = p.kept ? S.kept : S.keep;
   }
 
   function changed() {
@@ -131,55 +125,45 @@ export function initChambre() {
     if (e.key === 'ArrowLeft') show(current + (rtl ? 1 : -1));
   });
 
-  lookButtons.forEach((b) =>
+  mark.addEventListener('click', () => {
+    pick().marked = !pick().marked;
+    changed();
+  });
+  dirButtons.forEach((b) =>
     b.addEventListener('click', () => {
-      pick().look = b.dataset.look as Look;
+      pick().dir = b.dataset.dir as Direction;
       changed();
     }),
   );
-  strength.addEventListener('input', () => {
-    pick().amount = Number(strength.value);
-    vTop.style.opacity = String(pick().amount / 100);
-  });
-  strength.addEventListener('change', changed);
   note.addEventListener('change', () => {
     pick().note = note.value.trim();
     changed();
   });
-  keep.addEventListener('click', () => {
-    pick().kept = !pick().kept;
-    changed();
-  });
 
-  // Swipe to the next photo; press and hold to see the original
+  // Swipe to the next proof; a double tap circles it
   let startX = 0;
   let startY = 0;
-  let holding = 0;
-  let moved = false;
+  let lastTap = 0;
   stage.addEventListener('pointerdown', (e) => {
-    if ((e.target as Element).closest('button')) return;
     startX = e.clientX;
     startY = e.clientY;
-    moved = false;
-    holding = window.setTimeout(() => {
-      if (!moved) vTop.style.opacity = '0';
-    }, 220);
   });
-  stage.addEventListener('pointermove', (e) => {
-    if (Math.abs(e.clientX - startX) > 10 || Math.abs(e.clientY - startY) > 10) moved = true;
-  });
-  const release = (e: PointerEvent) => {
-    clearTimeout(holding);
-    vTop.style.opacity = String(pick().amount / 100);
+  stage.addEventListener('pointerup', (e) => {
+    if ((e.target as Element).closest('button')) return;
     const dx = e.clientX - startX;
-    if (moved && Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(e.clientY - startY)) {
-      // a swipe towards the start edge shows the next photo
+    const dy = e.clientY - startY;
+    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) {
+      // a swipe towards the start edge shows the next proof
       show(current + (dx < 0 !== rtl ? 1 : -1));
+      return;
     }
-  };
-  stage.addEventListener('pointerup', release);
-  stage.addEventListener('pointercancel', () => {
-    clearTimeout(holding);
-    vTop.style.opacity = String(pick().amount / 100);
+    if (Math.abs(dx) < 10 && Math.abs(dy) < 10) {
+      const now = performance.now();
+      if (now - lastTap < 320) {
+        pick().marked = !pick().marked;
+        changed();
+        lastTap = 0;
+      } else lastTap = now;
+    }
   });
 }
