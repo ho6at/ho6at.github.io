@@ -1,8 +1,9 @@
-// La Chambre Noire contact sheet (components/Chambre.astro): circle favourite proofs, pick a direction for each,
-// add a note, then send the selection by email. Choices stay in this browser.
+// La Chambre Noire contact sheet (components/Chambre.astro): turn on the light table, open a negative to develop
+// it, circle favourite proofs, pick a direction for each, add a note, then send the selection by email.
+// Choices stay in this browser.
 
 type Direction = 'couleur' | 'noir' | 'libre';
-type Pick = { marked: boolean; dir: Direction; note: string };
+type Pick = { marked: boolean; dir: Direction; note: string; developed: boolean };
 type Strings = Record<string, string> & {
   directions: Record<Direction, { name: string; text: string }>;
   quota: number;
@@ -24,12 +25,29 @@ export function initChambre() {
   try {
     saved = JSON.parse(localStorage.getItem(key) || '{}');
   } catch {}
-  tiles.forEach((t) => picks.set(t.dataset.photo!, { marked: false, dir: 'libre', note: '', ...saved[t.dataset.photo!] }));
+  tiles.forEach((t) => picks.set(t.dataset.photo!, { marked: false, dir: 'libre', note: '', developed: false, ...saved[t.dataset.photo!] }));
   const save = () => {
     try {
       localStorage.setItem(key, JSON.stringify(Object.fromEntries(picks)));
     } catch {}
   };
+
+  /* ---------- the entrance: the safelight, then the light table ---------- */
+  const safelight = $('[data-safelight]');
+  const lit = () => {
+    try {
+      return sessionStorage.getItem(`${key}-lit`) === '1';
+    } catch {
+      return false;
+    }
+  };
+  if (lit()) safelight.classList.add('off');
+  $('[data-lights]', safelight).addEventListener('click', () => {
+    safelight.classList.add('off');
+    try {
+      sessionStorage.setItem(`${key}-lit`, '1');
+    } catch {}
+  });
 
   const num = (n: number) => n.toLocaleString(S.locale);
   const eur = (n: number) =>
@@ -44,6 +62,7 @@ export function initChambre() {
   function paintTile(t: HTMLElement) {
     const p = picks.get(t.dataset.photo!)!;
     t.classList.toggle('is-marked', p.marked);
+    t.classList.toggle('is-developed', p.developed);
     $('.tile-dir', t).textContent = S.directions[p.dir].name;
   }
 
@@ -73,6 +92,7 @@ export function initChambre() {
   const stage = $('[data-stage]', viewer);
   const frame = $('[data-v-frame]', viewer);
   const img = $<HTMLImageElement>('[data-v-img]', viewer);
+  const neg = $<HTMLImageElement>('[data-v-neg]', viewer);
   const index = $('[data-index]', viewer);
   const mark = $<HTMLButtonElement>('[data-mark]', viewer);
   const markLabel = $('[data-mark-label]', viewer);
@@ -87,6 +107,19 @@ export function initChambre() {
     current = (i + tiles.length) % tiles.length;
     const src = $<HTMLImageElement>('img', tiles[current]).getAttribute('src')!.replace('-480.webp', '-1280.webp');
     img.src = src;
+    neg.src = src;
+    // a negative develops the first time it is opened; afterwards it opens already developed
+    const p = pick();
+    frame.classList.toggle('instant', p.developed);
+    frame.classList.toggle('is-developed', p.developed);
+    if (!p.developed) {
+      void frame.offsetWidth;
+      frame.classList.remove('instant');
+      setTimeout(() => frame.classList.add('is-developed'), 250);
+      p.developed = true;
+      paintTile(tiles[current]);
+      save();
+    }
     index.textContent = `${num(current + 1)} / ${num(tiles.length)}`;
     paintViewer();
   }

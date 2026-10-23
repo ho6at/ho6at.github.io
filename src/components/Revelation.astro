@@ -1,7 +1,7 @@
 ---
 // La Chambre Noire, the delivery ("révélation"): the finished photos, one under the other, each surfacing like a
-// print in the developer as it scrolls into view (a pale veil fades away; opacity and transform only), signed by
-// the photographer.
+// print in the developer as it scrolls into view (a pale veil fades away; opacity and transform only), hung to dry
+// on a line with a wooden peg, and signed by the photographer.
 import { chambre } from '../i18n/chambre';
 
 interface Props {
@@ -29,6 +29,7 @@ const base = `/chambre/${session.id}/`;
     {
       session.photos.map((p, i) => (
         <li class="print" data-print>
+          <span class="peg" aria-hidden="true" />
           <div class="print-frame">
             <img
               src={`${base}${p.id}-1280.webp`}
@@ -111,8 +112,37 @@ const base = `/chambre/${session.id}/`;
     display: grid;
     gap: clamp(3rem, 10vw, 5rem);
   }
+  /* the drying line and its wooden peg */
+  .print {
+    position: relative;
+    padding-top: 1.6rem;
+  }
+  .print::before {
+    content: '';
+    position: absolute;
+    top: 0.55rem;
+    left: calc(var(--gutter) * -1);
+    right: calc(var(--gutter) * -1);
+    height: 1px;
+    background: rgb(240 232 218 / 0.28);
+  }
+  .peg {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    z-index: 2;
+    width: 0.8rem;
+    height: 2.4rem;
+    margin-left: -0.4rem;
+    border-radius: 2px;
+    background: linear-gradient(90deg, #8a6440, #c49a6c 45%, #9c7349);
+    box-shadow: 0 2px 6px rgb(0 0 0 / 0.5);
+  }
   .print-frame {
     position: relative;
+    transform-origin: 50% 0;
+    transform: rotate(-1.4deg);
+    transition: transform 2.2s cubic-bezier(0.3, 1.6, 0.5, 1);
     overflow: hidden;
     border-radius: 3px;
     background: #f2ede4;
@@ -142,6 +172,9 @@ const base = `/chambre/${session.id}/`;
   }
   .print:global(.developed) .veil {
     opacity: 0;
+  }
+  .print:global(.developed) .print-frame {
+    transform: none;
   }
   .print-sign {
     display: flex;

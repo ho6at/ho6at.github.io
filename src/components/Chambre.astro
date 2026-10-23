@@ -3,6 +3,8 @@
 // circle their favourites with a red grease pencil (the package sets how many are included, more are extra) and
 // pick a direction for each: Couleur, Noir or Libre (the photographer's choice). Nothing is edited on the page;
 // the proofs are shown flat and marked "Épreuve", and the editing stays handwork in Lightroom.
+// The visit opens in the dark under a red safelight; the proofs then lie on a light table as negatives, and each
+// develops into a positive when opened.
 // Choices are kept in this browser (localStorage) and sent by email for now.
 import { site } from '../site';
 import { PRICES } from '../lib/pricing';
@@ -38,6 +40,13 @@ const loop = 'M52 6 C78 5 95 22 94 50 C93 79 74 95 47 94 C20 93 5 76 6 49 C7 23 
 ---
 
 <main class="chambre" data-chambre={JSON.stringify(strings)}>
+  <!-- The entrance: darkness and a red safelight, until the light table is turned on -->
+  <div class="safelight" data-safelight>
+    <span class="bulb" aria-hidden="true"></span>
+    <p>{c.enter}</p>
+    <button type="button" class="button lights" data-lights>{c.lights}</button>
+  </div>
+
   <header class="wrap ch-head">
     <a class="ch-logo" href={home} aria-label="Luminoor">
       <img src="/brand/luminoor-logo.png" alt="Luminoor Paris" width="556" height="166" />
@@ -75,7 +84,8 @@ const loop = 'M52 6 C78 5 95 22 94 50 C93 79 74 95 47 94 C20 93 5 76 6 49 C7 23 
         session.photos.map((p, i) => (
           <li class="tile" data-photo={p.id} data-file={p.file}>
             <button type="button" class="tile-open" data-open={i} aria-label={`${c.frame} ${i + 1}`}>
-              <img src={`${base}${p.id}-480.webp`} alt="" width={p.w} height={p.h} loading="lazy" decoding="async" />
+              <img class="pos" src={`${base}${p.id}-480.webp`} alt="" width={p.w} height={p.h} loading="lazy" decoding="async" />
+              <img class="neg" src={`${base}${p.id}-480.webp`} alt="" width={p.w} height={p.h} loading="lazy" decoding="async" />
               <span class="proof-mark" aria-hidden="true">{c.proof}</span>
               <svg class="loop" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
                 <path d={loop} />
@@ -119,7 +129,8 @@ const loop = 'M52 6 C78 5 95 22 94 50 C93 79 74 95 47 94 C20 93 5 76 6 49 C7 23 
     </div>
     <div class="v-stage" data-stage>
       <div class="v-frame" data-v-frame>
-        <img data-v-img alt="" />
+        <img class="pos" data-v-img alt="" />
+        <img class="neg" data-v-neg alt="" />
         <span class="proof-mark" aria-hidden="true">{c.proof}</span>
         <svg class="loop" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
           <path d={loop} />
@@ -160,6 +171,50 @@ const loop = 'M52 6 C78 5 95 22 94 50 C93 79 74 95 47 94 C20 93 5 76 6 49 C7 23 
 <style>
   .chambre {
     padding-bottom: 9rem;
+    /* the room: dark, with the red safelight still glowing at the top */
+    background: radial-gradient(70% 28rem at 50% 0%, rgb(150 24 14 / 0.22), transparent 70%), #080606;
+  }
+
+  /* the entrance */
+  .safelight {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 1.6rem;
+    padding: 2rem;
+    text-align: center;
+    background: radial-gradient(60% 45% at 50% 0%, rgb(190 30 18 / 0.5), transparent 72%), #070303;
+    color: #e3958a;
+    transition: opacity 0.9s var(--ease);
+  }
+  .safelight p {
+    font-size: 1.15rem;
+    letter-spacing: 0.02em;
+  }
+  .bulb {
+    position: absolute;
+    top: 1.2rem;
+    left: 50%;
+    width: 0.9rem;
+    height: 0.9rem;
+    margin-left: -0.45rem;
+    border-radius: 50%;
+    background: #ff4a33;
+    box-shadow:
+      0 0 18px 6px rgb(255 60 40 / 0.6),
+      0 0 80px 30px rgb(200 30 20 / 0.35);
+  }
+  .button.lights {
+    background: transparent;
+    color: #f2c9c2;
+    border: 1px solid rgb(230 120 105 / 0.55);
+  }
+  .safelight:global(.off) {
+    opacity: 0;
+    pointer-events: none;
   }
   .ch-head {
     padding-top: clamp(2rem, 6vw, 4rem);
@@ -260,11 +315,11 @@ const loop = 'M52 6 C78 5 95 22 94 50 C93 79 74 95 47 94 C20 93 5 76 6 49 C7 23 
     color: var(--muted);
   }
 
-  /* the contact sheet: dark film, frame numbers along the edge */
+  /* the contact sheet on a light table: film frames with sprocket holes, frame numbers along the edge */
   .sheet-film {
-    background: #0c0b0a;
-    border-block: 1px solid rgb(240 240 240 / 0.06);
-    padding-block: 1.5rem;
+    background: radial-gradient(ellipse at 50% 40%, #fbf8f1, #e6dfd1);
+    box-shadow: inset 0 0 70px rgb(0 0 0 / 0.22);
+    padding-block: 1.8rem;
   }
   .ch-grid {
     list-style: none;
@@ -277,14 +332,24 @@ const loop = 'M52 6 C78 5 95 22 94 50 C93 79 74 95 47 94 C20 93 5 76 6 49 C7 23 
     position: relative;
   }
   .tile-open {
+    --holes: repeating-linear-gradient(90deg, transparent 0 3px, rgb(246 240 228 / 0.9) 3px 7px, transparent 7px 10px);
     display: block;
     position: relative;
     width: 100%;
     padding: 0;
     border: 0;
-    background: #000;
+    background:
+      var(--holes) 0 3px / 100% 4px no-repeat,
+      var(--holes) 0 calc(100% - 3px) / 100% 4px no-repeat,
+      #15120f;
     cursor: zoom-in;
-    aspect-ratio: 2 / 3;
+    aspect-ratio: 2 / 3.25;
+    box-shadow: 0 6px 18px -8px rgb(0 0 0 / 0.5);
+  }
+  .tile .tile-open img {
+    inset: 10px 4px;
+    width: calc(100% - 8px);
+    height: calc(100% - 20px);
   }
   .tile-open img,
   .v-frame img {
@@ -299,10 +364,23 @@ const loop = 'M52 6 C78 5 95 22 94 50 C93 79 74 95 47 94 C20 93 5 76 6 49 C7 23 
   .v-frame img {
     object-fit: contain;
   }
+  /* a negative over each proof: colours inverted on the orange of film, until it develops */
+  .tile-open img.neg,
+  .v-frame img.neg {
+    filter: invert(1) sepia(0.6) saturate(2.3) hue-rotate(-14deg) brightness(0.88) contrast(0.92);
+    transition: opacity 1.4s cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+  .tile:global(.is-developed) img.neg,
+  .v-frame:global(.is-developed) img.neg {
+    opacity: 0;
+  }
+  .v-frame:global(.instant) img.neg {
+    transition: none;
+  }
   .proof-mark {
     position: absolute;
-    left: 0.5rem;
-    bottom: 0.45rem;
+    left: 0.6rem;
+    bottom: 0.9rem;
     font-size: 0.55rem;
     letter-spacing: 0.3em;
     text-transform: uppercase;
@@ -341,7 +419,7 @@ const loop = 'M52 6 C78 5 95 22 94 50 C93 79 74 95 47 94 C20 93 5 76 6 49 C7 23 
     margin-top: 0.3rem;
     font-size: 0.6rem;
     letter-spacing: 0.12em;
-    color: rgb(214 168 82 / 0.75);
+    color: rgb(120 78 28 / 0.85);
     font-variant-numeric: tabular-nums;
   }
   .tile-dir {
@@ -604,6 +682,9 @@ const loop = 'M52 6 C78 5 95 22 94 50 C93 79 74 95 47 94 C20 93 5 76 6 49 C7 23 
   }
   @media (prefers-reduced-motion: reduce) {
     .loop,
+    .safelight,
+    .tile-open img.neg,
+    .v-frame img.neg,
     .viewer[open] {
       transition: none;
       animation: none;
