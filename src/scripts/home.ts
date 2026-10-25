@@ -76,9 +76,9 @@ else {
     const ticks = $$('.vf-ticks li', track);
     const hint = $('[data-vf-hint]', track);
     const pad = (k: number) => String(k).padStart(2, '0');
-    const blurs = $$<HTMLImageElement>('.vf-blur', track);
-    // a new frame: the flash fires, the old photo is gone at once, the soft copy of the new one shows, the sharp
-    // photo fades in over it, and the focus square lands on the face, locks and fades
+    const slides = $$('.vf-slide', track);
+    // a new frame: the lens hunts for focus (soft, almost sharp, soft again, sharp) while the focus square lands
+    // on the face, locks and fades
     const play = (i: number) => {
       const [fx, fy] = (shots[i].dataset.focus || '0.5 0.45').split(' ');
       frame.style.setProperty('--fx', fx);
@@ -97,13 +97,8 @@ else {
     };
     const take = (i: number) => {
       if (i === current) return;
-      shots[current].classList.add('cut');
-      shots[current].classList.remove('on');
-      void shots[current].offsetWidth;
-      shots[current].classList.remove('cut');
       current = i;
-      blurs.forEach((b, k) => b.classList.toggle('on', k === i));
-      shots[i].classList.add('on');
+      slides.forEach((s, k) => s.classList.toggle('on', k === i));
       ticks.forEach((t, k) => t.classList.toggle('on', k <= i));
       n.textContent = pad(i + 1);
       placeEl.textContent = shots[i].dataset.place!;

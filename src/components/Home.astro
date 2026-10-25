@@ -88,7 +88,7 @@ const strings = {
 
   <!-- Gallery: «Le Viseur», a paparazzi's viewfinder; scrolling down takes the next frame, a tap opens it full screen -->
   <section class="section gallery-section" id="gallery">
-    <!-- The viewfinder stays in place while scrolling; each step of the scroll is a new frame, with a flash -->
+    <!-- The viewfinder stays in place while scrolling; each step of the scroll is a new frame, found in focus -->
     <div class="vf-track" data-viseur style={`--n: ${galleryPhotos.length}`}>
       {/* a stopping point for each frame after the first, so one swipe or wheel turn moves one frame only */}
       {galleryPhotos.slice(1).map((_, k) => <span class="vf-stop" style={`--k: ${k + 1}`} aria-hidden="true" />)}
@@ -99,37 +99,35 @@ const strings = {
         </div>
         <div class="vf-frame" data-vf-frame tabindex="0" role="button" aria-label={t.gallery.title}>
           {
-            galleryPhotos.map((ph, i) => (
-              <img class:list={['vf-blur', { on: i === 0 }]} src={`/photos/${ph.id}-blur.webp`} alt="" aria-hidden="true" />
-            ))
-          }
-          {
             galleryPhotos.map((ph, i) => {
               const item = t.gallery.items[ph.id];
               return (
-                <img
-                  class:list={['vf-img', { on: i === 0 }]}
-                  src={src(ph.id)}
-                  srcset={srcset(ph.id)}
-                  sizes="(max-width: 700px) 92vw, 60vh"
-                  width={ph.w}
-                  height={ph.h}
-                  alt={item.alt}
-                  loading={i < 2 ? 'eager' : 'lazy'}
-                  decoding="async"
-                  data-full={srcset(ph.id)}
-                  data-place={item.place}
-                  data-light={t.light.names[ph.light]}
-                  data-focus={'focus' in ph ? ph.focus.join(' ') : '0.5 0.45'}
-                  data-focus2={'focus2' in ph ? ph.focus2.join(' ') : undefined}
-                />
+                <div class:list={['vf-slide', { on: i === 0 }]}>
+                  <img class="vf-blur" src={`/photos/${ph.id}-blur.webp`} alt="" aria-hidden="true" />
+                  <img class="vf-soft" src={`/photos/${ph.id}-soft.webp`} alt="" aria-hidden="true" />
+                  <img
+                    class="vf-img"
+                    src={src(ph.id)}
+                    srcset={srcset(ph.id)}
+                    sizes="(max-width: 700px) 92vw, 60vh"
+                    width={ph.w}
+                    height={ph.h}
+                    alt={item.alt}
+                    loading={i < 2 ? 'eager' : 'lazy'}
+                    decoding="async"
+                    data-full={srcset(ph.id)}
+                    data-place={item.place}
+                    data-light={t.light.names[ph.light]}
+                    data-focus={'focus' in ph ? ph.focus.join(' ') : '0.5 0.45'}
+                    data-focus2={'focus2' in ph ? ph.focus2.join(' ') : undefined}
+                  />
+                </div>
               );
             })
           }
           <span class="vf-corners" aria-hidden="true"></span>
           <span class="vf-focus" aria-hidden="true"></span>
           <span class="vf-focus second" aria-hidden="true"></span>
-          <span class="vf-flash" data-vf-flash aria-hidden="true"></span>
         </div>
         <div class="vf-bar">
           <p class="vf-info">
@@ -747,7 +745,7 @@ const strings = {
   }
 
   /* Gallery: «Le Viseur». The track is tall; the viewfinder stays put inside it while the page scrolls, and
-     scripts/home.ts shows the frame for the current part of the track (opacity only, with a short flash). */
+     scripts/home.ts shows the frame for the current part of the track, and the lens finds its focus. */
   .vf-track {
     position: relative;
     height: calc(var(--n) * 38svh + 100svh);
@@ -801,28 +799,79 @@ const strings = {
     background: #000;
     cursor: zoom-in;
     outline: none;
+    overflow: hidden;
   }
-  /* each frame: a soft out-of-focus copy first, then the sharp photo fading in over it, like a lens finding focus */
-  .vf-img,
-  .vf-blur {
+  /* each frame finds its focus like a real lens: three levels of the same photo (very soft, half sharp, sharp)
+     cross-fade as the autofocus hunts (almost sharp, overshoots back to soft, then locks), while the picture
+     "breathes" a little in size. Opacity and scale only, so it stays smooth in Safari. */
+  .vf-slide {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+  }
+  .vf-slide:global(.on) {
+    opacity: 1;
+  }
+  .vf-slide img {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
+  }
+  .vf-soft {
     opacity: 0;
   }
-  .vf-blur:global(.on) {
-    opacity: 1;
+  .vf-frame:global(.shot) .vf-slide:global(.on) {
+    animation: vf-breathe 1.6s cubic-bezier(0.3, 0.7, 0.3, 1) both;
   }
-  .vf-img {
-    transition: opacity 1.15s cubic-bezier(0.45, 0, 0.2, 1) 0.18s;
+  .vf-frame:global(.shot) .vf-slide:global(.on) .vf-soft {
+    animation: vf-soft 1.6s linear both;
   }
-  .vf-img:global(.on) {
-    opacity: 1;
+  .vf-frame:global(.shot) .vf-slide:global(.on) .vf-img {
+    animation: vf-sharp 1.6s linear both;
   }
-  .vf-img:global(.cut) {
-    transition: none;
+  @keyframes vf-breathe {
+    0% {
+      transform: scale(1.045);
+    }
+    45% {
+      transform: scale(0.994);
+    }
+    70% {
+      transform: scale(1.006);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  @keyframes vf-soft {
+    0%,
+    8% {
+      opacity: 0;
+    }
+    26% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+  @keyframes vf-sharp {
+    0%,
+    24% {
+      opacity: 0;
+    }
+    40% {
+      opacity: 0.92;
+    }
+    54% {
+      opacity: 0.25;
+    }
+    76%,
+    100% {
+      opacity: 1;
+    }
   }
   /* the viewfinder: four corner marks a little outside the picture, and a focus square in the middle */
   .vf-corners {
@@ -896,31 +945,6 @@ const strings = {
       transform: scale(1);
     }
   }
-  .vf-flash {
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(circle at 50% 45%, #fff, #f6efe2 70%);
-    opacity: 0;
-    pointer-events: none;
-  }
-  /* a real flash: a near-instant burst, then a slow fall-off */
-  .vf-frame:global(.shot) .vf-flash {
-    animation: vf-flash 1s cubic-bezier(0.2, 0.6, 0.3, 1);
-  }
-  @keyframes vf-flash {
-    0% {
-      opacity: 0;
-    }
-    4% {
-      opacity: 0.95;
-    }
-    12% {
-      opacity: 0.7;
-    }
-    to {
-      opacity: 0;
-    }
-  }
   /* the line of camera information under the frame, and a tick per frame */
   .vf-bar {
     width: min(100%, calc(var(--fh) * 2 / 3));
@@ -982,11 +1006,8 @@ const strings = {
     }
   }
   @media (prefers-reduced-motion: reduce) {
-    .vf-img,
-    .vf-blur {
-      transition: none;
-    }
-    .vf-frame:global(.shot) .vf-flash,
+    .vf-frame:global(.shot) .vf-slide:global(.on),
+    .vf-frame:global(.shot) .vf-slide:global(.on) img,
     .vf-frame:global(.shot) .vf-focus {
       animation: none;
     }
