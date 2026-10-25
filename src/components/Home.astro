@@ -86,7 +86,7 @@ const strings = {
 
   </section>
 
-  <!-- Gallery: real sessions, in a film strip on phones and an editorial grid on wider screens -->
+  <!-- Gallery: real sessions in a grid that scrolls down; a tap opens a photo full screen -->
   <section class="section" id="gallery">
     <div class="wrap head">
       <h2>{t.gallery.title}</h2>
@@ -105,12 +105,22 @@ const strings = {
       {
         galleryPhotos.map((ph) => {
           const item = t.gallery.items[ph.id];
+          const wide = ph.w > ph.h;
           return (
-            <figure class="shot" data-kind={ph.kind} data-bw={'bw' in ph ? '1' : undefined}>
+            <figure
+              class:list={['shot', { wide }]}
+              data-kind={ph.kind}
+              data-bw={'bw' in ph ? '1' : undefined}
+              data-full={srcset(ph.id)}
+              data-place={item.place}
+              data-light={t.light.names[ph.light]}
+              tabindex="0"
+              role="button"
+            >
               <img
                 src={src(ph.id)}
                 srcset={srcset(ph.id)}
-                sizes={ph.w > ph.h ? "(max-width: 700px) 176vw, 96vh" : "(max-width: 700px) 78vw, 43vh"}
+                sizes={wide ? '(max-width: 700px) 92vw, 800px' : '(max-width: 700px) 46vw, 400px'}
                 width={ph.w}
                 height={ph.h}
                 alt={item.alt}
@@ -126,15 +136,26 @@ const strings = {
         })
       }
     </div>
-    <div class="wrap strip-nav">
-      <p class="counter" aria-hidden="true" dir="ltr"><b data-count-now></b> / <span data-count-total></span></p>
-      <button type="button" class="strip-btn" data-strip="-1" tabindex="-1">
+    <!-- A photo, full screen -->
+    <dialog class="lightbox" data-lightbox aria-label={t.gallery.title}>
+      <button type="button" class="lb-btn lb-close" data-lb-close aria-label={t.sessions.close}>
+        <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"></path></svg>
+      </button>
+      <figure class="lb-figure" data-lb-stage>
+        <img data-lb-img alt="" sizes="100vw" />
+        <figcaption>
+          <span class="shot-light" data-lb-light></span>
+          <span data-lb-place></span>
+          <span class="lb-count" data-lb-count dir="ltr"></span>
+        </figcaption>
+      </figure>
+      <button type="button" class="lb-btn lb-nav prev" data-lb-step="-1" aria-label={t.sessions.back}>
         <svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"></path></svg>
       </button>
-      <button type="button" class="strip-btn" data-strip="1" tabindex="-1">
+      <button type="button" class="lb-btn lb-nav next" data-lb-step="1" aria-label={t.sessions.next}>
         <svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"></path></svg>
       </button>
-    </div>
+    </dialog>
   </section>
 
   <!-- How it works: the paparazzi idea in three steps -->
@@ -711,34 +732,41 @@ const strings = {
     }
   }
 
-  /* Gallery: a film strip of tall photos that slides sideways */
+  /* Gallery: a grid that scrolls down, two columns on phones and three on wider screens;
+     landscape photos span two columns */
   .gallery {
-    display: flex;
-    gap: 1rem;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    scroll-padding-inline: var(--gutter);
-    scrollbar-width: none;
-    overscroll-behavior-x: contain;
-  }
-  .gallery::-webkit-scrollbar {
-    display: none;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.75rem;
+    grid-auto-flow: dense;
   }
   .shot {
     position: relative;
-    flex: none;
-    height: clamp(22rem, 64vh, 40rem);
     margin: 0;
     border-radius: 6px;
     overflow: hidden;
     background: var(--raised);
-    scroll-snap-align: start;
+    aspect-ratio: 2 / 3;
+    cursor: zoom-in;
+  }
+  .shot.wide {
+    grid-column: span 2;
+    /* two columns wide and as tall as its neighbours */
+    aspect-ratio: auto;
   }
   .shot img {
     display: block;
+    width: 100%;
     height: 100%;
-    width: auto;
+    object-fit: cover;
     transition: transform 1.2s var(--ease);
+  }
+  .shot:focus-visible {
+    outline: 2px solid #e6d6bd;
+    outline-offset: 2px;
+  }
+  .shot[hidden] {
+    display: none;
   }
   /* a viewfinder's corner marks close in on the photo under the pointer */
   .shot::after {
@@ -767,19 +795,150 @@ const strings = {
     inset: auto 0 0;
     display: flex;
     flex-wrap: wrap;
-    gap: 0.2rem 0.7rem;
+    gap: 0.1rem 0.6rem;
     align-items: baseline;
-    padding: 2.5rem 1.2rem 1.1rem;
+    padding: 2.2rem 0.9rem 0.8rem;
     background: linear-gradient(transparent, rgb(5 5 5 / 0.75));
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     color: rgb(240 240 240 / 0.88);
   }
   .shot-light {
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     letter-spacing: 0.2em;
     text-transform: uppercase;
     color: #e6d6bd;
   }
+  @media (hover: hover) {
+    .shot:hover img {
+      transform: scale(1.03);
+    }
+    .shot:hover::after {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @media (max-width: 700px) {
+    .gallery {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.5rem;
+    }
+    .shot.wide {
+      aspect-ratio: 3 / 2;
+    }
+    .shot figcaption {
+      padding: 1.6rem 0.6rem 0.55rem;
+      font-size: 0.7rem;
+    }
+    .shot-light {
+      display: none;
+    }
+  }
+
+  /* the photo, full screen */
+  .lightbox {
+    width: 100vw;
+    max-width: none;
+    height: 100dvh;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: #050505;
+    color: var(--ivory);
+    overflow: hidden;
+  }
+  .lightbox[open] {
+    display: grid;
+    place-items: center;
+    animation: lb-in 0.35s var(--ease);
+  }
+  @keyframes lb-in {
+    from {
+      opacity: 0;
+    }
+  }
+  .lightbox::backdrop {
+    background: #050505;
+  }
+  .lb-figure {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-rows: minmax(0, 1fr) auto;
+    padding: 3.8rem 0.75rem max(1rem, env(safe-area-inset-bottom));
+    touch-action: pan-y;
+  }
+  .lb-figure img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transition: opacity 0.25s var(--ease);
+  }
+  .lb-figure img:global(.fading) {
+    opacity: 0;
+  }
+  .lb-figure figcaption {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: baseline;
+    gap: 0.3rem 0.8rem;
+    padding-top: 0.9rem;
+    font-size: 0.9rem;
+    color: rgb(240 240 240 / 0.85);
+    text-align: center;
+  }
+  .lb-count {
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+  }
+  .lb-btn {
+    position: absolute;
+    width: 2.8rem;
+    height: 2.8rem;
+    border-radius: 50%;
+    border: 1px solid var(--line);
+    background: rgb(240 240 240 / 0.06);
+    color: var(--ivory);
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+  }
+  .lb-btn svg {
+    width: 1.1rem;
+    height: 1.1rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .lb-close {
+    top: 0.8rem;
+    inset-inline-end: 0.8rem;
+  }
+  .lb-nav {
+    top: 50%;
+    margin-top: -1.4rem;
+    display: none;
+  }
+  .lb-nav.prev {
+    inset-inline-start: 1rem;
+  }
+  .lb-nav.next {
+    inset-inline-end: 1rem;
+  }
+  :global([dir='rtl']) .lb-nav svg {
+    transform: scaleX(-1);
+  }
+  @media (hover: hover) {
+    .lb-nav {
+      display: grid;
+    }
+  }
+
   /* filters: couples, solo, black and white */
   .filters {
     display: flex;
@@ -819,85 +978,6 @@ const strings = {
     opacity: 0;
     transform: translateY(8px);
   }
-  .shot[hidden] {
-    display: none;
-  }
-  /* a film counter: which frame you are on */
-  .counter {
-    margin-inline-end: auto;
-    font-size: 0.85rem;
-    letter-spacing: 0.15em;
-    color: var(--muted);
-    font-variant-numeric: tabular-nums;
-  }
-  .counter b {
-    font-weight: 400;
-    color: #e6d6bd;
-  }
-  .strip-nav {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 0.6rem;
-    margin-top: 1.25rem;
-  }
-  .strip-btn {
-    display: none;
-    width: 2.9rem;
-    height: 2.9rem;
-    border-radius: 50%;
-    border: 1px solid var(--line);
-    background: rgb(240 240 240 / 0.04);
-    color: var(--ivory);
-    cursor: pointer;
-    display: grid;
-    place-items: center;
-    transition:
-      background 0.3s var(--ease),
-      border-color 0.3s var(--ease);
-  }
-  .strip-btn:hover {
-    background: rgb(240 240 240 / 0.1);
-    border-color: var(--line-strong);
-  }
-  .strip-btn svg {
-    width: 1.1rem;
-    height: 1.1rem;
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 1.5;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
-  :global([dir='rtl']) .strip-btn svg {
-    transform: scaleX(-1);
-  }
-  @media (hover: hover) {
-    .shot:hover img {
-      transform: scale(1.03);
-    }
-    .shot:hover::after {
-      opacity: 1;
-      transform: none;
-    }
-    .strip-btn {
-      display: grid;
-    }
-  }
-  /* phones: each photo takes most of the width, the next one peeking in */
-  @media (max-width: 700px) {
-    .shot {
-      flex: 0 0 78%;
-      height: auto;
-    }
-    .shot img {
-      width: 100%;
-      height: auto;
-      aspect-ratio: 2 / 3;
-      object-fit: cover;
-    }
-  }
-
   .note {
     margin-top: 1.75rem;
     font-size: 0.95rem;

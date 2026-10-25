@@ -64,73 +64,90 @@ else {
   watch.observe(root, { attributes: true, attributeFilter: ['class'] });
 }
 
-/* ---------- Gallery strip: filters, frame counter, previous / next for mouse users ---------- */
+/* ---------- Gallery: filters, and a photo full screen on tap ---------- */
 {
-  const strip = document.querySelector<HTMLElement>('[data-gallery]');
-  const shots = strip ? $$<HTMLElement>('.shot', strip) : [];
-  const now = document.querySelector<HTMLElement>('[data-count-now]');
-  const total = document.querySelector<HTMLElement>('[data-count-total]');
-  const pad = (n: number) => n.toString().padStart(2, '0').replace(/\d/g, (d) => Number(d).toLocaleString(S.locale));
+  const grid = document.querySelector<HTMLElement>('[data-gallery]');
+  const shots = grid ? $$<HTMLElement>('.shot', grid) : [];
   const visible = () => shots.filter((s) => !s.hidden);
-  // the frame nearest the strip's start edge
-  const count = () => {
-    if (!strip || !now || !total) return;
-    const shown = visible();
-    const edge = document.dir === 'rtl' ? strip.getBoundingClientRect().right : strip.getBoundingClientRect().left;
-    let best = 0;
-    let dist = Infinity;
-    shown.forEach((s, i) => {
-      const r = s.getBoundingClientRect();
-      const d = Math.abs((document.dir === 'rtl' ? r.right : r.left) - edge);
-      if (d < dist) [dist, best] = [d, i];
-    });
-    now.textContent = pad(best + 1);
-    total.textContent = pad(shown.length);
-  };
-  let ticking = false;
-  strip?.addEventListener(
-    'scroll',
-    () => {
-      if (ticking) return;
-      ticking = true;
-      requestAnimationFrame(() => {
-        ticking = false;
-        count();
-      });
-    },
-    { passive: true },
-  );
-  count();
 
   $$<HTMLButtonElement>('[data-filter]').forEach((b) =>
     b.addEventListener('click', () => {
-      if (!strip || b.getAttribute('aria-pressed') === 'true') return;
+      if (!grid || b.getAttribute('aria-pressed') === 'true') return;
       $$('[data-filter]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
       const f = b.dataset.filter;
       const apply = () => {
         shots.forEach((s) => {
           s.hidden = !(f === 'all' || (f === 'bw' ? s.dataset.bw === '1' : s.dataset.kind === f));
         });
-        strip.scrollLeft = 0;
-        count();
-        strip.classList.remove('switching');
+        grid.classList.remove('switching');
       };
       if (reduceMotion) return apply();
-      strip.classList.add('switching');
+      grid.classList.add('switching');
       setTimeout(apply, 250);
     }),
   );
 
-  $$<HTMLButtonElement>('[data-strip]').forEach((b) =>
-    b.addEventListener('click', () => {
-      if (!strip) return;
-      const card = strip.querySelector<HTMLElement>('.shot:not([hidden])');
-      const step = (card?.offsetWidth ?? 300) + 16;
-      // in Persian the strip runs right to left, so "next" scrolls the other way
-      const dir = Number(b.dataset.strip) * (document.dir === 'rtl' ? -1 : 1);
-      strip.scrollBy({ left: dir * step, behavior: reduceMotion ? 'auto' : 'smooth' });
-    }),
-  );
+  const box = document.querySelector<HTMLDialogElement>('[data-lightbox]');
+  if (box) {
+    const img = $<HTMLImageElement>('[data-lb-img]', box);
+    const light = $('[data-lb-light]', box);
+    const place = $('[data-lb-place]', box);
+    const count = $('[data-lb-count]', box);
+    let list: HTMLElement[] = [];
+    let at = 0;
+    const show = (i: number) => {
+      at = (i + list.length) % list.length;
+      const s = list[at];
+      const set = () => {
+        img.srcset = s.dataset.full!;
+        img.alt = $<HTMLImageElement>('img', s).alt;
+        light.textContent = s.dataset.light!;
+        place.textContent = s.dataset.place!;
+        count.textContent = `${(at + 1).toLocaleString(S.locale)} / ${list.length.toLocaleString(S.locale)}`;
+        img.classList.remove('fading');
+      };
+      if (!box.open || reduceMotion) return set();
+      img.classList.add('fading');
+      setTimeout(set, 200);
+    };
+    const open = (s: HTMLElement) => {
+      list = visible();
+      show(list.indexOf(s));
+      box.showModal();
+    };
+    shots.forEach((s) => {
+      s.addEventListener('click', () => open(s));
+      s.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          open(s);
+        }
+      });
+    });
+    $('[data-lb-close]', box).addEventListener('click', () => box.close());
+    $$<HTMLButtonElement>('[data-lb-step]', box).forEach((b) =>
+      b.addEventListener('click', () => show(at + Number(b.dataset.lbStep))),
+    );
+    const rtl = document.dir === 'rtl';
+    box.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight') show(at + (rtl ? -1 : 1));
+      if (e.key === 'ArrowLeft') show(at + (rtl ? 1 : -1));
+    });
+    // swipe sideways for the next photo, down to close
+    let x0 = 0;
+    let y0 = 0;
+    const stage = $('[data-lb-stage]', box);
+    stage.addEventListener('pointerdown', (e) => {
+      x0 = e.clientX;
+      y0 = e.clientY;
+    });
+    stage.addEventListener('pointerup', (e) => {
+      const dx = e.clientX - x0;
+      const dy = e.clientY - y0;
+      if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) show(at + (dx < 0 !== rtl ? 1 : -1));
+      else if (dy > 90 && Math.abs(dy) > Math.abs(dx)) box.close();
+    });
+  }
 }
 
 /* ---------- Gliding between sections ---------- */
