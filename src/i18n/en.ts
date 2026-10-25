@@ -41,6 +41,7 @@ const en: typeof fr = {
     filters: { all: 'All', couple: 'Couples', solo: 'Solo', bw: 'Black & white' },
     items: {
       'couple-night-run': { alt: 'A couple running hand in hand across a Paris street at night, in black and white', place: 'A Haussmann street' },
+      'rain': { alt: 'A lone figure under an umbrella at the end of a rain-soaked street, shop lights reflected on the pavement', place: 'In the rain' },
       'mist': { alt: 'A woman in white standing in a cloud of mist beneath a Parisian rotunda', place: 'In the mist' },
       'window-diner': { alt: 'A man dining alone behind a restaurant window lettered “Plats à emporter”, in black and white', place: 'A restaurant window' },
       'louvre-arch': { alt: 'A couple in silhouette, foreheads touching, under the Passage Richelieu arch facing the Louvre pyramid, the crowd blurring past, in black and white', place: 'Passage Richelieu, Louvre' },

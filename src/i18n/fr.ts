@@ -39,6 +39,7 @@ export default {
     filters: { all: 'Tout', couple: 'Couples', solo: 'Solo', bw: 'Noir & blanc' },
     items: {
       'couple-night-run': { alt: 'Un couple traverse une rue de Paris en courant main dans la main, la nuit, en noir et blanc', place: 'Une rue haussmannienne' },
+      'rain': { alt: 'Une silhouette sous un parapluie au bout d’une rue trempée, les vitrines reflétées sur le trottoir', place: 'Sous la pluie' },
       'mist': { alt: 'Une femme en blanc debout dans un nuage de brume, sous une rotonde parisienne', place: 'Dans la brume' },
       'window-diner': { alt: 'Un homme dîne seul derrière une vitrine de restaurant marquée « Plats à emporter », en noir et blanc', place: 'Une vitrine de restaurant' },
       'louvre-arch': { alt: 'Un couple en silhouette, front contre front, sous l’arche du passage Richelieu face à la pyramide du Louvre, la foule floue autour d’eux, en noir et blanc', place: 'Passage Richelieu, Louvre' },
