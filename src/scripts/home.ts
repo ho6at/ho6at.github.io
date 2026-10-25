@@ -128,6 +128,8 @@ else {
         ticking = false;
         const r = track.getBoundingClientRect();
         const run = r.height - window.innerHeight;
+        // while the viewfinder fills the screen, the header and the tab bar step aside
+        root.classList.toggle('immersive', r.top <= 1 && r.bottom >= window.innerHeight - 1);
         const p = Math.min(1, Math.max(0, -r.top / run));
         // the first frame changes after only a short scroll, the rest are spread evenly
         take(Math.min(shots.length - 1, Math.floor(p * (shots.length - 1) + 0.75)));
@@ -204,7 +206,8 @@ else {
 const snapPoint = (el: HTMLElement) =>
   Math.max(0, Math.round(el.getBoundingClientRect().top + window.scrollY - parseFloat(getComputedStyle(el).scrollMarginTop || '0')));
 const stops = () => {
-  const list = $$<HTMLElement>('main > .hero, main > .section, main > .contact').map(snapPoint);
+  // the sections, and each frame of the gallery's viewfinder
+  const list = $$<HTMLElement>('main > .hero, main > .section, main > .contact, .vf-stop').map(snapPoint);
   list.push(Math.round(document.documentElement.scrollHeight - window.innerHeight)); // the very bottom
   return list.sort((a, b) => a - b);
 };

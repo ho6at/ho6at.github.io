@@ -90,6 +90,8 @@ const strings = {
   <section class="section gallery-section" id="gallery">
     <!-- The viewfinder stays in place while scrolling; each step of the scroll is a new frame, with a flash -->
     <div class="vf-track" data-viseur style={`--n: ${galleryPhotos.length}`}>
+      {/* a stopping point for each frame after the first, so one swipe or wheel turn moves one frame only */}
+      {galleryPhotos.slice(1).map((_, k) => <span class="vf-stop" style={`--k: ${k + 1}`} aria-hidden="true" />)}
       <div class="viseur">
         <div class="vf-head">
           <h2>{t.gallery.title}</h2>
@@ -394,7 +396,13 @@ const strings = {
     position: fixed;
     inset: 0 0 auto;
     z-index: 20;
-    transition: background 0.5s var(--ease);
+    transition:
+      background 0.5s var(--ease),
+      transform 0.5s var(--ease);
+  }
+  /* inside the viewfinder the header and the tab bar slide away (scripts/home.ts sets html.immersive) */
+  :global(html.immersive) .top {
+    transform: translateY(-110%);
   }
   .top:global(.scrolled) {
     background: rgb(10 10 10 / 0.6);
@@ -744,6 +752,16 @@ const strings = {
     position: relative;
     height: calc(var(--n) * 38svh + 100svh);
   }
+  .vf-stop {
+    position: absolute;
+    left: 0;
+    width: 1px;
+    height: 1px;
+    top: calc(var(--n) * 38svh * (var(--k) - 0.25) / (var(--n) - 1));
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    pointer-events: none;
+  }
   .viseur {
     position: sticky;
     top: 0;
@@ -752,9 +770,9 @@ const strings = {
     align-content: center;
     justify-items: center;
     gap: 0.9rem;
-    padding: 4.3rem 0.75rem 6rem;
+    padding: 1.2rem 0.75rem 1.4rem;
     /* the frame's height, shared with the information bar under it */
-    --fh: min(57svh, calc((100vw - 1.5rem - 1.4rem) * 1.5));
+    --fh: min(calc(100svh - 13rem), calc((100vw - 1.5rem) * 1.5));
   }
   /* the section starts right on the viewfinder: its title sits on the same screen */
   .gallery-section {
@@ -810,7 +828,7 @@ const strings = {
   .vf-corners {
     --c: rgb(240 232 218 / 0.9);
     position: absolute;
-    inset: -0.7rem;
+    inset: 0.7rem;
     background:
       linear-gradient(var(--c), var(--c)) top left / 1.6rem 1.5px no-repeat,
       linear-gradient(var(--c), var(--c)) top left / 1.5px 1.6rem no-repeat,
@@ -905,7 +923,7 @@ const strings = {
   }
   /* the line of camera information under the frame, and a tick per frame */
   .vf-bar {
-    width: min(100%, calc(var(--fh) * 2 / 3 + 1.4rem));
+    width: min(100%, calc(var(--fh) * 2 / 3));
     display: grid;
     gap: 0.6rem;
   }
@@ -945,7 +963,7 @@ const strings = {
   }
   .vf-hint {
     position: absolute;
-    bottom: 5.2rem;
+    bottom: 0.5rem;
     left: 0;
     right: 0;
     text-align: center;
@@ -960,7 +978,7 @@ const strings = {
   }
   @media (min-width: 900px) {
     .viseur {
-      --fh: 66svh;
+      --fh: min(calc(100svh - 13rem), 78svh);
     }
   }
   @media (prefers-reduced-motion: reduce) {
@@ -1576,6 +1594,10 @@ const strings = {
       border: 1px solid var(--line);
       backdrop-filter: blur(22px) saturate(1.3);
       box-shadow: 0 20px 40px -12px rgb(0 0 0 / 0.7);
+      transition: transform 0.5s var(--ease);
+    }
+    :global(html.immersive) .tabbar {
+      transform: translateY(calc(100% + 2rem));
     }
     .tabbar a,
     .tabbar button {
