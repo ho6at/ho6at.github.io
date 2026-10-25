@@ -87,14 +87,14 @@ const strings = {
   </section>
 
   <!-- Gallery: «Le Viseur», a paparazzi's viewfinder; scrolling down takes the next frame, a tap opens it full screen -->
-  <section class="section" id="gallery">
-    <div class="wrap head">
-      <h2>{t.gallery.title}</h2>
-      <p class="lead">{t.gallery.lead}</p>
-    </div>
+  <section class="section gallery-section" id="gallery">
     <!-- The viewfinder stays in place while scrolling; each step of the scroll is a new frame, with a flash -->
     <div class="vf-track" data-viseur style={`--n: ${galleryPhotos.length}`}>
       <div class="viseur">
+        <div class="vf-head">
+          <h2>{t.gallery.title}</h2>
+          <p class="vf-lead">{t.gallery.lead}</p>
+        </div>
         <div class="vf-frame" data-vf-frame tabindex="0" role="button" aria-label={t.gallery.title}>
           {
             galleryPhotos.map((ph, i) => (
@@ -740,7 +740,7 @@ const strings = {
      scripts/home.ts shows the frame for the current part of the track (opacity only, with a short flash). */
   .vf-track {
     position: relative;
-    height: calc(var(--n) * 55svh + 100svh);
+    height: calc(var(--n) * 38svh + 100svh);
   }
   .viseur {
     position: sticky;
@@ -749,12 +749,34 @@ const strings = {
     display: grid;
     align-content: center;
     justify-items: center;
-    gap: 1rem;
-    padding: 5rem var(--gutter) 6.5rem;
+    gap: 0.9rem;
+    padding: 4.6rem var(--gutter) 6.2rem;
+    /* the frame's height, shared with the information bar under it */
+    --fh: min(50svh, calc((100vw - 2 * var(--gutter)) * 1.5));
+  }
+  /* the section starts right on the viewfinder: its title sits on the same screen */
+  .gallery-section {
+    padding-top: 0;
+    scroll-margin-top: 0;
+  }
+  .vf-head {
+    text-align: center;
+    max-width: 34rem;
+    margin-bottom: 0.6rem;
+  }
+  .vf-head h2 {
+    font-size: clamp(1.5rem, 5vw, 2.4rem);
+  }
+  .vf-lead {
+    margin-top: 0.35rem;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    color: var(--muted);
+    text-wrap: balance;
   }
   .vf-frame {
     position: relative;
-    height: min(64svh, calc((100vw - 2 * var(--gutter)) * 1.5));
+    height: var(--fh);
     aspect-ratio: 2 / 3;
     background: #000;
     cursor: zoom-in;
@@ -870,7 +892,7 @@ const strings = {
   }
   /* the line of camera information under the frame, and a tick per frame */
   .vf-bar {
-    width: min(100%, calc(min(64svh, (100vw - 2 * var(--gutter)) * 1.5) * 2 / 3 + 1.4rem));
+    width: min(100%, calc(var(--fh) * 2 / 3 + 1.4rem));
     display: grid;
     gap: 0.6rem;
   }
@@ -910,7 +932,7 @@ const strings = {
   }
   .vf-hint {
     position: absolute;
-    bottom: 6.5rem;
+    bottom: 5.2rem;
     left: 0;
     right: 0;
     text-align: center;
@@ -924,11 +946,8 @@ const strings = {
     opacity: 0;
   }
   @media (min-width: 900px) {
-    .vf-frame {
-      height: 68svh;
-    }
-    .vf-bar {
-      width: calc(68svh * 2 / 3 + 1.4rem);
+    .viseur {
+      --fh: 58svh;
     }
   }
   @media (prefers-reduced-motion: reduce) {

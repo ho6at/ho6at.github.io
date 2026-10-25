@@ -120,8 +120,9 @@ else {
         ticking = false;
         const r = track.getBoundingClientRect();
         const run = r.height - window.innerHeight;
-        const p = Math.min(0.9999, Math.max(0, -r.top / run));
-        take(Math.floor(p * shots.length));
+        const p = Math.min(1, Math.max(0, -r.top / run));
+        // the first frame changes after only a short scroll, the rest are spread evenly
+        take(Math.min(shots.length - 1, Math.floor(p * (shots.length - 1) + 0.75)));
       });
     };
     addEventListener('scroll', onScroll, { passive: true });
