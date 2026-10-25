@@ -38,6 +38,7 @@ const en: typeof fr = {
   gallery: {
     title: 'Le Flâneur, in pictures',
     lead: 'Real sessions in Paris. No one is posing: they walk, run, wait, and we are somewhere across the street.',
+    scrollHint: 'Scroll',
     filters: { all: 'All', couple: 'Couples', solo: 'Solo', bw: 'Black & white' },
     items: {
       'couple-night-run': { alt: 'A couple running hand in hand across a Paris street at night, in black and white', place: 'A Haussmann street' },

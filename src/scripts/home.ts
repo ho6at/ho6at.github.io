@@ -64,25 +64,45 @@ else {
   watch.observe(root, { attributes: true, attributeFilter: ['class'] });
 }
 
-/* ---------- Gallery: photos rise into view, and open full screen on tap ---------- */
+/* ---------- Gallery «Le Viseur»: scrolling down takes the next frame; a tap opens it full screen ---------- */
 {
-  const grid = document.querySelector<HTMLElement>('[data-gallery]');
-  const shots = grid ? $$<HTMLElement>('.shot', grid) : [];
-  const visible = () => shots.filter((s) => !s.hidden);
-
-  // each photo rises into view once, as in an exhibition
-  if (reduceMotion || !('IntersectionObserver' in window)) shots.forEach((s) => s.classList.add('seen'));
-  else {
-    const io = new IntersectionObserver(
-      (entries) =>
-        entries.forEach((e) => {
-          if (!e.isIntersecting) return;
-          e.target.classList.add('seen');
-          io.unobserve(e.target);
-        }),
-      { rootMargin: '0px 0px -12% 0px' },
-    );
-    shots.forEach((s) => io.observe(s));
+  const track = document.querySelector<HTMLElement>('[data-viseur]');
+  const shots = track ? $$<HTMLImageElement>('.vf-img', track) : [];
+  let current = 0;
+  if (track && shots.length) {
+    const frame = $('[data-vf-frame]', track);
+    const n = $('[data-vf-n]', track);
+    const placeEl = $('[data-vf-place]', track);
+    const ticks = $$('.vf-ticks li', track);
+    const hint = $('[data-vf-hint]', track);
+    const pad = (k: number) => String(k).padStart(2, '0');
+    const take = (i: number) => {
+      if (i === current) return;
+      current = i;
+      shots.forEach((s, k) => s.classList.toggle('on', k === i));
+      ticks.forEach((t, k) => t.classList.toggle('on', k <= i));
+      n.textContent = pad(i + 1);
+      placeEl.textContent = shots[i].dataset.place!;
+      hint.classList.add('gone');
+      // the flash and the focus square: restart their animation for each new frame
+      frame.classList.remove('shot');
+      void frame.offsetWidth;
+      frame.classList.add('shot');
+    };
+    let ticking = false;
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        ticking = false;
+        const r = track.getBoundingClientRect();
+        const run = r.height - window.innerHeight;
+        const p = Math.min(0.9999, Math.max(0, -r.top / run));
+        take(Math.floor(p * shots.length));
+      });
+    };
+    addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
   }
 
   const box = document.querySelector<HTMLDialogElement>('[data-lightbox]');
@@ -98,7 +118,7 @@ else {
       const s = list[at];
       const set = () => {
         img.srcset = s.dataset.full!;
-        img.alt = $<HTMLImageElement>('img', s).alt;
+        img.alt = (s as HTMLImageElement).alt;
         light.textContent = s.dataset.light!;
         place.textContent = s.dataset.place!;
         count.textContent = `${(at + 1).toLocaleString(S.locale)} / ${list.length.toLocaleString(S.locale)}`;
@@ -108,19 +128,18 @@ else {
       img.classList.add('fading');
       setTimeout(set, 200);
     };
-    const open = (s: HTMLElement) => {
-      list = visible();
-      show(list.indexOf(s));
+    const open = () => {
+      list = shots;
+      show(current);
       box.showModal();
     };
-    shots.forEach((s) => {
-      s.addEventListener('click', () => open(s));
-      s.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          open(s);
-        }
-      });
+    const frame = document.querySelector<HTMLElement>('[data-vf-frame]');
+    frame?.addEventListener('click', open);
+    frame?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        open();
+      }
     });
     $('[data-lb-close]', box).addEventListener('click', () => box.close());
     $$<HTMLButtonElement>('[data-lb-step]', box).forEach((b) =>

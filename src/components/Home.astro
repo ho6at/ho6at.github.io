@@ -86,45 +86,53 @@ const strings = {
 
   </section>
 
-  <!-- Gallery: an exhibition, one photo at a time on black, each with a museum-style label; a tap opens it full screen -->
+  <!-- Gallery: «Le Viseur», a paparazzi's viewfinder; scrolling down takes the next frame, a tap opens it full screen -->
   <section class="section" id="gallery">
     <div class="wrap head">
       <h2>{t.gallery.title}</h2>
       <p class="lead">{t.gallery.lead}</p>
     </div>
-    <ol class="wrap expo" data-gallery>
-      {
-        galleryPhotos.map((ph, i) => {
-          const item = t.gallery.items[ph.id];
-          const wide = ph.w > ph.h;
-          return (
-            <li
-              class:list={['shot', { wide }]}
-              data-full={srcset(ph.id)}
-              data-place={item.place}
-              data-light={t.light.names[ph.light]}
-              tabindex="0"
-              role="button"
-            >
-              <img
-                src={src(ph.id)}
-                srcset={srcset(ph.id)}
-                sizes={wide ? '(max-width: 700px) 100vw, 70vw' : '(max-width: 700px) 100vw, 50vw'}
-                width={ph.w}
-                height={ph.h}
-                alt={item.alt}
-                loading="lazy"
-                decoding="async"
-              />
-              <p class="label">
-                <span class="label-n" dir="ltr">N° {String(i + 1).padStart(2, '0')}</span>
-                <span>{item.place}</span>
-              </p>
-            </li>
-          );
-        })
-      }
-    </ol>
+    <!-- The viewfinder stays in place while scrolling; each step of the scroll is a new frame, with a flash -->
+    <div class="vf-track" data-viseur style={`--n: ${galleryPhotos.length}`}>
+      <div class="viseur">
+        <div class="vf-frame" data-vf-frame tabindex="0" role="button" aria-label={t.gallery.title}>
+          {
+            galleryPhotos.map((ph, i) => {
+              const item = t.gallery.items[ph.id];
+              return (
+                <img
+                  class:list={['vf-img', { on: i === 0 }]}
+                  src={src(ph.id)}
+                  srcset={srcset(ph.id)}
+                  sizes="(max-width: 700px) 92vw, 60vh"
+                  width={ph.w}
+                  height={ph.h}
+                  alt={item.alt}
+                  loading={i < 2 ? 'eager' : 'lazy'}
+                  decoding="async"
+                  data-full={srcset(ph.id)}
+                  data-place={item.place}
+                  data-light={t.light.names[ph.light]}
+                />
+              );
+            })
+          }
+          <span class="vf-corners" aria-hidden="true"></span>
+          <span class="vf-focus" aria-hidden="true"></span>
+          <span class="vf-flash" data-vf-flash aria-hidden="true"></span>
+        </div>
+        <div class="vf-bar">
+          <p class="vf-info">
+            <span class="vf-n" dir="ltr"><b data-vf-n>01</b> / {String(galleryPhotos.length).padStart(2, '0')}</span>
+            <span data-vf-place>{t.gallery.items[galleryPhotos[0].id].place}</span>
+          </p>
+          <ol class="vf-ticks" aria-hidden="true">
+            {galleryPhotos.map((_, i) => <li class:list={{ on: i === 0 }} />)}
+          </ol>
+        </div>
+        <p class="vf-hint" data-vf-hint aria-hidden="true">{t.gallery.scrollHint} ↓</p>
+      </div>
+    </div>
 
     <!-- A photo, full screen -->
     <dialog class="lightbox" data-lightbox aria-label={t.gallery.title}>
@@ -722,75 +730,166 @@ const strings = {
     }
   }
 
-  /* Gallery: an exhibition. One photo at a time, alone on black, rising gently into view.
-     On wider screens they alternate sides and sizes, like the pages of an art magazine. */
-  .expo {
-    list-style: none;
-    margin: 0 auto;
-    padding-block: 0;
-    display: grid;
-    gap: clamp(5rem, 18vh, 11rem);
-  }
-  .shot {
+  /* Gallery: «Le Viseur». The track is tall; the viewfinder stays put inside it while the page scrolls, and
+     scripts/home.ts shows the frame for the current part of the track (opacity only, with a short flash). */
+  .vf-track {
     position: relative;
-    cursor: zoom-in;
-    opacity: 0;
-    transform: translateY(2.5rem);
-    transition:
-      opacity 1.4s var(--ease),
-      transform 1.6s var(--ease);
+    height: calc(var(--n) * 55svh + 100svh);
   }
-  .shot:global(.seen) {
-    opacity: 1;
-    transform: none;
-  }
-  .shot img {
-    display: block;
-    width: 100%;
-    height: auto;
-    max-height: 82svh;
-    object-fit: contain;
-    object-position: left;
-  }
-  :global([dir='rtl']) .shot img {
-    object-position: right;
-  }
-  .shot:focus-visible {
-    outline: 2px solid #e6d6bd;
-    outline-offset: 6px;
-  }
-  /* the label, small and quiet, as in a museum */
-  .label {
-    display: flex;
+  .viseur {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    display: grid;
+    align-content: center;
+    justify-items: center;
     gap: 1rem;
-    align-items: baseline;
-    margin-top: 1rem;
-    font-size: 0.8rem;
-    color: var(--muted);
+    padding: 5rem var(--gutter) 6.5rem;
   }
-  .label-n {
+  .vf-frame {
+    position: relative;
+    height: min(64svh, calc((100vw - 2 * var(--gutter)) * 1.5));
+    aspect-ratio: 2 / 3;
+    background: #000;
+    cursor: zoom-in;
+    outline: none;
+  }
+  .vf-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 0.45s var(--ease);
+  }
+  .vf-img:global(.on) {
+    opacity: 1;
+  }
+  /* the viewfinder: four corner marks a little outside the picture, and a focus square in the middle */
+  .vf-corners {
+    --c: rgb(240 232 218 / 0.9);
+    position: absolute;
+    inset: -0.7rem;
+    background:
+      linear-gradient(var(--c), var(--c)) top left / 1.6rem 1.5px no-repeat,
+      linear-gradient(var(--c), var(--c)) top left / 1.5px 1.6rem no-repeat,
+      linear-gradient(var(--c), var(--c)) top right / 1.6rem 1.5px no-repeat,
+      linear-gradient(var(--c), var(--c)) top right / 1.5px 1.6rem no-repeat,
+      linear-gradient(var(--c), var(--c)) bottom left / 1.6rem 1.5px no-repeat,
+      linear-gradient(var(--c), var(--c)) bottom left / 1.5px 1.6rem no-repeat,
+      linear-gradient(var(--c), var(--c)) bottom right / 1.6rem 1.5px no-repeat,
+      linear-gradient(var(--c), var(--c)) bottom right / 1.5px 1.6rem no-repeat;
+    pointer-events: none;
+  }
+  .vf-focus {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 2.6rem;
+    height: 2.6rem;
+    margin: -1.3rem 0 0 -1.3rem;
+    border: 1.5px solid rgb(240 232 218 / 0.75);
+    opacity: 0.8;
+    pointer-events: none;
+  }
+  .vf-frame:global(.shot) .vf-focus {
+    animation: vf-lock 0.5s var(--ease);
+  }
+  @keyframes vf-lock {
+    from {
+      transform: scale(1.5);
+      opacity: 0;
+    }
+  }
+  .vf-flash {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 45%, #fff, #f6efe2 70%);
+    opacity: 0;
+    pointer-events: none;
+  }
+  .vf-frame:global(.shot) .vf-flash {
+    animation: vf-flash 0.42s ease-out;
+  }
+  @keyframes vf-flash {
+    12% {
+      opacity: 0.85;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+  /* the line of camera information under the frame, and a tick per frame */
+  .vf-bar {
+    width: min(100%, calc(min(64svh, (100vw - 2 * var(--gutter)) * 1.5) * 2 / 3 + 1.4rem));
+    display: grid;
+    gap: 0.6rem;
+  }
+  .vf-info {
+    display: flex;
+    gap: 0.9rem;
+    align-items: baseline;
+    font-size: 0.8rem;
+    color: rgb(240 240 240 / 0.85);
+  }
+  .vf-n {
     font-size: 0.7rem;
     letter-spacing: 0.2em;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .vf-n b {
+    font-weight: 400;
     color: #e6d6bd;
   }
+  .vf-ticks {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 0.3rem;
+  }
+  .vf-ticks li {
+    flex: 1;
+    height: 2px;
+    border-radius: 2px;
+    background: rgb(240 240 240 / 0.18);
+    transition: background 0.4s var(--ease);
+  }
+  .vf-ticks li:global(.on) {
+    background: #e6d6bd;
+  }
+  .vf-hint {
+    position: absolute;
+    bottom: 6.5rem;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    transition: opacity 0.5s var(--ease);
+  }
+  .vf-hint:global(.gone) {
+    opacity: 0;
+  }
   @media (min-width: 900px) {
-    .shot {
-      width: 46%;
+    .vf-frame {
+      height: 68svh;
     }
-    .shot:nth-child(even) {
-      justify-self: end;
-      width: 38%;
-    }
-    .shot.wide {
-      width: 74%;
-      justify-self: center;
+    .vf-bar {
+      width: calc(68svh * 2 / 3 + 1.4rem);
     }
   }
   @media (prefers-reduced-motion: reduce) {
-    .shot {
-      opacity: 1;
-      transform: none;
+    .vf-img {
       transition: none;
+    }
+    .vf-frame:global(.shot) .vf-flash,
+    .vf-frame:global(.shot) .vf-focus {
+      animation: none;
     }
   }
 
