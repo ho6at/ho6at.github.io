@@ -64,28 +64,26 @@ else {
   watch.observe(root, { attributes: true, attributeFilter: ['class'] });
 }
 
-/* ---------- Gallery: filters, and a photo full screen on tap ---------- */
+/* ---------- Gallery: photos rise into view, and open full screen on tap ---------- */
 {
   const grid = document.querySelector<HTMLElement>('[data-gallery]');
   const shots = grid ? $$<HTMLElement>('.shot', grid) : [];
   const visible = () => shots.filter((s) => !s.hidden);
 
-  $$<HTMLButtonElement>('[data-filter]').forEach((b) =>
-    b.addEventListener('click', () => {
-      if (!grid || b.getAttribute('aria-pressed') === 'true') return;
-      $$('[data-filter]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
-      const f = b.dataset.filter;
-      const apply = () => {
-        shots.forEach((s) => {
-          s.hidden = !(f === 'all' || (f === 'bw' ? s.dataset.bw === '1' : s.dataset.kind === f));
-        });
-        grid.classList.remove('switching');
-      };
-      if (reduceMotion) return apply();
-      grid.classList.add('switching');
-      setTimeout(apply, 250);
-    }),
-  );
+  // each photo rises into view once, as in an exhibition
+  if (reduceMotion || !('IntersectionObserver' in window)) shots.forEach((s) => s.classList.add('seen'));
+  else {
+    const io = new IntersectionObserver(
+      (entries) =>
+        entries.forEach((e) => {
+          if (!e.isIntersecting) return;
+          e.target.classList.add('seen');
+          io.unobserve(e.target);
+        }),
+      { rootMargin: '0px 0px -12% 0px' },
+    );
+    shots.forEach((s) => io.observe(s));
+  }
 
   const box = document.querySelector<HTMLDialogElement>('[data-lightbox]');
   if (box) {

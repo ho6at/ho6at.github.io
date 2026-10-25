@@ -86,31 +86,20 @@ const strings = {
 
   </section>
 
-  <!-- Gallery: real sessions in a grid that scrolls down; a tap opens a photo full screen -->
+  <!-- Gallery: an exhibition, one photo at a time on black, each with a museum-style label; a tap opens it full screen -->
   <section class="section" id="gallery">
     <div class="wrap head">
       <h2>{t.gallery.title}</h2>
       <p class="lead">{t.gallery.lead}</p>
     </div>
-    <div class="wrap filters" role="group" aria-label={t.gallery.title}>
+    <ol class="wrap expo" data-gallery>
       {
-        (['all', 'couple', 'solo', 'bw'] as const).map((f) => (
-          <button type="button" class="filter" data-filter={f} aria-pressed={f === 'all' ? 'true' : 'false'}>
-            {t.gallery.filters[f]}
-          </button>
-        ))
-      }
-    </div>
-    <div class="wrap gallery" data-gallery>
-      {
-        galleryPhotos.map((ph) => {
+        galleryPhotos.map((ph, i) => {
           const item = t.gallery.items[ph.id];
           const wide = ph.w > ph.h;
           return (
-            <figure
+            <li
               class:list={['shot', { wide }]}
-              data-kind={ph.kind}
-              data-bw={'bw' in ph ? '1' : undefined}
               data-full={srcset(ph.id)}
               data-place={item.place}
               data-light={t.light.names[ph.light]}
@@ -120,22 +109,23 @@ const strings = {
               <img
                 src={src(ph.id)}
                 srcset={srcset(ph.id)}
-                sizes={wide ? '(max-width: 700px) 92vw, 800px' : '(max-width: 700px) 46vw, 400px'}
+                sizes={wide ? '(max-width: 700px) 100vw, 70vw' : '(max-width: 700px) 100vw, 50vw'}
                 width={ph.w}
                 height={ph.h}
                 alt={item.alt}
                 loading="lazy"
                 decoding="async"
               />
-              <figcaption>
-                <span class="shot-light">{t.light.names[ph.light]}</span>
+              <p class="label">
+                <span class="label-n" dir="ltr">N° {String(i + 1).padStart(2, '0')}</span>
                 <span>{item.place}</span>
-              </figcaption>
-            </figure>
+              </p>
+            </li>
           );
         })
       }
-    </div>
+    </ol>
+
     <!-- A photo, full screen -->
     <dialog class="lightbox" data-lightbox aria-label={t.gallery.title}>
       <button type="button" class="lb-btn lb-close" data-lb-close aria-label={t.sessions.close}>
@@ -732,105 +722,75 @@ const strings = {
     }
   }
 
-  /* Gallery: a grid that scrolls down, two columns on phones and three on wider screens;
-     landscape photos span two columns */
-  .gallery {
+  /* Gallery: an exhibition. One photo at a time, alone on black, rising gently into view.
+     On wider screens they alternate sides and sizes, like the pages of an art magazine. */
+  .expo {
+    list-style: none;
+    margin: 0 auto;
+    padding-block: 0;
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0.75rem;
-    grid-auto-flow: dense;
+    gap: clamp(5rem, 18vh, 11rem);
   }
   .shot {
     position: relative;
-    margin: 0;
-    border-radius: 6px;
-    overflow: hidden;
-    background: var(--raised);
-    aspect-ratio: 2 / 3;
     cursor: zoom-in;
+    opacity: 0;
+    transform: translateY(2.5rem);
+    transition:
+      opacity 1.4s var(--ease),
+      transform 1.6s var(--ease);
   }
-  .shot.wide {
-    grid-column: span 2;
-    /* two columns wide and as tall as its neighbours */
-    aspect-ratio: auto;
+  .shot:global(.seen) {
+    opacity: 1;
+    transform: none;
   }
   .shot img {
     display: block;
     width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 1.2s var(--ease);
+    height: auto;
+    max-height: 82svh;
+    object-fit: contain;
+    object-position: left;
+  }
+  :global([dir='rtl']) .shot img {
+    object-position: right;
   }
   .shot:focus-visible {
     outline: 2px solid #e6d6bd;
-    outline-offset: 2px;
+    outline-offset: 6px;
   }
-  .shot[hidden] {
-    display: none;
-  }
-  /* a viewfinder's corner marks close in on the photo under the pointer */
-  .shot::after {
-    --c: rgb(240 232 218 / 0.85);
-    content: '';
-    position: absolute;
-    inset: 0.9rem;
-    background:
-      linear-gradient(var(--c), var(--c)) top left / 1.3rem 1px no-repeat,
-      linear-gradient(var(--c), var(--c)) top left / 1px 1.3rem no-repeat,
-      linear-gradient(var(--c), var(--c)) top right / 1.3rem 1px no-repeat,
-      linear-gradient(var(--c), var(--c)) top right / 1px 1.3rem no-repeat,
-      linear-gradient(var(--c), var(--c)) bottom left / 1.3rem 1px no-repeat,
-      linear-gradient(var(--c), var(--c)) bottom left / 1px 1.3rem no-repeat,
-      linear-gradient(var(--c), var(--c)) bottom right / 1.3rem 1px no-repeat,
-      linear-gradient(var(--c), var(--c)) bottom right / 1px 1.3rem no-repeat;
-    opacity: 0;
-    transform: scale(1.06);
-    transition:
-      opacity 0.5s var(--ease),
-      transform 0.6s var(--ease);
-    pointer-events: none;
-  }
-  .shot figcaption {
-    position: absolute;
-    inset: auto 0 0;
+  /* the label, small and quiet, as in a museum */
+  .label {
     display: flex;
-    flex-wrap: wrap;
-    gap: 0.1rem 0.6rem;
+    gap: 1rem;
     align-items: baseline;
-    padding: 2.2rem 0.9rem 0.8rem;
-    background: linear-gradient(transparent, rgb(5 5 5 / 0.75));
+    margin-top: 1rem;
     font-size: 0.8rem;
-    color: rgb(240 240 240 / 0.88);
+    color: var(--muted);
   }
-  .shot-light {
-    font-size: 0.65rem;
+  .label-n {
+    font-size: 0.7rem;
     letter-spacing: 0.2em;
-    text-transform: uppercase;
     color: #e6d6bd;
   }
-  @media (hover: hover) {
-    .shot:hover img {
-      transform: scale(1.03);
+  @media (min-width: 900px) {
+    .shot {
+      width: 46%;
     }
-    .shot:hover::after {
-      opacity: 1;
-      transform: none;
-    }
-  }
-  @media (max-width: 700px) {
-    .gallery {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 0.5rem;
+    .shot:nth-child(even) {
+      justify-self: end;
+      width: 38%;
     }
     .shot.wide {
-      aspect-ratio: 3 / 2;
+      width: 74%;
+      justify-self: center;
     }
-    .shot figcaption {
-      padding: 1.6rem 0.6rem 0.55rem;
-      font-size: 0.7rem;
-    }
-    .shot-light {
-      display: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .shot {
+      opacity: 1;
+      transform: none;
+      transition: none;
     }
   }
 
@@ -939,45 +899,6 @@ const strings = {
     }
   }
 
-  /* filters: couples, solo, black and white */
-  .filters {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-bottom: 1.5rem;
-  }
-  .filter {
-    padding: 0.55rem 1.1rem;
-    border-radius: 999px;
-    border: 1px solid var(--line);
-    background: transparent;
-    color: var(--muted);
-    font: inherit;
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition:
-      background 0.3s var(--ease),
-      color 0.3s var(--ease),
-      border-color 0.3s var(--ease);
-  }
-  .filter:hover {
-    color: var(--ivory);
-    border-color: var(--line-strong);
-  }
-  .filter[aria-pressed='true'] {
-    background: var(--ivory);
-    border-color: var(--ivory);
-    color: #0a0a0a;
-  }
-  .gallery {
-    transition:
-      opacity 0.25s var(--ease),
-      transform 0.25s var(--ease);
-  }
-  .gallery:global(.switching) {
-    opacity: 0;
-    transform: translateY(8px);
-  }
   .note {
     margin-top: 1.75rem;
     font-size: 0.95rem;
