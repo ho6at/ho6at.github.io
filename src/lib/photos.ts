@@ -7,7 +7,7 @@ export const photos = [
   { id: 'procope', w: 6048, h: 4032, light: 'day', kind: 'couple', bw: true, sizes: [720, 1440, 2400] },
   { id: 'louvre-arch', w: 1024, h: 1536, light: 'golden', kind: 'couple', bw: true, sizes: [480, 960, 1024] },
   { id: 'louvre-arcades', w: 1024, h: 1536, light: 'day', kind: 'solo', bw: true, sizes: [480, 960, 1024] },
-  { id: 'rain', w: 3549, h: 5323, light: 'blue', kind: 'solo', bw: true, sizes: [480, 960, 1600] },
+  { id: 'rain', w: 2728, h: 4092, light: 'blue', kind: 'solo', bw: true, sizes: [480, 960, 1600] },
   { id: 'mist', w: 4032, h: 6048, light: 'day', kind: 'solo', sizes: [480, 960, 1600] },
   { id: 'eiffel-night', w: 941, h: 1672, light: 'night', kind: 'couple', sizes: [480, 941] },
   { id: 'louvre-window', w: 1536, h: 2304, light: 'day', kind: 'solo', sizes: [480, 960, 1536] },
