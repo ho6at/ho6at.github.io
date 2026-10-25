@@ -83,6 +83,14 @@ else {
       const [fx, fy] = (shots[i].dataset.focus || '0.5 0.45').split(' ');
       frame.style.setProperty('--fx', fx);
       frame.style.setProperty('--fy', fy);
+      // a second face far from the first gets its own square
+      const second = shots[i].dataset.focus2;
+      frame.classList.toggle('two', !!second);
+      if (second) {
+        const [fx2, fy2] = second.split(' ');
+        frame.style.setProperty('--fx2', fx2);
+        frame.style.setProperty('--fy2', fy2);
+      }
       frame.classList.remove('shot');
       void frame.offsetWidth;
       frame.classList.add('shot');

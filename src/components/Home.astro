@@ -119,12 +119,14 @@ const strings = {
                   data-place={item.place}
                   data-light={t.light.names[ph.light]}
                   data-focus={'focus' in ph ? ph.focus.join(' ') : '0.5 0.45'}
+                  data-focus2={'focus2' in ph ? ph.focus2.join(' ') : undefined}
                 />
               );
             })
           }
           <span class="vf-corners" aria-hidden="true"></span>
           <span class="vf-focus" aria-hidden="true"></span>
+          <span class="vf-focus second" aria-hidden="true"></span>
           <span class="vf-flash" data-vf-flash aria-hidden="true"></span>
         </div>
         <div class="vf-bar">
@@ -750,9 +752,9 @@ const strings = {
     align-content: center;
     justify-items: center;
     gap: 0.9rem;
-    padding: 4.6rem var(--gutter) 6.2rem;
+    padding: 4.3rem 0.75rem 6rem;
     /* the frame's height, shared with the information bar under it */
-    --fh: min(50svh, calc((100vw - 2 * var(--gutter)) * 1.5));
+    --fh: min(57svh, calc((100vw - 1.5rem - 1.4rem) * 1.5));
   }
   /* the section starts right on the viewfinder: its title sits on the same screen */
   .gallery-section {
@@ -765,7 +767,7 @@ const strings = {
     margin-bottom: 0.6rem;
   }
   .vf-head h2 {
-    font-size: clamp(1.5rem, 5vw, 2.4rem);
+    font-size: clamp(1.4rem, 4.6vw, 2.4rem);
   }
   .vf-lead {
     margin-top: 0.35rem;
@@ -833,8 +835,19 @@ const strings = {
     opacity: 0;
     pointer-events: none;
   }
+  .vf-focus.second {
+    left: calc(var(--fx2, 0.5) * 100%);
+    top: calc(var(--fy2, 0.45) * 100%);
+    display: none;
+  }
+  .vf-frame:global(.two) .vf-focus.second {
+    display: block;
+  }
   .vf-frame:global(.shot) .vf-focus {
     animation: vf-lock 2s ease-out both;
+  }
+  .vf-frame:global(.shot) .vf-focus.second {
+    animation-delay: 0.18s;
   }
   @keyframes vf-lock {
     0%,
@@ -947,7 +960,7 @@ const strings = {
   }
   @media (min-width: 900px) {
     .viseur {
-      --fh: 58svh;
+      --fh: 66svh;
     }
   }
   @media (prefers-reduced-motion: reduce) {
