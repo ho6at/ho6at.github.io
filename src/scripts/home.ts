@@ -76,19 +76,42 @@ else {
     const ticks = $$('.vf-ticks li', track);
     const hint = $('[data-vf-hint]', track);
     const pad = (k: number) => String(k).padStart(2, '0');
-    const take = (i: number) => {
-      if (i === current) return;
-      current = i;
-      shots.forEach((s, k) => s.classList.toggle('on', k === i));
-      ticks.forEach((t, k) => t.classList.toggle('on', k <= i));
-      n.textContent = pad(i + 1);
-      placeEl.textContent = shots[i].dataset.place!;
-      hint.classList.add('gone');
-      // the flash and the focus square: restart their animation for each new frame
+    const blurs = $$<HTMLImageElement>('.vf-blur', track);
+    // a new frame: the flash fires, the old photo is gone at once, the soft copy of the new one shows, the sharp
+    // photo fades in over it, and the focus square lands on the face, locks and fades
+    const play = (i: number) => {
+      const [fx, fy] = (shots[i].dataset.focus || '0.5 0.45').split(' ');
+      frame.style.setProperty('--fx', fx);
+      frame.style.setProperty('--fy', fy);
       frame.classList.remove('shot');
       void frame.offsetWidth;
       frame.classList.add('shot');
     };
+    const take = (i: number) => {
+      if (i === current) return;
+      shots[current].classList.add('cut');
+      shots[current].classList.remove('on');
+      void shots[current].offsetWidth;
+      shots[current].classList.remove('cut');
+      current = i;
+      blurs.forEach((b, k) => b.classList.toggle('on', k === i));
+      shots[i].classList.add('on');
+      ticks.forEach((t, k) => t.classList.toggle('on', k <= i));
+      n.textContent = pad(i + 1);
+      placeEl.textContent = shots[i].dataset.place!;
+      hint.classList.add('gone');
+      play(i);
+    };
+    // the first frame focuses when the viewfinder comes into view
+    const firstLook = new IntersectionObserver(
+      ([e]) => {
+        if (!e.isIntersecting) return;
+        firstLook.disconnect();
+        if (current === 0) play(0);
+      },
+      { threshold: 0.6 },
+    );
+    firstLook.observe(frame);
     let ticking = false;
     const onScroll = () => {
       if (ticking) return;

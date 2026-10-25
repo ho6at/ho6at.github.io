@@ -97,6 +97,11 @@ const strings = {
       <div class="viseur">
         <div class="vf-frame" data-vf-frame tabindex="0" role="button" aria-label={t.gallery.title}>
           {
+            galleryPhotos.map((ph, i) => (
+              <img class:list={['vf-blur', { on: i === 0 }]} src={`/photos/${ph.id}-blur.webp`} alt="" aria-hidden="true" />
+            ))
+          }
+          {
             galleryPhotos.map((ph, i) => {
               const item = t.gallery.items[ph.id];
               return (
@@ -113,6 +118,7 @@ const strings = {
                   data-full={srcset(ph.id)}
                   data-place={item.place}
                   data-light={t.light.names[ph.light]}
+                  data-focus={'focus' in ph ? ph.focus.join(' ') : '0.5 0.45'}
                 />
               );
             })
@@ -754,17 +760,27 @@ const strings = {
     cursor: zoom-in;
     outline: none;
   }
-  .vf-img {
+  /* each frame: a soft out-of-focus copy first, then the sharp photo fading in over it, like a lens finding focus */
+  .vf-img,
+  .vf-blur {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
     opacity: 0;
-    transition: opacity 0.45s var(--ease);
+  }
+  .vf-blur:global(.on) {
+    opacity: 1;
+  }
+  .vf-img {
+    transition: opacity 1.15s cubic-bezier(0.45, 0, 0.2, 1) 0.18s;
   }
   .vf-img:global(.on) {
     opacity: 1;
+  }
+  .vf-img:global(.cut) {
+    transition: none;
   }
   /* the viewfinder: four corner marks a little outside the picture, and a focus square in the middle */
   .vf-corners {
@@ -782,24 +798,49 @@ const strings = {
       linear-gradient(var(--c), var(--c)) bottom right / 1.5px 1.6rem no-repeat;
     pointer-events: none;
   }
+  /* the focus square lands on the face, locks with two blinks, then fades away */
   .vf-focus {
     position: absolute;
-    left: 50%;
-    top: 50%;
-    width: 2.6rem;
-    height: 2.6rem;
-    margin: -1.3rem 0 0 -1.3rem;
-    border: 1.5px solid rgb(240 232 218 / 0.75);
-    opacity: 0.8;
+    left: calc(var(--fx, 0.5) * 100%);
+    top: calc(var(--fy, 0.45) * 100%);
+    width: 2.8rem;
+    height: 2.8rem;
+    margin: -1.4rem 0 0 -1.4rem;
+    border: 1.5px solid rgb(240 232 218 / 0.9);
+    box-shadow: 0 0 0 1px rgb(0 0 0 / 0.25);
+    opacity: 0;
     pointer-events: none;
   }
   .vf-frame:global(.shot) .vf-focus {
-    animation: vf-lock 0.5s var(--ease);
+    animation: vf-lock 2s ease-out both;
   }
   @keyframes vf-lock {
-    from {
-      transform: scale(1.5);
+    0%,
+    14% {
       opacity: 0;
+      transform: scale(1.7);
+    }
+    30% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    38% {
+      opacity: 0.3;
+    }
+    44% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.3;
+    }
+    56%,
+    72% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    100% {
+      opacity: 0;
+      transform: scale(1);
     }
   }
   .vf-flash {
@@ -809,12 +850,19 @@ const strings = {
     opacity: 0;
     pointer-events: none;
   }
+  /* a real flash: a near-instant burst, then a slow fall-off */
   .vf-frame:global(.shot) .vf-flash {
-    animation: vf-flash 0.42s ease-out;
+    animation: vf-flash 1s cubic-bezier(0.2, 0.6, 0.3, 1);
   }
   @keyframes vf-flash {
+    0% {
+      opacity: 0;
+    }
+    4% {
+      opacity: 0.95;
+    }
     12% {
-      opacity: 0.85;
+      opacity: 0.7;
     }
     to {
       opacity: 0;
@@ -884,7 +932,8 @@ const strings = {
     }
   }
   @media (prefers-reduced-motion: reduce) {
-    .vf-img {
+    .vf-img,
+    .vf-blur {
       transition: none;
     }
     .vf-frame:global(.shot) .vf-flash,
