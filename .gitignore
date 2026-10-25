@@ -6,3 +6,6 @@ dist/
 
 # original photos (optimized copies go to public/)
 /photos/
+
+# Instagram videos (made from photos/, not part of the site)
+/reels/
