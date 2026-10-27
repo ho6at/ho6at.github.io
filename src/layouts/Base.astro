@@ -86,7 +86,35 @@ const fonts =
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href={`https://fonts.googleapis.com/css2?${fonts}&display=swap`} rel="stylesheet" />
+    {/* the fonts load without holding up the first paint: the text shows at once in a fallback, then swaps */}
+    <link rel="preload" as="style" href={`https://fonts.googleapis.com/css2?${fonts}&display=swap`} onload="this.onload=null;this.rel='stylesheet'" />
+    <noscript><link href={`https://fonts.googleapis.com/css2?${fonts}&display=swap`} rel="stylesheet" /></noscript>
+    {
+      site.goatcounter && !noindex && (
+        <script is:inline async data-goatcounter={`https://${site.goatcounter}.goatcounter.com/count`} src="https://gc.zgo.at/count.js" />
+      )
+    }
+    {
+      site.goatcounter && (
+        <script is:inline>
+          // marketing events (GoatCounter, no cookies): booking opened and sent, and the ways to get in touch
+          document.addEventListener('click', (e) => {
+            const el = e.target.closest('a, button');
+            if (!el || !window.goatcounter || !window.goatcounter.count) return;
+            const name = el.matches('[data-open-booking]')
+              ? 'booking-open'
+              : el.matches('[data-send]') ? 'booking-sent'
+              : el.matches('[data-send-email]') ? 'booking-sent-email'
+              : el.matches('[data-send-wa]') ? 'booking-sent-whatsapp'
+              : (el.getAttribute('href') || '').startsWith('mailto:') ? 'contact-email'
+              : (el.getAttribute('href') || '').includes('wa.me') ? 'contact-whatsapp'
+              : (el.getAttribute('href') || '').includes('instagram.com') ? 'contact-instagram'
+              : '';
+            if (name) window.goatcounter.count({ path: 'event/' + name, title: name, event: true });
+          });
+        </script>
+      )
+    }
   </head>
   <body>
     <slot />

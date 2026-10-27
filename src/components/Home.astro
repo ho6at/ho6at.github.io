@@ -6,6 +6,7 @@ import Splash from './Splash.astro';
 import Eiffel from './Eiffel.astro';
 import LightLogo from './LightLogo.astro';
 import { galleryPhotos, srcset, src } from '../lib/photos';
+import { reviews, reviewsTitle } from '../i18n/reviews';
 import { languages } from '../i18n/languages';
 import { landings, landingIds, landingUi, landingHref } from '../i18n/landings';
 import { site } from '../site';
@@ -183,6 +184,27 @@ const strings = {
     </ol>
   </section>
 
+  <!-- Reviews: shown once there are real ones (i18n/reviews.ts) -->
+  {
+    reviews.length > 0 && (
+      <section class="section" id="reviews">
+        <div class="wrap head">
+          <h2>{reviewsTitle[t.lang as 'fr' | 'en' | 'fa']}</h2>
+        </div>
+        <ul class="wrap reviews">
+          {reviews.map((r) => (
+            <li>
+              <blockquote lang={r.lang} dir={r.lang === 'fa' ? 'rtl' : 'ltr'}>{r.text}</blockquote>
+              <p class="who">
+                <b>{r.name}</b> · {r.from}
+              </p>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
+
   <!-- Sessions -->
   <section class="section" id="sessions">
     <div class="wrap head">
@@ -354,6 +376,7 @@ const strings = {
   <Logo href={home} size="footer" />
   <p>© {new Date().getFullYear()} Luminoor, {site.city}. {t.footer.rights}</p>
   <a href={t.footer.legalHref}>{t.footer.legal}</a>
+  <a href={t.footer.privacyHref}>{t.footer.privacy}</a>
 </footer>
 
 <!-- App-style tab bar on phones -->
@@ -1116,6 +1139,35 @@ const strings = {
     .lb-nav {
       display: grid;
     }
+  }
+
+  /* Reviews */
+  .reviews {
+    list-style: none;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+    gap: 1rem;
+  }
+  .reviews li {
+    padding: 1.6rem 1.5rem;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: rgb(240 240 240 / 0.02);
+  }
+  .reviews blockquote {
+    margin: 0;
+    font-size: 1.05rem;
+    line-height: 1.7;
+  }
+  .reviews .who {
+    margin-top: 1rem;
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+  .reviews .who b {
+    font-weight: 500;
+    color: #e6d6bd;
   }
 
   .note {

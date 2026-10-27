@@ -277,6 +277,8 @@ const fa: typeof fr = {
   footer: {
     legal: 'اطلاعات حقوقی',
     legalHref: '/mentions-legales/',
+    privacy: 'حریم خصوصی',
+    privacyHref: '/en/privacy/',
     rights: 'تمامی حقوق محفوظ است.',
   },
 };

@@ -9,4 +9,7 @@ export const site = {
   indexable: true,
   // Brand content (reels for brands) is not offered for now; set to true to show its section again.
   showBrands: false,
+  // Audience measurement with GoatCounter (no cookies, so no consent banner): the site's code, e.g. 'luminoor' for
+  // luminoor.goatcounter.com. Empty = off.
+  goatcounter: '',
 };

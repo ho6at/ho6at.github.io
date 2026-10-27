@@ -267,6 +267,8 @@ const en: typeof fr = {
   footer: {
     legal: 'Legal notice',
     legalHref: '/mentions-legales/',
+    privacy: 'Privacy',
+    privacyHref: '/en/privacy/',
     rights: 'All rights reserved.',
   },
 };

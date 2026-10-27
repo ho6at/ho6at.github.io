@@ -265,6 +265,8 @@ export default {
   footer: {
     legal: 'Mentions légales',
     legalHref: '/mentions-legales/',
+    privacy: 'Confidentialité',
+    privacyHref: '/confidentialite/',
     rights: 'Tous droits réservés.',
   },
 };

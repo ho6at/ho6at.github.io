@@ -1,0 +1,77 @@
+---
+// The page for addresses that don't exist (GitHub Pages serves 404.html). A broken link carries no language,
+// so it speaks all three, in a viewfinder that has lost its subject.
+import Base from '../layouts/Base.astro';
+import Logo from '../components/Logo.astro';
+---
+
+<Base lang="fr" title="Page introuvable — Luminoor" description="Cette page n’existe pas." noindex>
+  <main class="lost">
+    <div class="frame" aria-hidden="true"></div>
+    <Logo href="/" />
+    <p class="code" dir="ltr">404 · NO SUBJECT</p>
+    <div class="lines">
+      <p lang="fr">Cette rue n’existe pas. Même un flâneur s’y perd.</p>
+      <p lang="en">This street doesn’t exist. Even a flâneur gets lost.</p>
+      <p lang="fa" dir="rtl">این خیابان وجود ندارد. حتی یک فلانور هم گاهی گم می‌شود.</p>
+    </div>
+    <nav class="ways">
+      <a class="button" href="/" lang="fr">Accueil</a>
+      <a class="button ghost" href="/en/" lang="en">Home</a>
+      <a class="button ghost" href="/fa/" lang="fa">خانه</a>
+    </nav>
+  </main>
+</Base>
+
+<style>
+  .lost {
+    position: relative;
+    min-height: 100svh;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 1.6rem;
+    padding: 3rem 1.5rem;
+    text-align: center;
+  }
+  /* a viewfinder's corners around the empty page */
+  .frame {
+    --c: rgb(240 232 218 / 0.5);
+    position: absolute;
+    inset: 1.5rem;
+    background:
+      linear-gradient(var(--c), var(--c)) top left / 2rem 1.5px no-repeat,
+      linear-gradient(var(--c), var(--c)) top left / 1.5px 2rem no-repeat,
+      linear-gradient(var(--c), var(--c)) top right / 2rem 1.5px no-repeat,
+      linear-gradient(var(--c), var(--c)) top right / 1.5px 2rem no-repeat,
+      linear-gradient(var(--c), var(--c)) bottom left / 2rem 1.5px no-repeat,
+      linear-gradient(var(--c), var(--c)) bottom left / 1.5px 2rem no-repeat,
+      linear-gradient(var(--c), var(--c)) bottom right / 2rem 1.5px no-repeat,
+      linear-gradient(var(--c), var(--c)) bottom right / 1.5px 2rem no-repeat;
+    pointer-events: none;
+  }
+  .code {
+    font-family: ui-monospace, 'Menlo', monospace;
+    font-size: 0.8rem;
+    letter-spacing: 0.3em;
+    color: #e6d6bd;
+  }
+  .lines {
+    display: grid;
+    gap: 0.5rem;
+    max-width: 30rem;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+  .lines p:first-child {
+    color: var(--ivory);
+    font-size: 1.1rem;
+  }
+  .ways {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.6rem;
+    margin-top: 0.5rem;
+  }
+</style>

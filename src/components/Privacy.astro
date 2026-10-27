@@ -1,0 +1,127 @@
+---
+// The privacy policy (GDPR), in French or English. Company details still to complete are in [brackets], as on
+// the legal notice. Kept short and true to what the site actually does: no cookies, no advertising trackers.
+import Base from '../layouts/Base.astro';
+import { site } from '../site';
+
+interface Props {
+  lang: 'fr' | 'en';
+}
+const { lang } = Astro.props;
+const fr = lang === 'fr';
+const home = fr ? '/' : '/en/';
+---
+
+<Base
+  lang={lang}
+  title={fr ? 'Politique de confidentialité — Luminoor' : 'Privacy policy — Luminoor'}
+  description={fr ? 'Comment Luminoor traite vos données personnelles.' : 'How Luminoor handles your personal data.'}
+  alternates={[{ code: 'fr', href: '/confidentialite/' }, { code: 'en', href: '/en/privacy/' }]}
+>
+  <main class="wrap legal">
+    <a class="textlink" href={home}>Luminoor</a>
+    {
+      fr ? (
+        <>
+          <h1>Politique de confidentialité</h1>
+          <p>Mise à jour : octobre 2026.</p>
+          <h2>Responsable du traitement</h2>
+          <p>Luminoor SAS, [adresse], Paris — RCS Paris [numéro]. Contact : <a href={`mailto:${site.email}`}>{site.email}</a></p>
+          <h2>Les données que nous recevons</h2>
+          <p>
+            Uniquement ce que vous nous envoyez : quand vous demandez une séance (par e-mail ou WhatsApp), votre prénom,
+            votre e-mail ou numéro, la date, le type de séance et vos remarques. Pendant et après la séance, les photos
+            prises de vous.
+          </p>
+          <h2>Pourquoi, et sur quelle base</h2>
+          <p>
+            Pour répondre à votre demande et organiser la séance (mesures précontractuelles et exécution du contrat), puis
+            pour la facturation (obligation légale). Nous ne vendons ni ne cédons vos données, et nous ne vous
+            envoyons pas de publicité sans votre accord.
+          </p>
+          <h2>Combien de temps</h2>
+          <p>
+            Les demandes sans suite : 3 ans après le dernier contact. Les données des clients : le temps de la relation,
+            puis la durée légale de conservation des factures (10 ans). Vos photos restent dans votre galerie privée
+            [durée à préciser], et nous ne les montrons publiquement qu’avec votre accord écrit.
+          </p>
+          <h2>Qui y a accès</h2>
+          <p>
+            Nous seuls, et nos prestataires techniques : la messagerie (OVHcloud, France) et l’hébergement du site
+            (GitHub, États-Unis), qui ne reçoit pas vos demandes.
+          </p>
+          <h2>Cookies et mesure d’audience</h2>
+          <p>
+            Ce site ne dépose aucun cookie publicitaire ni de suivi. La mesure d’audience, si elle est active, est
+            anonyme et sans cookie. Les polices de caractères sont chargées depuis Google Fonts, ce qui transmet votre
+            adresse IP à Google.
+          </p>
+          <h2>Vos droits</h2>
+          <p>
+            Vous pouvez accéder à vos données, les corriger, les supprimer, vous opposer à leur traitement ou en demander
+            une copie : écrivez à <a href={`mailto:${site.email}`}>{site.email}</a>. Vous pouvez aussi saisir la CNIL
+            (cnil.fr).
+          </p>
+        </>
+      ) : (
+        <>
+          <h1>Privacy policy</h1>
+          <p>Updated October 2026.</p>
+          <h2>Who is responsible</h2>
+          <p>Luminoor SAS, [address], Paris — RCS Paris [number]. Contact: <a href={`mailto:${site.email}`}>{site.email}</a></p>
+          <h2>What we receive</h2>
+          <p>
+            Only what you send us: when you ask for a session (by email or WhatsApp), your first name, email or number,
+            the date, the kind of session and your notes. During and after the session, the photos taken of you.
+          </p>
+          <h2>Why, and on what basis</h2>
+          <p>
+            To answer your request and organise the session (pre-contract steps and the contract itself), then for
+            invoicing (a legal obligation). We never sell or share your data, and we don’t send you advertising without
+            your consent.
+          </p>
+          <h2>How long</h2>
+          <p>
+            Requests that don’t lead to a session: 3 years after the last contact. Client data: for as long as we work
+            together, then the legal period for keeping invoices (10 years). Your photos stay in your private gallery
+            [period to confirm], and we only show them publicly with your written consent.
+          </p>
+          <h2>Who can see it</h2>
+          <p>
+            Only us, and our technical providers: email (OVHcloud, France) and website hosting (GitHub, United States),
+            which never receives your requests.
+          </p>
+          <h2>Cookies and audience measurement</h2>
+          <p>
+            This site sets no advertising or tracking cookies. Audience measurement, when active, is anonymous and
+            cookie-free. Fonts are loaded from Google Fonts, which passes your IP address to Google.
+          </p>
+          <h2>Your rights</h2>
+          <p>
+            You can access, correct or delete your data, object to its use, or ask for a copy: write to
+            <a href={`mailto:${site.email}`}>{site.email}</a>. You can also complain to the CNIL, the French data
+            protection authority (cnil.fr).
+          </p>
+        </>
+      )
+    }
+  </main>
+</Base>
+
+<style>
+  .legal {
+    max-width: 44rem;
+    padding-block: 3rem 5rem;
+  }
+  h1 {
+    font-size: clamp(2.3rem, 6vw, 3.3rem);
+    margin: 2rem 0 0.6rem;
+  }
+  h2 {
+    font-size: 1.4rem;
+    margin: 2.1rem 0 0.5rem;
+  }
+  p {
+    line-height: 1.7;
+  }
+</style>
