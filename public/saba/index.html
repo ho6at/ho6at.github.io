@@ -1,0 +1,493 @@
+<!doctype html>
+<!-- Saba × Luminoor media kit: a private pitch page, reachable by link only (noindex, not in the sitemap).
+     English and French side by side; the dashed boxes are the parts Saba fills from her own Insights. -->
+<html lang="en" data-lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="robots" content="noindex, nofollow" />
+<meta name="theme-color" content="#0a0a0a" />
+<title>Saba × Luminoor</title>
+<link rel="icon" href="/favicon.png" />
+<link rel="preload" as="image" href="/photos/mist-960.webp" imagesrcset="/photos/mist-960.webp 960w, /photos/mist-1600.webp 1600w" imagesizes="100vw" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,300..600;1,300..400&family=Cormorant+Garamond:ital,wght@0,400;1,400&display=swap" />
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --line: rgb(240 240 240 / 0.11);
+    --ivory: #f2f2f2;
+    --muted: #9a9a9a;
+    --gold: #e6d6bd;
+    --foil: linear-gradient(100deg, #c9b59a 0%, #efe3cf 18%, #fffaf0 28%, #dcc9ab 42%, #a8927a 56%, #e6d6bd 72%, #fbf3e4 82%, #c9b59a 100%);
+    --serif: 'Cormorant Garamond', Georgia, serif;
+    --sans: 'Jost', 'Avenir Next', system-ui, sans-serif;
+    --gutter: clamp(1rem, 5vw, 4rem);
+    --ease: cubic-bezier(0.22, 0.8, 0.2, 1);
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { background: var(--bg); color: var(--ivory); font: 300 1rem/1.6 var(--sans); -webkit-font-smoothing: antialiased; }
+  html[data-lang='en'] body [lang='fr'], html[data-lang='fr'] body [lang='en'] { display: none !important; }
+  img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  a { color: inherit; }
+  .wrap { max-width: 72rem; margin: 0 auto; padding: 0 var(--gutter); }
+  .label { font-size: 0.7rem; letter-spacing: 0.32em; text-transform: uppercase; color: var(--gold); }
+  h1, h2, h3 { font-family: var(--serif); font-weight: 400; line-height: 1.05; letter-spacing: -0.01em; }
+  h2 { font-size: clamp(2rem, 6vw, 3.4rem); margin: 0.6rem 0 1.2rem; }
+  em { font-style: italic; }
+  .foil { background: var(--foil); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  section { padding: clamp(4rem, 10vw, 7rem) 0; border-top: 1px solid var(--line); }
+  p.lead { max-width: 38rem; color: rgb(242 242 242 / 0.8); font-size: 1.05rem; }
+  .muted { color: var(--muted); }
+
+  /* language and PDF controls */
+  .bar { position: fixed; top: max(0.9rem, env(safe-area-inset-top)); right: 0.9rem; z-index: 10; display: flex; gap: 0.4rem; }
+  .bar button { font: 400 0.7rem/1 var(--sans); letter-spacing: 0.18em; text-transform: uppercase; color: var(--ivory); background: rgb(10 10 10 / 0.55); border: 1px solid rgb(242 242 242 / 0.25); border-radius: 999px; padding: 0.55rem 0.8rem; -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); cursor: pointer; }
+  .bar button[aria-pressed='true'] { background: var(--ivory); color: var(--bg); border-color: var(--ivory); }
+  .bar .sep { width: 0.3rem; }
+
+  /* cover */
+  .cover { position: relative; min-height: 100svh; display: grid; align-items: end; overflow: hidden; }
+  .cover > img { position: absolute; inset: 0; object-position: 50% 30%; filter: brightness(0.7) saturate(0.85); transform: scale(1.04); animation: drift 14s var(--ease) forwards; }
+  @keyframes drift { to { transform: scale(1); } }
+  .cover::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgb(10 10 10 / 0.25) 0%, transparent 35%, rgb(10 10 10 / 0.92) 88%); }
+  .cover .wrap { position: relative; z-index: 1; padding-bottom: clamp(2.5rem, 8vh, 5rem); width: 100%; }
+  .cover h1 { font-size: clamp(3.2rem, 13vw, 8rem); margin: 0.8rem 0 1rem; }
+  .cover h1 .x { font-family: var(--sans); font-weight: 200; font-size: 0.5em; vertical-align: 0.35em; color: var(--muted); padding: 0 0.15em; }
+  .cover p { max-width: 30rem; color: rgb(242 242 242 / 0.85); }
+  .cover .logo { width: 9rem; height: auto; margin-bottom: 1.5rem; opacity: 0.9; }
+  .viewfinder { position: absolute; inset: 1.1rem; z-index: 1; pointer-events: none; --c: rgb(242 242 242 / 0.55);
+    background:
+      linear-gradient(var(--c), var(--c)) top left / 1.6rem 1px no-repeat, linear-gradient(var(--c), var(--c)) top left / 1px 1.6rem no-repeat,
+      linear-gradient(var(--c), var(--c)) top right / 1.6rem 1px no-repeat, linear-gradient(var(--c), var(--c)) top right / 1px 1.6rem no-repeat,
+      linear-gradient(var(--c), var(--c)) bottom left / 1.6rem 1px no-repeat, linear-gradient(var(--c), var(--c)) bottom left / 1px 1.6rem no-repeat,
+      linear-gradient(var(--c), var(--c)) bottom right / 1.6rem 1px no-repeat, linear-gradient(var(--c), var(--c)) bottom right / 1px 1.6rem no-repeat; }
+  .rec { position: absolute; top: max(2rem, calc(env(safe-area-inset-top) + 1rem)); left: 2.2rem; z-index: 2; font: 400 0.7rem/1 ui-monospace, Menlo, monospace; letter-spacing: 0.2em; color: rgb(242 242 242 / 0.75); }
+  .rec::before { content: ''; display: inline-block; width: 0.45rem; height: 0.45rem; border-radius: 50%; background: #c0392b; margin-right: 0.5rem; animation: blink 1.6s steps(2) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  /* the parts Saba fills in: dashed, with a small tag */
+  .slot { position: relative; border: 1px dashed rgb(230 214 189 / 0.45); border-radius: 3px; color: var(--muted); }
+  .tag { display: inline-block; font: 400 0.6rem/1 var(--sans); letter-spacing: 0.2em; text-transform: uppercase; color: var(--bg); background: var(--gold); border-radius: 999px; padding: 0.3rem 0.55rem; }
+  .slot .tag { position: absolute; top: 0.7rem; right: 0.7rem; }
+
+  /* stats */
+  .grid { display: grid; gap: 1px; background: var(--line); border: 1px solid var(--line); }
+  .stats { grid-template-columns: repeat(2, 1fr); margin-top: 2.5rem; }
+  .stat { background: var(--bg); padding: 1.4rem 1.2rem; }
+  .stat b { display: block; font: 400 clamp(1.9rem, 6vw, 2.8rem)/1 var(--serif); }
+  .stat span { display: block; font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); }
+  .stat.todo b { color: var(--muted); font-size: 1.4rem; border-bottom: 1px dashed var(--muted); display: inline-block; padding-bottom: 0.2rem; margin-bottom: 0.5rem; min-width: 3rem; }
+  @media (min-width: 760px) { .stats { grid-template-columns: repeat(4, 1fr); } }
+  .insights { margin-top: 1rem; display: grid; place-items: center; min-height: 9rem; padding: 2.5rem 1.2rem 1.5rem; text-align: center; font-size: 0.9rem; }
+
+  .audience { margin-top: 3rem; display: grid; gap: 1.5rem; }
+  @media (min-width: 860px) { .audience { grid-template-columns: 1.2fr 1fr; gap: 3rem; align-items: start; } }
+  .audience h3 { font-size: 1.8rem; margin-bottom: 0.7rem; }
+
+  /* pillars */
+  .pillars { display: grid; gap: 1.4rem; margin-top: 2rem; }
+  @media (min-width: 860px) { .pillars { grid-template-columns: repeat(3, 1fr); } }
+  .pillars div { padding-left: 1.2rem; border-left: 1px solid var(--gold); }
+  .pillars strong { display: block; font-weight: 500; letter-spacing: 0.04em; }
+  .pillars p { color: var(--muted); font-size: 0.95rem; }
+  .credit { margin-top: 2rem; font-size: 0.8rem; color: var(--muted); }
+
+  /* before / after and the sample reel */
+  .duo { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; margin-top: 2.5rem; }
+  .duo .slot { aspect-ratio: 4 / 5; display: grid; align-content: end; padding: 1rem; }
+  .duo .slot strong { color: var(--ivory); font-weight: 400; font-family: var(--serif); font-size: 1.3rem; }
+  .duo .slot small { font-size: 0.8rem; }
+  .reel { margin-top: 2.5rem; display: grid; gap: 2rem; align-items: center; }
+  @media (min-width: 760px) { .reel { grid-template-columns: 16rem 1fr; } }
+  .reel .slot { aspect-ratio: 9 / 16; width: min(12rem, 60vw); display: grid; place-items: center; text-align: center; padding: 1.5rem; }
+  .play { width: 3.4rem; height: 3.4rem; border-radius: 50%; border: 1px solid rgb(242 242 242 / 0.5); display: grid; place-items: center; margin: 0 auto 1rem; }
+  .play::before { content: ''; border-left: 0.75rem solid var(--ivory); border-top: 0.45rem solid transparent; border-bottom: 0.45rem solid transparent; margin-left: 0.2rem; }
+
+  /* past brands and the case study */
+  .logos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem; margin-top: 2.5rem; }
+  @media (min-width: 760px) { .logos { grid-template-columns: repeat(6, 1fr); } }
+  .logos .slot { aspect-ratio: 3 / 2; display: grid; place-items: center; font: italic 400 1rem var(--serif); }
+  .case { margin-top: 1rem; padding: 2rem 1.4rem 1.6rem; }
+  .case h3 { color: var(--ivory); font-size: 1.6rem; margin-bottom: 1.2rem; }
+  .case .grid { grid-template-columns: repeat(2, 1fr); }
+  @media (min-width: 760px) { .case .grid { grid-template-columns: repeat(4, 1fr); } }
+
+  /* ideas */
+  .ideas { display: grid; gap: 1px; margin-top: 2.5rem; }
+  @media (min-width: 860px) { .ideas { grid-template-columns: repeat(2, 1fr); } }
+  .idea { background: var(--bg); padding: 1.8rem 1.5rem; }
+  .idea .k { font-size: 0.7rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--muted); }
+  .idea h3 { font-size: 1.6rem; margin: 0.5rem 0 0.6rem; }
+  .idea p { color: rgb(242 242 242 / 0.78); font-size: 0.95rem; }
+
+  /* offers */
+  .offers { margin-top: 2.5rem; }
+  @media (min-width: 860px) { .offers { grid-template-columns: repeat(2, 1fr); } }
+  .offer { background: var(--bg); padding: 2rem 1.5rem; display: grid; gap: 0.6rem; align-content: start; }
+  .offer .n { font: italic 400 1rem var(--serif); color: var(--gold); }
+  .offer h3 { font-size: 1.7rem; line-height: 1.1; }
+  .offer p { color: var(--muted); font-size: 0.95rem; }
+  .offer ul { padding-left: 1.1rem; color: rgb(242 242 242 / 0.85); font-size: 0.95rem; }
+  .price { margin-top: 0.6rem; display: flex; align-items: baseline; gap: 0.6rem; font-size: 0.75rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); }
+  .price b { font: 400 1.6rem/1 var(--serif); letter-spacing: 0; color: var(--muted); border-bottom: 1px dashed var(--muted); min-width: 4.5rem; }
+
+  /* terms */
+  .terms { margin-top: 2.5rem; }
+  @media (min-width: 860px) { .terms { grid-template-columns: repeat(3, 1fr); } }
+  .term { background: var(--bg); padding: 1.8rem 1.5rem; }
+  .term h3 { font-size: 1.5rem; margin-bottom: 0.9rem; }
+  .term ul { list-style: none; padding: 0; display: grid; gap: 0.6rem; font-size: 0.95rem; color: rgb(242 242 242 / 0.82); }
+  .term li { padding-left: 1rem; position: relative; }
+  .term li::before { content: '—'; position: absolute; left: 0; color: var(--gold); }
+
+  /* calendar */
+  .cal { list-style: none; padding: 0; margin-top: 2rem; }
+  .cal li { display: grid; grid-template-columns: 7.5rem 1fr; gap: 1rem; padding: 1.1rem 0; border-bottom: 1px solid var(--line); }
+  .cal time { font: italic 400 1.15rem var(--serif); color: var(--gold); }
+  .cal strong { font-weight: 500; display: block; }
+  .cal p { color: var(--muted); font-size: 0.92rem; }
+
+  /* process */
+  .steps { list-style: none; padding: 0; margin-top: 2rem; counter-reset: s; }
+  .steps li { counter-increment: s; display: grid; grid-template-columns: 3.5rem 1fr; padding: 1.3rem 0; border-bottom: 1px solid var(--line); }
+  .steps li::before { content: counter(s, decimal-leading-zero); font: italic 400 1.4rem var(--serif); color: var(--gold); }
+  .steps strong { font-weight: 500; display: block; }
+  .steps p { color: var(--muted); font-size: 0.95rem; }
+
+  /* contact */
+  .contact { text-align: center; }
+  .contact h2 { font-size: clamp(2.4rem, 8vw, 4.5rem); }
+  .people { margin: 2.5rem auto 0; max-width: 46rem; text-align: left; }
+  @media (min-width: 700px) { .people { grid-template-columns: 1fr 1fr; } }
+  .people > div { background: var(--bg); padding: 1.6rem 1.4rem; }
+  .people b { display: block; font: 400 1.4rem var(--serif); margin: 0.3rem 0 0.6rem; }
+  .people a { display: block; text-decoration: none; border-bottom: 1px solid var(--line); padding: 0.35rem 0; font-size: 0.95rem; word-break: break-all; }
+  .pdf { margin-top: 2.5rem; font: 400 0.75rem/1 var(--sans); letter-spacing: 0.25em; text-transform: uppercase; color: var(--bg); background: var(--ivory); border: 0; border-radius: 999px; padding: 1rem 1.6rem; cursor: pointer; }
+  footer { padding: 2rem 0 calc(3rem + env(safe-area-inset-bottom)); text-align: center; font-size: 0.75rem; color: var(--muted); letter-spacing: 0.15em; text-transform: uppercase; }
+
+  .reveal { opacity: 0; transform: translateY(18px); transition: opacity 1s var(--ease), transform 1s var(--ease); }
+  .reveal.on { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; } .cover > img, .rec::before { animation: none; } }
+
+  /* Save as PDF: same dark pages, no controls, nothing left hidden by the scroll reveal */
+  @media print {
+    @page { margin: 0; }
+    html, body { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: var(--bg); }
+    .bar, .pdf, .rec::before { display: none !important; }
+    .reveal { opacity: 1 !important; transform: none !important; }
+    .cover { min-height: 100vh; break-after: page; }
+    .cover > img { animation: none; transform: none; }
+    section { padding: 3rem 0; }
+    .offer, .term, .idea, .stat, .case, .cal li, .steps li { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bar" role="group" aria-label="Language">
+  <button type="button" data-set-lang="en" aria-pressed="true">EN</button>
+  <button type="button" data-set-lang="fr" aria-pressed="false">FR</button>
+  <span class="sep"></span>
+  <button type="button" data-pdf>PDF</button>
+</div>
+
+<header class="cover">
+  <img src="/photos/mist-960.webp" srcset="/photos/mist-960.webp 960w, /photos/mist-1600.webp 1600w" sizes="100vw" alt="Saba Majlessi in drifting mist" />
+  <div class="viewfinder" aria-hidden="true"></div>
+  <p class="rec" aria-hidden="true">REC · PARIS</p>
+  <div class="wrap">
+    <img class="logo" src="/brand/luminoor-logo.webp" width="556" height="166" alt="Luminoor Paris" />
+    <p class="label"><span lang="en">Media kit · Brand collaborations</span><span lang="fr">Media kit · Collaborations de marque</span></p>
+    <h1>Saba <span class="x">×</span> <em class="foil">Luminoor</em></h1>
+    <p lang="en">A Paris voice followed by 474K people, photographed the way the street sees her: candid, unposed, caught like a star.</p>
+    <p lang="fr">Une voix de Paris suivie par 474K personnes, photographiée comme la rue la voit : sur le vif, sans pose, saisie comme une star.</p>
+  </div>
+</header>
+
+<main>
+  <!-- the creator -->
+  <section>
+    <div class="wrap">
+      <p class="label"><span lang="en">The creator</span><span lang="fr">La créatrice</span></p>
+      <h2>Saba Majlessi</h2>
+      <p class="lead" lang="en">Paris-based creator with a verified audience that follows her days in the city: style, travel, beauty and the small rituals in between. Based in Paris, travelling across Europe.</p>
+      <p class="lead" lang="fr">Créatrice basée à Paris, compte certifié, suivie au quotidien dans la ville : style, voyage, beauté et tous les petits rituels entre les deux. Basée à Paris, en voyage partout en Europe.</p>
+      <div class="grid stats">
+        <div class="stat"><b>474K</b><span lang="en">Instagram followers</span><span lang="fr">Abonnés Instagram</span></div>
+        <div class="stat"><b>982</b><span lang="en">Posts</span><span lang="fr">Publications</span></div>
+        <div class="stat"><b>Paris</b><span lang="en">Based · verified</span><span lang="fr">Basée · certifiée</span></div>
+        <div class="stat todo"><b>—</b><span lang="en">Avg. reel views</span><span lang="fr">Vues moy. par reel</span></div>
+        <div class="stat todo"><b>—</b><span lang="en">Engagement rate</span><span lang="fr">Taux d'engagement</span></div>
+        <div class="stat todo"><b>—</b><span lang="en">Monthly reach</span><span lang="fr">Portée mensuelle</span></div>
+        <div class="stat todo"><b>—</b><span lang="en">Top countries · cities</span><span lang="fr">Pays · villes clés</span></div>
+        <div class="stat todo"><b>—</b><span lang="en">Audience age · gender</span><span lang="fr">Âge · genre</span></div>
+      </div>
+      <div class="slot insights">
+        <span class="tag">Saba</span>
+        <p lang="en">Screenshots from Instagram Insights, last 30 days: reach, audience, top content.</p>
+        <p lang="fr">Captures d'Instagram Insights, 30 derniers jours : portée, audience, meilleurs contenus.</p>
+      </div>
+
+      <div class="audience">
+        <div>
+          <h3 lang="en">Who's <em>watching</em></h3>
+          <h3 lang="fr">Qui <em>regarde</em></h3>
+          <p class="muted" lang="en">Saba speaks to her audience in Persian: a community spread across Europe, North America and the Gulf, loyal to the voices it trusts and generous on fashion, beauty and travel. It is hard to reach through any other channel, and through her, a brand reaches it in Paris.</p>
+          <p class="muted" lang="fr">Saba s'adresse à son audience en persan : une communauté répartie entre l'Europe, l'Amérique du Nord et le Golfe, fidèle aux voix qu'elle suit et prête à dépenser pour la mode, la beauté et le voyage. Difficile à toucher par un autre canal ; à travers elle, une marque la rencontre à Paris.</p>
+        </div>
+        <div class="slot" style="padding: 2.6rem 1.2rem 1.4rem">
+          <span class="tag">Saba</span>
+          <p lang="en">Top 5 countries with their share, and the main age group, from Insights.</p>
+          <p lang="fr">Top 5 des pays avec leur part, et la tranche d'âge principale, depuis Insights.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- the look -->
+  <section>
+    <div class="wrap reveal">
+      <p class="label"><span lang="en">The look</span><span lang="fr">Le regard</span></p>
+      <h2>Le <em>Flâneur</em></h2>
+      <p class="lead" lang="en">Luminoor is a Paris studio with one signature: candid street photography in the spirit of fashion-week street style. Saba walks the city as she is; the camera follows, unseen, and catches the moments a posed shoot never gets.</p>
+      <p class="lead" lang="fr">Luminoor est un studio parisien à une seule signature : la photo de rue prise sur le vif, dans l'esprit du street style des fashion weeks. Saba marche dans la ville telle qu'elle est ; l'appareil suit, invisible, et saisit ce qu'une séance posée n'attrape jamais.</p>
+      <div class="pillars">
+        <div><strong lang="en">Unposed, not staged</strong><strong lang="fr">Sans pose, sans mise en scène</strong><p lang="en">The product lives in a real moment, so it reads as desire, not advertising.</p><p lang="fr">Le produit vit dans un vrai moment : on y lit le désir, pas la publicité.</p></div>
+        <div><strong lang="en">Paris as the set</strong><strong lang="fr">Paris pour décor</strong><p lang="en">Saint-Germain cafés, the Louvre's arcades, Île Saint-Louis at dusk. Scouted for each brand.</p><p lang="fr">Cafés de Saint-Germain, arcades du Louvre, l'Île Saint-Louis au crépuscule. Repérés pour chaque marque.</p></div>
+        <div><strong lang="en">One team, end to end</strong><strong lang="fr">Une équipe, de bout en bout</strong><p lang="en">Creator, photographer and edit together: brands brief once and get finished content.</p><p lang="fr">Créatrice, photographe et retouche ensemble : un seul brief, un contenu fini.</p></div>
+      </div>
+      <p class="credit"><span lang="en">Photography</span><span lang="fr">Photographie</span> · Hojjat · Luminoor Paris · <a href="https://luminoor.studio/">luminoor.studio</a></p>
+    </div>
+  </section>
+
+  <!-- before / after and the sample reel -->
+  <section>
+    <div class="wrap">
+      <p class="label"><span lang="en">The difference</span><span lang="fr">La différence</span></p>
+      <h2 lang="en">Same moment, <em>two eyes</em></h2>
+      <h2 lang="fr">Même instant, <em>deux regards</em></h2>
+      <p class="lead" lang="en">What a phone catches, and what Le Flâneur catches, of the very same scene.</p>
+      <p class="lead" lang="fr">Ce que capte un téléphone, et ce que capte Le Flâneur, d'une même scène.</p>
+      <div class="duo">
+        <div class="slot"><span class="tag">Shoot</span><strong lang="en">Phone snapshot</strong><strong lang="fr">Photo au téléphone</strong><small lang="en">Posed, flat light</small><small lang="fr">Posée, lumière plate</small></div>
+        <div class="slot"><span class="tag">Shoot</span><strong>Le Flâneur</strong><small lang="en">Candid, Paris light</small><small lang="fr">Sur le vif, lumière de Paris</small></div>
+      </div>
+      <div class="reel">
+        <div class="slot"><span class="tag">Shoot</span><div><span class="play" aria-hidden="true"></span><p lang="en">15-second sample reel</p><p lang="fr">Reel exemple, 15 secondes</p></div></div>
+        <div>
+          <h3 style="font-size: 1.8rem; margin-bottom: 0.7rem" lang="en">Fifteen seconds of <em>Paris</em></h3>
+          <h3 style="font-size: 1.8rem; margin-bottom: 0.7rem" lang="fr">Quinze secondes de <em>Paris</em></h3>
+          <p class="muted" lang="en">Saba crosses the street, the camera finds her, focuses, and takes the shot: the product sits inside a scene that feels found, not made. Every reel is cut to music and sized for Reels, Stories and TikTok.</p>
+          <p class="muted" lang="fr">Saba traverse la rue, l'objectif la trouve, fait le point et déclenche : le produit vit dans une scène trouvée, pas fabriquée. Chaque reel est monté en musique, au format Reels, Stories et TikTok.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- trusted by + case study -->
+  <section>
+    <div class="wrap">
+      <p class="label"><span lang="en">Trusted by</span><span lang="fr">Ils lui font confiance</span></p>
+      <h2 lang="en">Brands she has <em>worked with</em></h2>
+      <h2 lang="fr">Marques avec qui elle a <em>travaillé</em></h2>
+      <div class="logos">
+        <div class="slot">—</div><div class="slot">—</div><div class="slot">—</div>
+        <div class="slot">—</div><div class="slot">—</div><div class="slot">—</div>
+      </div>
+      <div class="slot case">
+        <span class="tag">Saba</span>
+        <p class="label"><span lang="en">Case study</span><span lang="fr">Étude de cas</span></p>
+        <h3 lang="en">Brand · campaign · format</h3>
+        <h3 lang="fr">Marque · campagne · format</h3>
+        <div class="grid">
+          <div class="stat todo"><b>—</b><span lang="en">Views</span><span lang="fr">Vues</span></div>
+          <div class="stat todo"><b>—</b><span lang="en">Engagement</span><span lang="fr">Engagement</span></div>
+          <div class="stat todo"><b>—</b><span lang="en">Link clicks</span><span lang="fr">Clics</span></div>
+          <div class="stat todo"><b>—</b><span lang="en">Code uses · sales</span><span lang="fr">Codes · ventes</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ideas -->
+  <section>
+    <div class="wrap">
+      <p class="label"><span lang="en">Ideas</span><span lang="fr">Idées</span></p>
+      <h2 lang="en">Picture your brand <em>here</em></h2>
+      <h2 lang="fr">Imaginez votre marque <em>ici</em></h2>
+      <div class="grid ideas reveal">
+        <div class="idea">
+          <p class="k"><span lang="en">Fragrance</span><span lang="fr">Parfum</span></p>
+          <h3 lang="en">Seven a.m., <em>Saint-Germain</em></h3><h3 lang="fr">Sept heures, <em>Saint-Germain</em></h3>
+          <p lang="en">The café shutters go up; Saba passes with the bottle in her bag, stops at the window, and the light catches the glass. One reel, three frames.</p>
+          <p lang="fr">Les rideaux des cafés se lèvent ; Saba passe, le flacon dans son sac, s'arrête devant la vitrine et la lumière accroche le verre. Un reel, trois images.</p>
+        </div>
+        <div class="idea">
+          <p class="k"><span lang="en">Jewellery</span><span lang="fr">Joaillerie</span></p>
+          <h3 lang="en">The Seine, <em>after dark</em></h3><h3 lang="fr">La Seine, <em>à la nuit</em></h3>
+          <p lang="en">Pont des Arts at night, a hand on the railing, the piece lit by the river. Shot from a distance, as if the city had caught her.</p>
+          <p lang="fr">Le pont des Arts la nuit, une main sur la rambarde, le bijou éclairé par le fleuve. Pris de loin, comme si la ville l'avait surprise.</p>
+        </div>
+        <div class="idea">
+          <p class="k"><span lang="en">Hotel · restaurant</span><span lang="fr">Hôtel · restaurant</span></p>
+          <h3 lang="en">Checking in, <em>unseen</em></h3><h3 lang="fr">Arrivée <em>incognito</em></h3>
+          <p lang="en">From the taxi door to the room with a view, a stay told like a sighting. Stories the same night, carousel the next morning.</p>
+          <p lang="fr">De la portière du taxi à la chambre avec vue, un séjour raconté comme une apparition. Stories le soir même, carrousel le lendemain.</p>
+        </div>
+        <div class="idea">
+          <p class="k"><span lang="en">Seasonal</span><span lang="fr">Saisonnier</span></p>
+          <h3 lang="en">Nowruz <em>in Paris</em></h3><h3 lang="fr">Norouz <em>à Paris</em></h3>
+          <p lang="en">The Persian New Year, 20 March: a gifting capsule, a spring walk and the moment that matters most to her audience, with your product at its centre.</p>
+          <p lang="fr">Le Nouvel An persan, le 20 mars : une capsule cadeaux, une promenade de printemps et le moment le plus fort pour son audience, avec votre produit au centre.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- offers -->
+  <section>
+    <div class="wrap">
+      <p class="label"><span lang="en">For brands</span><span lang="fr">Pour les marques</span></p>
+      <h2 lang="en">Ways to work <em>together</em></h2>
+      <h2 lang="fr">Travailler <em>ensemble</em></h2>
+      <div class="grid offers reveal">
+        <div class="offer">
+          <span class="n">I.</span>
+          <h3>The Sighting</h3>
+          <p lang="en">One product, one Paris moment.</p><p lang="fr">Un produit, un instant de Paris.</p>
+          <ul lang="en"><li>1 feed carousel, published as a Collab post</li><li>3 stories with link</li><li>10 edited photos for the brand's own channels</li></ul>
+          <ul lang="fr"><li>1 carrousel publié en Collab</li><li>3 stories avec lien</li><li>10 photos retouchées pour les canaux de la marque</li></ul>
+          <p class="price"><span lang="en">From</span><span lang="fr">À partir de</span> <b>€ —</b></p>
+        </div>
+        <div class="offer">
+          <span class="n">II.</span>
+          <h3>The Story</h3>
+          <p lang="en">A full day in the city, told as a candid reel.</p><p lang="fr">Une journée entière en ville, racontée en reel sur le vif.</p>
+          <ul lang="en"><li>1 reel + 1 carousel</li><li>Story sequence across the day</li><li>25 edited photos, 3 months usage</li></ul>
+          <ul lang="fr"><li>1 reel + 1 carrousel</li><li>Stories tout au long de la journée</li><li>25 photos retouchées, 3 mois d'utilisation</li></ul>
+          <p class="price"><span lang="en">From</span><span lang="fr">À partir de</span> <b>€ —</b></p>
+        </div>
+        <div class="offer">
+          <span class="n">III.</span>
+          <h3 lang="en">Content only</h3><h3 lang="fr">Contenu seul</h3>
+          <p lang="en">No posting: Le Flâneur imagery for the brand's site, ads and social.</p><p lang="fr">Sans publication : des images Le Flâneur pour le site, les publicités et les réseaux de la marque.</p>
+          <ul lang="en"><li>Half or full day in Paris</li><li>Photos and short vertical clips</li><li>Usage rights by agreement</li></ul>
+          <ul lang="fr"><li>Demi-journée ou journée à Paris</li><li>Photos et courts formats verticaux</li><li>Droits d'utilisation sur accord</li></ul>
+          <p class="price"><span lang="en">From</span><span lang="fr">À partir de</span> <b>€ —</b></p>
+        </div>
+        <div class="offer">
+          <span class="n">IV.</span>
+          <h3 lang="en">Fashion Week &amp; events</h3><h3 lang="fr">Fashion Week &amp; événements</h3>
+          <p lang="en">Street style outside the shows, openings and launches, delivered the same night.</p><p lang="fr">Street style devant les défilés, ouvertures et lancements, livré le soir même.</p>
+          <ul lang="en"><li>Live stories during the event</li><li>Next-morning carousel</li><li>Selects for the brand's press</li></ul>
+          <ul lang="fr"><li>Stories en direct pendant l'événement</li><li>Carrousel le lendemain matin</li><li>Sélection pour la presse de la marque</li></ul>
+          <p class="price"><span lang="en">From</span><span lang="fr">À partir de</span> <b>€ —</b></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- terms -->
+  <section>
+    <div class="wrap">
+      <p class="label"><span lang="en">Terms</span><span lang="fr">Conditions</span></p>
+      <h2 lang="en">The <em>fine print</em></h2>
+      <h2 lang="fr">Les <em>conditions</em></h2>
+      <div class="grid terms reveal">
+        <div class="term">
+          <h3 lang="en">Usage rights</h3><h3 lang="fr">Droits d'utilisation</h3>
+          <ul lang="en"><li>3 months of organic use on the brand's channels, included</li><li>Paid ads, whitelisting or longer use: quoted separately</li><li>Photos credited to @luminoor.paris</li></ul>
+          <ul lang="fr"><li>3 mois d'utilisation organique sur les canaux de la marque, inclus</li><li>Publicité payante, whitelisting ou durée plus longue : sur devis</li><li>Crédit photo @luminoor.paris</li></ul>
+        </div>
+        <div class="term">
+          <h3 lang="en">Timing</h3><h3 lang="fr">Délais</h3>
+          <ul lang="en"><li>Book at least two weeks ahead</li><li>Edited selection within 72 hours</li><li>One round of changes; publication on an agreed date</li><li>Results shared 7 days after posting</li></ul>
+          <ul lang="fr"><li>Réservation au moins deux semaines à l'avance</li><li>Sélection retouchée sous 72 heures</li><li>Une série de retouches ; publication à une date convenue</li><li>Statistiques partagées 7 jours après publication</li></ul>
+        </div>
+        <div class="term">
+          <h3 lang="en">Exclusivity</h3><h3 lang="fr">Exclusivité</h3>
+          <ul lang="en"><li>One brand per category at a time, for the month of the campaign</li><li>Longer exclusivity on request</li><li>Posts labelled “Collaboration commerciale”, as French law requires</li></ul>
+          <ul lang="fr"><li>Une seule marque par catégorie pendant le mois de la campagne</li><li>Exclusivité plus longue sur demande</li><li>Publications signalées « Collaboration commerciale », comme l'exige la loi</li></ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- calendar -->
+  <section>
+    <div class="wrap">
+      <p class="label"><span lang="en">The year in Paris</span><span lang="fr">L'année à Paris</span></p>
+      <h2 lang="en">Moments to <em>book early</em></h2>
+      <h2 lang="fr">Les moments à <em>réserver tôt</em></h2>
+      <ol class="cal">
+        <li><time lang="en">January</time><time lang="fr">Janvier</time><div><strong lang="en">Men's Fashion Week · winter sales</strong><strong lang="fr">Fashion Week Homme · soldes d'hiver</strong></div></li>
+        <li><time lang="en">February</time><time lang="fr">Février</time><div><strong lang="en">Valentine's Day</strong><strong lang="fr">Saint-Valentin</strong><p lang="en">Jewellery, fragrance, restaurants.</p><p lang="fr">Joaillerie, parfum, restaurants.</p></div></li>
+        <li><time lang="en">Late Feb – March</time><time lang="fr">Fin fév. – mars</time><div><strong lang="en">Paris Fashion Week, women's</strong><strong lang="fr">Paris Fashion Week, femme</strong><p lang="en">Street style outside the shows.</p><p lang="fr">Street style devant les défilés.</p></div></li>
+        <li><time lang="en">20 March</time><time lang="fr">20 mars</time><div><strong lang="en">Nowruz</strong><strong lang="fr">Norouz</strong><p lang="en">The Persian New Year: the peak moment for her audience.</p><p lang="fr">Le Nouvel An persan : le temps fort de son audience.</p></div></li>
+        <li><time lang="en">June</time><time lang="fr">Juin</time><div><strong lang="en">Men's Fashion Week · summer in the city</strong><strong lang="fr">Fashion Week Homme · l'été à Paris</strong></div></li>
+        <li><time lang="en">Late Sept – Oct</time><time lang="fr">Fin sept. – oct.</time><div><strong lang="en">Paris Fashion Week, women's</strong><strong lang="fr">Paris Fashion Week, femme</strong></div></li>
+        <li><time lang="en">Nov – Dec</time><time lang="fr">Nov. – déc.</time><div><strong lang="en">Holiday gifting · Yalda night, 21 December</strong><strong lang="fr">Cadeaux des fêtes · nuit de Yalda, 21 décembre</strong></div></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- process -->
+  <section>
+    <div class="wrap">
+      <p class="label"><span lang="en">How it works</span><span lang="fr">Comment ça marche</span></p>
+      <h2 lang="en">Brief to <em>post</em></h2>
+      <h2 lang="fr">Du brief à la <em>publication</em></h2>
+      <ol class="steps">
+        <li><div><strong>Brief</strong><p lang="en">Product, message, dates and usage. One call.</p><p lang="fr">Produit, message, dates et usage. Un seul appel.</p></div></li>
+        <li><div><strong lang="en">Scouting</strong><strong lang="fr">Repérage</strong><p lang="en">Locations and light chosen for the brand; a short moodboard to approve.</p><p lang="fr">Lieux et lumière choisis pour la marque ; un moodboard court à valider.</p></div></li>
+        <li><div><strong lang="en">The walk</strong><strong lang="fr">La balade</strong><p lang="en">Saba moves through Paris, Luminoor follows and shoots candid.</p><p lang="fr">Saba traverse Paris, Luminoor suit et photographie sur le vif.</p></div></li>
+        <li><div><strong lang="en">Selection</strong><strong lang="fr">Sélection</strong><p lang="en">Edited photos within 72 hours, with one round of changes.</p><p lang="fr">Photos retouchées sous 72 heures, avec une série de retouches.</p></div></li>
+        <li><div><strong>Publication</strong><p lang="en">Posted as a Collab, tagged and labelled. Results shared after 7 days.</p><p lang="fr">Publié en Collab, identifié et signalé. Statistiques partagées après 7 jours.</p></div></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- contact -->
+  <section class="contact">
+    <div class="wrap">
+      <p class="label">Contact</p>
+      <h2 lang="en">Let's be <em>seen</em></h2>
+      <h2 lang="fr">Faisons-nous <em>remarquer</em></h2>
+      <div class="grid people">
+        <div><span class="label"><span lang="en">Creator</span><span lang="fr">Créatrice</span></span><b>Saba Majlessi</b><a href="https://www.instagram.com/saba.majlessi/">@saba.majlessi</a><a href="mailto:saba.majlessi14@gmail.com">saba.majlessi14@gmail.com</a></div>
+        <div><span class="label"><span lang="en">Photography</span><span lang="fr">Photographie</span></span><b>Luminoor Paris</b><a href="https://www.instagram.com/luminoor.paris/">@luminoor.paris</a><a href="mailto:bonjour@luminoor.studio">bonjour@luminoor.studio</a><a href="https://luminoor.studio/">luminoor.studio</a></div>
+      </div>
+      <button class="pdf" type="button" data-pdf><span lang="en">Save as PDF</span><span lang="fr">Enregistrer en PDF</span></button>
+    </div>
+  </section>
+</main>
+
+<footer>Paris · 2026</footer>
+
+<script>
+  // language: ?lang=fr in the link, else the last choice, else the browser's
+  const root = document.documentElement;
+  const setLang = (l) => {
+    root.dataset.lang = l;
+    root.lang = l;
+    document.querySelectorAll('[data-set-lang]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.setLang === l)));
+    try { localStorage.setItem('mk-lang', l); } catch {}
+  };
+  let stored = null;
+  try { stored = localStorage.getItem('mk-lang'); } catch {}
+  const asked = new URLSearchParams(location.search).get('lang');
+  setLang(['en', 'fr'].includes(asked) ? asked : stored || (navigator.language.startsWith('fr') ? 'fr' : 'en'));
+  document.querySelectorAll('[data-set-lang]').forEach((b) => b.addEventListener('click', () => setLang(b.dataset.setLang)));
+
+  // PDF: the browser's own print, where "Save as PDF" lives (on iPhone: Share › Print › pinch out › Share)
+  document.querySelectorAll('[data-pdf]').forEach((b) => b.addEventListener('click', () => window.print()));
+
+  const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('on'); io.unobserve(e.target); } }), { threshold: 0.15 });
+  document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+  addEventListener('beforeprint', () => document.querySelectorAll('.reveal').forEach((el) => el.classList.add('on')));
+</script>
+</body>
+</html>

@@ -9,3 +9,6 @@ dist/
 
 # Instagram videos (made from photos/, not part of the site)
 /reels/
+
+# private pitch material, not part of the site
+/media-kit/
