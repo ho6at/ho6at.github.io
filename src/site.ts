@@ -2,7 +2,9 @@
 export const site = {
   name: 'Luminoor',
   email: 'bonjour@luminoor.studio',
-  instagram: 'https://www.instagram.com/luminoor.galerie/',
+  instagram: 'https://www.instagram.com/luminoor.paris/',
+  // the photographer's own page, shown under his name in the team section
+  photographerInstagram: 'https://www.instagram.com/ho6at/',
   whatsapp: '', // e.g. 'https://wa.me/33600000000' — leave empty to hide
   city: 'Paris',
   // Search engines may index the site (set to false to hide it again).

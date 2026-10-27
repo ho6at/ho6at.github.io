@@ -313,6 +313,11 @@ const strings = {
             <h3>{p.name}</h3>
             <p class="role">{p.role}</p>
             <p class="person-body">{p.body}</p>
+            {i === 0 && site.photographerInstagram && (
+              <a class="person-ig" href={site.photographerInstagram} rel="me" dir="ltr">
+                @{site.photographerInstagram.replace(/\/$/, '').split('/').pop()}
+              </a>
+            )}
           </article>
         ))
       }
@@ -1139,6 +1144,19 @@ const strings = {
     .lb-nav {
       display: grid;
     }
+  }
+
+  .person-ig {
+    display: inline-block;
+    margin-top: 0.8rem;
+    font-size: 0.85rem;
+    letter-spacing: 0.04em;
+    color: #e6d6bd;
+    text-decoration: none;
+    border-bottom: 1px solid rgb(230 214 189 / 0.35);
+  }
+  .person-ig:hover {
+    border-color: #e6d6bd;
   }
 
   /* Reviews */
