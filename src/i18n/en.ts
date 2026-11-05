@@ -49,6 +49,8 @@ const en: typeof fr = {
       'louvre-arch': { alt: 'A couple in silhouette, foreheads touching, under the Passage Richelieu arch facing the Louvre pyramid, the crowd blurring past, in black and white', place: 'Passage Richelieu, Louvre' },
       'louvre-arcades': { alt: 'A bride in a long white dress glancing back under the Louvre arcades, in black and white', place: 'The Louvre arcades' },
       'procope': { alt: 'A couple in sunglasses standing still in front of Le Procope while passers-by blur behind them, in black and white', place: 'Le Procope, Saint-Germain' },
+      'procope-passersby': { alt: 'A woman in a checked shirt standing still in front of Le Procope while passers-by blur past and two diners look on, an old portrait behind the glass, in black and white', place: 'Le Procope, Saint-Germain' },
+      'window-reflection': { alt: 'A woman’s face reflected in a rain-speckled café window at night, her hair dark in the foreground, in black and white', place: 'A café window at night' },
       'cafe-motion': { alt: 'A woman walking past a café terrace while passers-by blur around her', place: 'A café terrace' },
       'regrattier': { alt: 'A couple embracing on Rue Le Regrattier as a passer-by walks through the foreground, in black and white', place: 'Rue Le Regrattier, Île Saint-Louis' },
       'eiffel-night': { alt: 'A couple dressed in white in a Paris street, the lit Eiffel Tower behind them', place: 'The Eiffel Tower' },
