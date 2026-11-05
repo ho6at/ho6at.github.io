@@ -6,6 +6,7 @@ export const photos = [
   { id: 'couple-night-run', w: 4032, h: 6048, light: 'night', kind: 'couple', bw: true, sizes: [480, 960, 1600], focus: [0.43, 0.585], focus2: [0.72, 0.56] },
   { id: 'regrattier', w: 2160, h: 3240, light: 'day', kind: 'couple', bw: true, sizes: [480, 960, 1600], focus: [0.535, 0.53] },
   { id: 'window-diner', w: 1024, h: 1536, light: 'night', kind: 'solo', bw: true, sizes: [480, 960, 1024], focus: [0.53, 0.585] },
+  { id: 'cafe-mirror', w: 1536, h: 2304, light: 'day', kind: 'solo', bw: true, sizes: [480, 960, 1536], focus: [0.445, 0.37] },
   { id: 'procope', w: 6048, h: 4032, light: 'day', kind: 'couple', bw: true, sizes: [720, 1440, 2400], focus: [0.43, 0.325], focus2: [0.675, 0.27] },
   { id: 'louvre-arch', w: 1024, h: 1536, light: 'golden', kind: 'couple', bw: true, sizes: [480, 960, 1024], focus: [0.475, 0.497] },
   { id: 'louvre-arcades', w: 1024, h: 1536, light: 'day', kind: 'solo', bw: true, sizes: [480, 960, 1024], focus: [0.505, 0.385] },

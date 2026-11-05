@@ -43,6 +43,7 @@ export default {
       'rain': { alt: 'Une silhouette sous un parapluie au bout d’une rue trempée, les vitrines reflétées sur le trottoir', place: 'Sous la pluie' },
       'mist': { alt: 'Une femme en blanc debout dans un nuage de brume, sous une rotonde parisienne', place: 'Dans la brume' },
       'window-diner': { alt: 'Un homme dîne seul derrière une vitrine de restaurant marquée « Plats à emporter », en noir et blanc', place: 'Une vitrine de restaurant' },
+      'cafe-mirror': { alt: 'Une femme se met du rouge à lèvres dans le vieux miroir d’un café, vue par-dessus son épaule, en noir et blanc', place: 'Le miroir d’un café' },
       'louvre-arch': { alt: 'Un couple en silhouette, front contre front, sous l’arche du passage Richelieu face à la pyramide du Louvre, la foule floue autour d’eux, en noir et blanc', place: 'Passage Richelieu, Louvre' },
       'louvre-arcades': { alt: 'Une mariée en longue robe blanche se retourne sous les arcades du Louvre, en noir et blanc', place: 'Les arcades du Louvre' },
       'procope': { alt: 'Un couple en lunettes de soleil, immobile devant le Procope, les passants flous derrière eux, en noir et blanc', place: 'Le Procope, Saint-Germain' },

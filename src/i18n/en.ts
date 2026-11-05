@@ -45,6 +45,7 @@ const en: typeof fr = {
       'rain': { alt: 'A lone figure under an umbrella at the end of a rain-soaked street, shop lights reflected on the pavement', place: 'In the rain' },
       'mist': { alt: 'A woman in white standing in a cloud of mist beneath a Parisian rotunda', place: 'In the mist' },
       'window-diner': { alt: 'A man dining alone behind a restaurant window lettered “Plats à emporter”, in black and white', place: 'A restaurant window' },
+      'cafe-mirror': { alt: 'A woman putting on lipstick in an old café mirror, seen over her shoulder, in black and white', place: 'A café mirror' },
       'louvre-arch': { alt: 'A couple in silhouette, foreheads touching, under the Passage Richelieu arch facing the Louvre pyramid, the crowd blurring past, in black and white', place: 'Passage Richelieu, Louvre' },
       'louvre-arcades': { alt: 'A bride in a long white dress glancing back under the Louvre arcades, in black and white', place: 'The Louvre arcades' },
       'procope': { alt: 'A couple in sunglasses standing still in front of Le Procope while passers-by blur behind them, in black and white', place: 'Le Procope, Saint-Germain' },
