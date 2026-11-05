@@ -21,6 +21,18 @@ Puis ouvrir http://localhost:4321.
 | Mise en page et styles | `src/components/Home.astro`, `src/styles/global.css` |
 | Mentions légales | `src/pages/mentions-legales/index.astro` |
 
+## Édition des photos (look Luminoor)
+
+`scripts/luminoor_edit.py` applique le noir et blanc maison (mesuré sur la galerie, à 60 %, réglages classiques uniquement, sans IA). Les originaux ne sont jamais modifiés ; tout ce qui est dans `photos/` reste hors de git.
+
+```bash
+python3 scripts/luminoor_edit.py photos/_inbox/*.jpg              # plein cadre -> photos/_edited/
+python3 scripts/luminoor_edit.py photos/_inbox/*.jpg --instagram  # 4:5 + signature -> photos/_edited/instagram/
+python3 scripts/luminoor_edit.py photo.jpg --site mon-id          # fichiers de la galerie dans public/photos/
+```
+
+La signature est lue depuis `photos/_brand/signature-ho6at.png`. Pillow est requis (`python3 -m pip install --user pillow`).
+
 Le bandeau du haut change de couleur selon la lumière réelle à Paris (aube, jour, heure dorée, heure bleue, nuit) : `src/lib/sun.ts`.
 
 ## Avant la mise en ligne
