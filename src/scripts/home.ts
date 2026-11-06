@@ -211,25 +211,33 @@ const stops = () => {
 const duration = 1100;
 const ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 let moving = false;
-const glide = (to: number, done = () => {}) => {
+// `to` can be a function: the target is then read again on every frame, so the glide still lands on
+// its section when the layout moves on the way (images arriving, a phone's toolbar, the gallery's frames).
+const glide = (to: number | (() => number), done = () => {}) => {
+  const target = typeof to === 'function' ? to : () => to;
   moving = true;
   root.style.scrollSnapType = 'none';
   const finish = () => {
-    root.style.scrollSnapType = '';
+    // a last check once things have settled: some phones let a snap point catch the page on the way
     setTimeout(() => {
-      moving = false;
-      done();
-    }, 120); // let trackpad momentum die down before the next move
+      const end = target();
+      if (Math.abs(window.scrollY - end) > 2) window.scrollTo({ top: end, behavior: 'instant' });
+      root.style.scrollSnapType = '';
+      setTimeout(() => {
+        moving = false;
+        done();
+      }, 120); // let trackpad momentum die down before the next move
+    }, 60);
   };
   if (reduceMotion) {
-    window.scrollTo({ top: to, behavior: 'instant' });
+    window.scrollTo({ top: target(), behavior: 'instant' });
     return finish();
   }
   const from = window.scrollY;
   const start = performance.now();
   const step = (now: number) => {
     const t = Math.min(1, (now - start) / duration);
-    window.scrollTo({ top: from + (to - from) * ease(t), behavior: 'instant' });
+    window.scrollTo({ top: from + (target() - from) * ease(t), behavior: 'instant' });
     if (t < 1) requestAnimationFrame(step);
     else finish();
   };
@@ -244,7 +252,7 @@ document.addEventListener('click', (e) => {
   const section = id ? document.getElementById(id) : null;
   if (!section) return;
   e.preventDefault();
-  glide(id === 'top' ? 0 : snapPoint(section));
+  glide(id === 'top' ? 0 : () => snapPoint(section));
   history.replaceState(null, '', `#${id}`);
 });
 

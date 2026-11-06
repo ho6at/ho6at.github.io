@@ -48,6 +48,8 @@ export default {
       'louvre-arcades': { alt: 'Une mariée en longue robe blanche se retourne sous les arcades du Louvre, en noir et blanc', place: 'Les arcades du Louvre' },
       'procope': { alt: 'Un couple en lunettes de soleil, immobile devant le Procope, les passants flous derrière eux, en noir et blanc', place: 'Le Procope, Saint-Germain' },
       'procope-passersby': { alt: 'Une femme en chemise à carreaux, immobile devant le Procope, les passants flous devant elle et deux dîneurs qui la regardent, un vieux portrait derrière la vitre, en noir et blanc', place: 'Le Procope, Saint-Germain' },
+      'smoking-scarf': { alt: 'Une femme en foulard et bottes blanches fume sur le seuil d’une porte et jette un regard à l’objectif, deux hommes flous au premier plan, en noir et blanc', place: 'Un seuil de porte à Paris' },
+      'fog-rotunda': { alt: 'Une femme en robe portefeuille claire sort d’un nuage de brume sous la rotonde de la Bourse de Commerce, une manche levée vers le visage, en noir et blanc', place: 'Bourse de Commerce' },
       'window-reflection': { alt: 'Le visage d’une femme reflété dans la vitre d’un café constellée de pluie, la nuit, ses cheveux sombres au premier plan, en noir et blanc', place: 'La vitre d’un café, la nuit' },
       'cafe-motion': { alt: 'Une femme passe devant une terrasse de café, les passants flous autour d’elle', place: 'Une terrasse de café' },
       'regrattier': { alt: 'Un couple enlacé rue Le Regrattier, un passant au premier plan, en noir et blanc', place: 'Rue Le Regrattier, île Saint-Louis' },
