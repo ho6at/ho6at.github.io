@@ -150,6 +150,13 @@ const en: typeof fr = {
       'Hello Luminoor,\n\nI’d like to book a session:\n{summary}\n\nEstimated total: {price}\n\n{note}\n\nThanks,\n{name}\n{contact}',
     around: 'around',
     sheetTitle: 'Book a session',
+    pending: {
+      title: 'Bookings open soon',
+      body: 'We’re not taking new sessions just yet. Drop us a line and you’ll be the first to know when bookings open.',
+      cta: 'Notify me',
+      subject: 'Luminoor waiting list',
+      message: 'Hello Luminoor,\n\nPlease let me know when bookings open.\n\nThanks,',
+    },
     steps: ['Kind of session', 'Your session', 'Add-ons', 'Date and light', 'Your details', 'Summary'],
     next: 'Continue',
     back: 'Back',

@@ -571,8 +571,18 @@ function check(name: string, value?: string) {
   if (input) input.checked = true;
 }
 
+// Bookings paused (site.bookingOpen = false): the page has a small "bookings open soon" dialog, opened instead of the form
+const pending = document.querySelector<HTMLDialogElement>('[data-pending]');
+if (pending) {
+  pending.querySelector('[data-pending-close]')?.addEventListener('click', () => pending.close());
+  pending.addEventListener('click', (e) => {
+    if (e.target === pending) pending.close();
+  });
+}
+
 $$<HTMLElement>('[data-open-booking]').forEach((b) =>
   b.addEventListener('click', () => {
+    if (pending) return pending.showModal();
     applyPreset(b.dataset.package ?? '');
     check('light', b.dataset.light);
     go(0);
@@ -598,7 +608,8 @@ go(0);
   if (params.has('book')) {
     applyPreset(params.get('book') || '');
     go(0);
-    sheet.showModal();
+    if (pending) pending.showModal();
+    else sheet.showModal();
     history.replaceState(null, '', location.pathname + location.hash);
   }
 }

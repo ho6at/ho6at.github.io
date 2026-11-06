@@ -30,7 +30,8 @@ export function homeSchema(t: typeof fr, pageUrl: string, siteUrl: string) {
         description: [p.places, p.photos, p.bonus, p.style].filter(Boolean).join('. '),
         price: p.price,
         priceCurrency: 'EUR',
-        availability: 'https://schema.org/InStock',
+        // while bookings are paused the offers are announced, not bookable
+        availability: site.bookingOpen ? 'https://schema.org/InStock' : 'https://schema.org/PreOrder',
         itemOffered: { '@type': 'Service', name: `${t.sessions.title} — ${p.name}`, areaServed: 'Paris' },
       })),
     },

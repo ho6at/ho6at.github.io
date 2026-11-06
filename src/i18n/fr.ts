@@ -148,6 +148,13 @@ export default {
       'Bonjour Luminoor,\n\nJe souhaite réserver une séance :\n{summary}\n\nTotal estimé : {price}\n\n{note}\n\nMerci,\n{name}\n{contact}',
     around: 'vers',
     sheetTitle: 'Réserver une séance',
+    pending: {
+      title: 'Réservations bientôt ouvertes',
+      body: 'Nous ne prenons pas de nouvelles séances pour le moment. Laissez-nous un mot : vous serez les premiers prévenus à l’ouverture des réservations.',
+      cta: 'Me prévenir',
+      subject: 'Liste d’attente Luminoor',
+      message: 'Bonjour Luminoor,\n\nPrévenez-moi quand les réservations ouvriront.\n\nMerci,',
+    },
     steps: ['Type de séance', 'Votre séance', 'Options', 'Date et lumière', 'Vos coordonnées', 'Récapitulatif'],
     next: 'Continuer',
     back: 'Retour',

@@ -247,7 +247,53 @@ const presetName = (id: Preset) => s.packages.find((p) => p.id === id)?.name ?? 
   </form>
 </dialog>
 
+{
+  !site.bookingOpen && (
+    <dialog class="sheet pending" data-pending aria-labelledby="pending-title">
+      <div class="pending-inner">
+        <button type="button" class="close" data-pending-close aria-label={s.close}>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" /></svg>
+        </button>
+        <h2 id="pending-title">{s.pending.title}</h2>
+        <p>{s.pending.body}</p>
+        <a
+          class="button"
+          href={`mailto:${site.email}?subject=${encodeURIComponent(s.pending.subject)}&body=${encodeURIComponent(s.pending.message)}`}
+        >
+          {s.pending.cta}
+        </a>
+      </div>
+    </dialog>
+  )
+}
+
 <style>
+  .pending {
+    width: min(28rem, calc(100vw - 2rem));
+  }
+  .pending-inner {
+    position: relative;
+    display: grid;
+    gap: 1rem;
+    padding: 2rem 1.75rem 1.75rem;
+  }
+  .pending-inner h2 {
+    margin: 0;
+    padding-inline-end: 2.5rem;
+  }
+  .pending-inner p {
+    margin: 0;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+  .pending-inner .close {
+    position: absolute;
+    top: 1rem;
+    inset-inline-end: 1rem;
+  }
+  .pending-inner .button {
+    justify-self: start;
+  }
   .sheet {
     padding: 0;
     border: 0;
