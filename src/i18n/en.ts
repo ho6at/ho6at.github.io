@@ -152,10 +152,14 @@ const en: typeof fr = {
     sheetTitle: 'Book a session',
     pending: {
       title: 'Bookings open soon',
+      notice: 'Bookings open soon. Explore our sessions and prices now.',
+      heroCta: 'See sessions and prices',
       body: 'We’re not taking new sessions just yet. Drop us a line and you’ll be the first to know when bookings open.',
       cta: 'Notify me',
       subject: 'Luminoor waiting list',
-      message: 'Hello Luminoor,\n\nPlease let me know when bookings open.\n\nThanks,',
+      banner: 'Bookings open soon: build your session to see the price, and we’ll let you know when bookings open.',
+      message:
+        'Hello Luminoor,\n\nPlease let me know when bookings open. The session I have in mind:\n{summary}\n\nEstimated total: {price}\n\n{note}\n\nThanks,\n{name}\n{contact}',
     },
     steps: ['Kind of session', 'Your session', 'Add-ons', 'Date and light', 'Your details', 'Summary'],
     next: 'Continue',

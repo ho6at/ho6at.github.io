@@ -39,6 +39,7 @@ const presetName = (id: Preset) => s.packages.find((p) => p.id === id)?.name ?? 
         {s.steps.map(() => <span />)}
       </div>
     </header>
+    {!site.bookingOpen && <p class="pending-banner">{s.pending.banner}</p>}
 
     <div class="viewport">
       <div class="track" data-track-steps>
@@ -229,10 +230,10 @@ const presetName = (id: Preset) => s.packages.find((p) => p.id === id)?.name ?? 
             </div>
           </div>
           <div class="send">
-            <a class="button" data-send-email href={`mailto:${site.email}`}>{s.sendEmail}</a>
-            {site.whatsapp && <a class="button ghost" data-send-wa href={site.whatsapp}>{s.sendWhatsapp}</a>}
+            <a class="button" data-send-email href={`mailto:${site.email}`}>{site.bookingOpen ? s.sendEmail : s.pending.cta}</a>
+            {site.bookingOpen && site.whatsapp && <a class="button ghost" data-send-wa href={site.whatsapp}>{s.sendWhatsapp}</a>}
           </div>
-          <p class="hint">{s.reassurance}</p>
+          <p class="hint">{site.bookingOpen ? s.reassurance : s.pending.body}</p>
         </div>
       </div>
     </div>
@@ -247,52 +248,17 @@ const presetName = (id: Preset) => s.packages.find((p) => p.id === id)?.name ?? 
   </form>
 </dialog>
 
-{
-  !site.bookingOpen && (
-    <dialog class="sheet pending" data-pending aria-labelledby="pending-title">
-      <div class="pending-inner">
-        <button type="button" class="close" data-pending-close aria-label={s.close}>
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" /></svg>
-        </button>
-        <h2 id="pending-title">{s.pending.title}</h2>
-        <p>{s.pending.body}</p>
-        <a
-          class="button"
-          href={`mailto:${site.email}?subject=${encodeURIComponent(s.pending.subject)}&body=${encodeURIComponent(s.pending.message)}`}
-        >
-          {s.pending.cta}
-        </a>
-      </div>
-    </dialog>
-  )
-}
 
 <style>
-  .pending {
-    width: min(28rem, calc(100vw - 2rem));
-  }
-  .pending-inner {
-    position: relative;
-    display: grid;
-    gap: 1rem;
-    padding: 2rem 1.75rem 1.75rem;
-  }
-  .pending-inner h2 {
-    margin: 0;
-    padding-inline-end: 2.5rem;
-  }
-  .pending-inner p {
-    margin: 0;
+  /* bookings paused: a slim note under the sheet header */
+  .pending-banner {
+    margin: 0 1.5rem 0.75rem;
+    padding: 0.6rem 0.9rem;
+    border: 1px solid var(--line);
+    border-radius: 12px;
     color: var(--muted);
-    line-height: 1.6;
-  }
-  .pending-inner .close {
-    position: absolute;
-    top: 1rem;
-    inset-inline-end: 1rem;
-  }
-  .pending-inner .button {
-    justify-self: start;
+    font-size: 0.88rem;
+    line-height: 1.5;
   }
   .sheet {
     padding: 0;

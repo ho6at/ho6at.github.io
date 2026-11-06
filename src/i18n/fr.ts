@@ -150,10 +150,14 @@ export default {
     sheetTitle: 'Réserver une séance',
     pending: {
       title: 'Réservations bientôt ouvertes',
+      notice: 'Réservations bientôt ouvertes. Découvrez dès maintenant nos séances et leurs prix.',
+      heroCta: 'Voir les séances et les prix',
       body: 'Nous ne prenons pas de nouvelles séances pour le moment. Laissez-nous un mot : vous serez les premiers prévenus à l’ouverture des réservations.',
       cta: 'Me prévenir',
       subject: 'Liste d’attente Luminoor',
-      message: 'Bonjour Luminoor,\n\nPrévenez-moi quand les réservations ouvriront.\n\nMerci,',
+      banner: 'Réservations bientôt ouvertes : composez votre séance pour voir le prix, nous vous préviendrons à l’ouverture.',
+      message:
+        'Bonjour Luminoor,\n\nPrévenez-moi quand les réservations ouvriront. La séance qui m’intéresse :\n{summary}\n\nTotal estimé : {price}\n\n{note}\n\nMerci,\n{name}\n{contact}',
     },
     steps: ['Type de séance', 'Votre séance', 'Options', 'Date et lumière', 'Vos coordonnées', 'Récapitulatif'],
     next: 'Continuer',

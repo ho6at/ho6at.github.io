@@ -24,8 +24,9 @@ const strings = {
   locale: t.locale,
   email: site.email,
   whatsapp: site.whatsapp,
-  subject: t.sessions.subject,
-  message: t.sessions.message,
+  // while bookings are paused the same builder sends a waiting-list e-mail with the chosen session
+  subject: site.bookingOpen ? t.sessions.subject : t.sessions.pending.subject,
+  message: site.bookingOpen ? t.sessions.message : t.sessions.pending.message,
   around: t.sessions.around,
   packages: t.sessions.packages,
   custom: t.sessions.custom,
@@ -80,9 +81,10 @@ const strings = {
       <h1><span class="sr-only">{t.meta.h1Prefix}</span>{t.hero.title}</h1>
       <p class="hero-lead">{t.hero.lead}</p>
       <div class="hero-actions">
-        <button class="button" type="button" data-open-booking>{t.hero.cta}</button>
+        <button class="button" type="button" data-open-booking>{site.bookingOpen ? t.hero.cta : t.sessions.pending.heroCta}</button>
         <a class="button ghost" href="#gallery">{t.hero.ctaSecondary}</a>
       </div>
+      {!site.bookingOpen && <p class="hero-pending">{t.sessions.pending.notice}</p>}
     </div>
 
   </section>
@@ -700,6 +702,15 @@ const strings = {
   .hero .hero-actions {
     justify-content: center;
     animation: enter 1.4s var(--ease) 1.5s both;
+  }
+  /* bookings paused: one quiet line under the hero buttons */
+  .hero-pending {
+    margin: 1.25rem auto 0;
+    max-width: 34rem;
+    color: var(--muted);
+    font-size: 0.9rem;
+    letter-spacing: 0.01em;
+    animation: enter 1.4s var(--ease) 1.7s both;
   }
   @keyframes enter {
     from {
