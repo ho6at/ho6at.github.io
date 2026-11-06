@@ -3,9 +3,9 @@
 // people → add-ons → date and light → contact → summary. The price is worked out live by lib/pricing.ts
 // (the same formula as the package prices shown elsewhere); scripts/home.ts drives the steps.
 import { site } from '../site';
-import { PRICES, PHOTO_TIERS, SHOOTS, PRESETS, MAX_LOCATIONS, MAX_OUTFITS, presetPrice, type Preset } from '../lib/pricing';
+import { PRICES, PHOTO_TIERS, SHOOTS, MAX_LOCATIONS, MAX_OUTFITS } from '../lib/pricing';
 import { languages } from '../i18n/languages';
-import { src as photoSrc, type PhotoId } from '../lib/photos';
+import { photo, src as photoSrc, type PhotoId } from '../lib/photos';
 import type fr from '../i18n/fr';
 
 interface Props {
@@ -18,10 +18,13 @@ const num = (n: number) => new Intl.NumberFormat(t.locale).format(n);
 const eur = (n: number) =>
   new Intl.NumberFormat(t.locale, { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(n);
 const shootLight = { street: 'day', couple: 'golden', proposal: 'blue', friends: 'dawn' } as const;
-const shootPhoto: Partial<Record<string, PhotoId>> = { street: 'night-hat', couple: 'couple-night-run', proposal: 'eiffel-night', friends: 'cafe-motion' };
+// black and white frames from the gallery; the square crop centres on the subject (the photo's focus)
+const shootPhoto: Partial<Record<string, PhotoId>> = { street: 'cafe-mirror', couple: 'couple-night-run', proposal: 'regrattier', friends: 'smoking-scarf' };
+const thumbPosition = (id: PhotoId) => {
+  const f = 'focus' in photo(id) ? (photo(id) as { focus: readonly number[] }).focus : [0.5, 0.35];
+  return `object-position: ${Math.round(f[0] * 100)}% ${Math.round(f[1] * 100)}%`;
+};
 const lights = ['dawn', 'day', 'golden', 'blue'] as const;
-const presets = Object.keys(PRESETS) as Preset[];
-const presetName = (id: Preset) => s.packages.find((p) => p.id === id)?.name ?? id;
 ---
 
 <dialog class="sheet" data-sheet aria-labelledby="sheet-title">
@@ -52,7 +55,7 @@ const presetName = (id: Preset) => s.packages.find((p) => p.id === id)?.name ?? 
                 <label class="option">
                   <input type="radio" name="shoot" value={id} checked={id === 'street'} />
                   {shootPhoto[id] ? (
-                    <img class="thumb photo" src={photoSrc(shootPhoto[id]!).replace(/-\d+\.webp$/, '-480.webp')} alt="" width="480" height="720" loading="lazy" decoding="async" />
+                    <img class="thumb photo" src={photoSrc(shootPhoto[id]!).replace(/-\d+\.webp$/, '-480.webp')} alt="" width="480" height="720" style={thumbPosition(shootPhoto[id]!)} loading="lazy" decoding="async" />
                   ) : (
                     <span class={`thumb plate plate-${shootLight[id]}`} aria-hidden="true" />
                   )}
@@ -70,19 +73,6 @@ const presetName = (id: Preset) => s.packages.find((p) => p.id === id)?.name ?? 
 
         <!-- 2. Places, photos and people -->
         <div class="pane" data-pane>
-          <div class="field">
-            <span class="field-label">{c.presetsLabel}</span>
-            <div class="presets">
-              {
-                presets.map((id) => (
-                  <button type="button" class="preset" data-preset={id}>
-                    <span class="preset-name">{presetName(id)}</span>
-                    <span class="preset-price">{eur(presetPrice(id))}</span>
-                  </button>
-                ))
-              }
-            </div>
-          </div>
           <div class="row">
             <div class="field">
               <span class="field-label" id="locations-label">{c.locationsLabel}</span>
@@ -490,40 +480,7 @@ const presetName = (id: Preset) => s.packages.find((p) => p.id === id)?.name ?? 
     white-space: nowrap;
   }
 
-  /* Your session: presets, steppers, photo count */
-  .presets {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 0.5rem;
-  }
-  .preset {
-    display: grid;
-    gap: 0.15rem;
-    padding: 0.7rem 0.4rem;
-    border-radius: 16px;
-    border: 1px solid var(--line);
-    background: var(--raised);
-    cursor: pointer;
-    text-align: center;
-    transition:
-      border-color 0.3s var(--ease),
-      background 0.3s var(--ease);
-  }
-  .preset:hover {
-    border-color: var(--line-strong);
-  }
-  .preset:global(.on) {
-    border-color: var(--accent);
-    background: linear-gradient(180deg, rgb(225 225 225 / 0.12), rgb(225 225 225 / 0.03));
-  }
-  .preset-name {
-    font-family: var(--display);
-    font-size: 1.05rem;
-  }
-  .preset-price {
-    font-size: 0.78rem;
-    color: var(--accent-soft);
-  }
+  /* Your session: steppers, photo count */
   .row {
     display: flex;
     flex-wrap: wrap;
@@ -1001,9 +958,6 @@ const presetName = (id: Preset) => s.packages.find((p) => p.id === id)?.name ?? 
     }
     .option {
       grid-template-columns: 3.5rem minmax(0, 1fr) auto;
-    }
-    .presets {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
     .sheet-foot {
       padding-bottom: max(1.25rem, env(safe-area-inset-bottom));

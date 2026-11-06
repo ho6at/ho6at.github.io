@@ -411,7 +411,7 @@ $$<HTMLInputElement>('input[name="shoot"]', form).forEach((r) =>
   }),
 );
 
-// Packages are presets: they fill in places, photos, outfits and the film
+// Packages (from the landing pages and ?book=) fill in places, photos, outfits and the film
 function applyPreset(id: string) {
   const p = PRESETS[id as Preset];
   if (!p) return;
@@ -420,12 +420,6 @@ function applyPreset(id: string) {
   check('photos', String(p.photos));
   $<HTMLInputElement>('input[name="video"]', form).checked = p.video;
 }
-$$<HTMLButtonElement>('[data-preset]', form).forEach((b) =>
-  b.addEventListener('click', () => {
-    applyPreset(b.dataset.preset!);
-    update();
-  }),
-);
 
 const sum = {
   shoot: $('[data-sum-shoot]', form),
@@ -515,13 +509,7 @@ function update() {
   sum.proposal.hidden = shoot !== 'proposal';
   sum.dawn.hidden = light !== 'dawn';
   dates.classList.toggle('off', flexible);
-  $$<HTMLButtonElement>('[data-preset]', form).forEach((b) => {
-    const p = PRESETS[b.dataset.preset as Preset];
-    b.classList.toggle(
-      'on',
-      p.locations === choice.locations && p.photos === choice.photos && p.outfits === choice.outfits && p.video === choice.video,
-    );
-  });
+
 
   // summary
   const lineLabel = (key: string) =>

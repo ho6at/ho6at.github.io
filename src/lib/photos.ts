@@ -3,13 +3,13 @@
 // viewfinder's focus square lands (the face, as a fraction of the 2:3 frame; `focus2` a second face far from the
 // first) and <id>-blur.webp its out-of-focus copy; captions and alt text live in i18n (gallery.items).
 export const photos = [
-  { id: 'couple-night-run', w: 4032, h: 6048, light: 'night', kind: 'couple', bw: true, sizes: [480, 960, 1600], focus: [0.43, 0.585], focus2: [0.72, 0.56] },
+  { id: 'louvre-arch', w: 1024, h: 1536, light: 'golden', kind: 'couple', bw: true, sizes: [480, 960, 1024], focus: [0.475, 0.497] },
   { id: 'regrattier', w: 2160, h: 3240, light: 'day', kind: 'couple', bw: true, sizes: [480, 960, 1600], focus: [0.535, 0.53] },
   { id: 'fog-rotunda', w: 1536, h: 2304, light: 'day', kind: 'solo', bw: true, sizes: [480, 960, 1536], focus: [0.505, 0.412] },
   { id: 'window-diner', w: 1024, h: 1536, light: 'night', kind: 'solo', bw: true, sizes: [480, 960, 1024], focus: [0.53, 0.585] },
   { id: 'cafe-mirror', w: 1536, h: 2304, light: 'day', kind: 'solo', bw: true, sizes: [480, 960, 1536], focus: [0.445, 0.37] },
   { id: 'procope-passersby', w: 4032, h: 6048, light: 'day', kind: 'solo', bw: true, sizes: [480, 960, 1600], focus: [0.515, 0.34] },
-  { id: 'louvre-arch', w: 1024, h: 1536, light: 'golden', kind: 'couple', bw: true, sizes: [480, 960, 1024], focus: [0.475, 0.497] },
+  { id: 'couple-night-run', w: 4032, h: 6048, light: 'night', kind: 'couple', bw: true, sizes: [480, 960, 1600], focus: [0.43, 0.585], focus2: [0.72, 0.56] },
   { id: 'smoking-scarf', w: 1225, h: 1838, light: 'day', kind: 'solo', bw: true, sizes: [480, 960, 1225], focus: [0.33, 0.305] },
   { id: 'louvre-arcades', w: 1024, h: 1536, light: 'day', kind: 'solo', bw: true, sizes: [480, 960, 1024], focus: [0.505, 0.385] },
   { id: 'window-reflection', w: 4032, h: 6048, light: 'night', kind: 'solo', bw: true, sizes: [480, 960, 1600], focus: [0.51, 0.39] },

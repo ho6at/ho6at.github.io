@@ -178,7 +178,6 @@ const en: typeof fr = {
         friends: { name: 'Friends', text: 'Your crew, like a gang at Fashion Week' },
       },
       proposalNote: 'We plan everything discreetly: scouting, timing, and we stay hidden until the big moment.',
-      presetsLabel: 'Start from a package',
       locationsLabel: 'Number of places',
       photosLabel: 'Edited photos',
       photosNote: 'All raw photos are included, whatever you choose.',

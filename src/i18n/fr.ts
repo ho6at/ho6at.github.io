@@ -176,7 +176,6 @@ export default {
         friends: { name: 'Entre amis', text: 'Votre bande, comme à la Fashion Week' },
       },
       proposalNote: 'On organise tout en toute discrétion : repérage, timing, et nous restons cachés jusqu’au grand moment.',
-      presetsLabel: 'Partir d’une formule',
       locationsLabel: 'Nombre de lieux',
       photosLabel: 'Photos retouchées',
       photosNote: 'Toutes les photos brutes sont incluses, quel que soit votre choix.',
